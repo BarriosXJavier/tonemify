@@ -1,3 +1,9 @@
+import ThemeGenerator from "@/components/theme-generator";
+
 export default function Home() {
-  return <main></main>;
+  return (
+    <main>
+      <ThemeGenerator />
+    </main>
+  );
 }
