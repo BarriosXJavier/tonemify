@@ -13,8 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ColorControls } from "@/components/color-controls";
-import { Input } from "@/components/ui/input"; // Ensure this import is present
-
+import { Input } from "@/components/ui/input";
 
 interface ColorConfig {
   hue: number;
@@ -51,6 +50,10 @@ const defaultColors: Record<string, ColorConfig> = {
 };
 
 function hslToHex(h: number, s: number, l: number): string {
+  // Clamp values to valid ranges
+  h = ((h % 360) + 360) % 360; // Ensure hue is between 0-359
+  s = Math.min(Math.max(s, 0), 100); // Saturation between 0-100
+  l = Math.min(Math.max(l, 0), 100); // Lightness between 0-100
   l /= 100;
   const a = (s * Math.min(l, 1 - l)) / 100;
   const f = (n: number) => {
@@ -70,22 +73,22 @@ export default function ThemeGenerator() {
   const [pasteInput, setPasteInput] = useState<string>("");
   const [isPasteDialogOpen, setIsPasteDialogOpen] = useState(false);
   const [savedThemes, setSavedThemes] = useState<Record<string, string>>({});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [themeName, setThemeName] = useState<string>("");
 
-  // Add a new state for the input value
   const [themeInput, setThemeInput] = useState<string>("");
 
   const [isViewSavedThemesOpen, setIsViewSavedThemesOpen] = useState(false);
-  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false); // State for dialog visibility
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false); //
 
   useEffect(() => {
-    const selectedThemeName = localStorage.getItem('selectedTheme');
+    const selectedThemeName = localStorage.getItem("selectedTheme");
     if (selectedThemeName) {
       const themeCSS = localStorage.getItem(selectedThemeName);
       if (themeCSS) {
         setPasteInput(themeCSS);
-        setThemeName(selectedThemeName); 
-        handlePasteTheme(themeCSS);
+        setThemeName(selectedThemeName);
+        handlePasteTheme();
       }
     }
   }, []);
@@ -106,7 +109,7 @@ export default function ThemeGenerator() {
           const hue = parseInt(match[2], 10);
           const saturation = parseInt(match[3], 10);
           const lightness = parseInt(match[4], 10);
-          parsedColors[name] = { hue, saturation, lightness, alpha: 1 }; // Default alpha
+          parsedColors[name] = { hue, saturation, lightness, alpha: 1 };
         }
       };
 
@@ -120,7 +123,6 @@ export default function ThemeGenerator() {
         addColorsFromMatch(darkColors);
       }
 
-      
       const expectedColors = [
         "background",
         "foreground",
@@ -226,14 +228,14 @@ export default function ThemeGenerator() {
   };
 
   const saveTheme = (): void => {
-    const name = themeInput; // Use the input value
+    const name = themeInput;
     if (name) {
       const themeCSS = generateThemeCSS();
-      localStorage.setItem(name, themeCSS); 
+      localStorage.setItem(name, themeCSS);
       setSavedThemes((prev) => ({ ...prev, [name]: themeCSS }));
       toast.success("Theme saved successfully!");
-      setThemeInput(""); // Clear the input after saving
-      setIsSaveDialogOpen(false); // Close the dialog
+      setThemeInput("");
+      setIsSaveDialogOpen(false);
     }
   };
 
@@ -247,19 +249,31 @@ export default function ThemeGenerator() {
               onClick={() => setIsPasteDialogOpen(true)}
               className="mb-2 sm:mb-0"
             >
-              <Clipboard className="w-4 h-4 mr-2" /> {/* Icon for Paste */}
-              Paste CSS Theme
+              <Clipboard className="w-4 h-4 mr-2" />
+              Paste CSS theme
             </Button>
-            <Button variant="outline" onClick={resetToDefault} className="mb-2 sm:mb-0">
-              <RefreshCcw className="w-4 h-4 mr-2" /> {/* Icon for Reset */}
+            <Button
+              variant="outline"
+              onClick={resetToDefault}
+              className="mb-2 sm:mb-0"
+            >
+              <RefreshCcw className="w-4 h-4 mr-2" />
               Reset
             </Button>
-            <Button variant="outline" onClick={() => setIsSaveDialogOpen(true)} className="mb-2 sm:mb-0">
-              <Save className="w-4 h-4 mr-2" /> {/* Icon for Save */}
+            <Button
+              variant="outline"
+              onClick={() => setIsSaveDialogOpen(true)}
+              className="mb-2 sm:mb-0"
+            >
+              <Save className="w-4 h-4 mr-2" />
               Save
             </Button>
-            <Button variant="outline" onClick={copyTheme} className="mb-2 sm:mb-0">
-              <Copy className="w-4 h-4 mr-2" /> {/* Icon for Copy */}
+            <Button
+              variant="outline"
+              onClick={copyTheme}
+              className="mb-2 sm:mb-0"
+            >
+              <Copy className="w-4 h-4 mr-2" />
               Copy Theme CSS
             </Button>
             <Button variant="outline">
@@ -268,21 +282,24 @@ export default function ThemeGenerator() {
           </div>
           {/* Paste Theme Dialog */}
           <Dialog open={isPasteDialogOpen} onOpenChange={setIsPasteDialogOpen}>
-            <DialogContent>
+            <DialogContent className="bg-background/60">
               <DialogHeader>
                 <DialogTitle>Paste CSS Theme</DialogTitle>
               </DialogHeader>
               <textarea
                 value={pasteInput}
                 onChange={(e) => setPasteInput(e.target.value)}
-                className="w-full h-60 border rounded p-2" // Increased height for better visibility
-                placeholder="Paste your CSS theme here..."
+                className="w-full h-60 border rounded p-2"
+                placeholder="Paste your CSS theme..."
               />
               <div className="flex justify-end space-x-2 mt-4">
                 <Button variant="outline" onClick={handlePasteTheme}>
                   Done
                 </Button>
-                <Button variant="outline" onClick={() => setIsPasteDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsPasteDialogOpen(false)}
+                >
                   Cancel
                 </Button>
               </div>
@@ -333,7 +350,7 @@ export default function ThemeGenerator() {
         open={activeColor !== null}
         onOpenChange={(open) => !open && setActiveColor(null)}
       >
-        <DialogContent className="bg-black text-white  dark:bg-white dark:text-black">
+        <DialogContent className="">
           <DialogHeader>
             <DialogTitle className="capitalize">{activeColor}</DialogTitle>
           </DialogHeader>
@@ -375,11 +392,11 @@ export default function ThemeGenerator() {
           <DialogHeader>
             <DialogTitle>Enter a cool theme name</DialogTitle>
           </DialogHeader>
-          <Input 
-            value={themeInput} 
-            onChange={(e) => setThemeInput(e.target.value)} 
-            placeholder="Enter a cool theme name" 
-            className="mb-4" 
+          <Input
+            value={themeInput}
+            onChange={(e) => setThemeInput(e.target.value)}
+            placeholder="Enter a cool theme name"
+            className="mb-4"
           />
           <Button variant="outline" onClick={saveTheme}>
             Save

@@ -2,7 +2,6 @@
 
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ReactNode } from "react";
-import { useTheme } from "next-themes";
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -14,7 +13,7 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "dark",
   attribute = "class",
   enableSystem = true,
   disableTransitionOnChange = false,
@@ -30,9 +29,3 @@ export function ThemeProvider({
     </NextThemesProvider>
   );
 }
-
-// Custom hook to use the theme context
-export const useThemeContext = () => {
-  const { theme, setTheme } = useTheme();
-  return { theme, setTheme };
-};

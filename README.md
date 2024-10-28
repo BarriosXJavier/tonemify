@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tonemify
+
+Tonemify is a web application designed to help users generate, prototype and manage shadcn themes effortlessly. With a user-friendly interface and powerful features, Tonemify allows you to fine tune your themes with ease.
+
+## Features
+
+- **Theme Generation**: Create custom themes using a simple and intuitive interface.
+- **Theme Management**: Save, edit, and delete your themes as needed.
+- **Responsive Design**: Works seamlessly on both desktop and mobile devices.
+- **Dark Mode Support**: Easily switch between light and dark themes.
+- **Clipboard Integration**: Copy your generated themes directly to your clipboard for easy use.
+
+## Technologies Used
+
+- **Frontend**: React, Next.js, TypeScript
+- **Styling**: Tailwind CSS, ShadCN
+- **Icons**: Lucide React
+- **Toast Notifications**: Sonner
 
 ## Getting Started
 
-First, run the development server:
+To get a local copy up and running, follow these steps:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Node.js (version 14 or higher)
+- npm or yarn
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Installation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Clone the repository:
 
-## Learn More
+   ```bash
+   git clone https://github.com/BarriosXJavier/tonemify.git
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. Navigate to the project directory:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   cd tonemify
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Install the dependencies:
 
-## Deploy on Vercel
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    Note that for this project, I used Bun
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. Start the development server:
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+5. Open your browser and go to `http://localhost:3000`.
+
+## Usage
+
+- **Creating a Theme**: Use the theme generator to create a new theme. Adjust the colors and settings as desired.
+- **Saving a Theme**: Once you're satisfied with your theme, save it for future use.
+- **Managing Themes**: Access your saved themes to edit or delete them as needed.
+
+## Contributing
+
+Contributions are welcome! If you have suggestions for improvements or new features, feel free to open an issue or submit a pull request.
+
+1. Fork the repository.
+2. Create your feature branch:
+
+   ```bash
+   git checkout -b feature/YourFeature
+   ```
+
+3. Commit your changes:
+
+   ```bash
+   git commit -m 'Add some feature'
+   ```
+
+4. Push to the branch:
+
+   ```bash
+   git push origin feature/YourFeature
+   ```
+
+5. Open a pull request.
+
+## Contact
+
+- **Author**: David
+- **Email**: [email](mailto:muriithid05@gmail.com)
+- **GitHub**: [BarriosXJavier](https://github.com/BarriosXJavier)
+
+Feel free to reach out if you have any questions or feedback!

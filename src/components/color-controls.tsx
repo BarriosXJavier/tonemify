@@ -26,6 +26,9 @@ export function ColorControls({
   };
 
   const hexToHsl = (hex: string): [number, number, number, number] => {
+    if (!/^#([0-9A-F]{3}){1,2}([0-9A-F]{2})?$/.test(hex)) {
+      throw new Error("Invalid hex color format");
+    }
     const r = parseInt(hex.slice(1, 3), 16) / 255;
     const g = parseInt(hex.slice(3, 5), 16) / 255;
     const b = parseInt(hex.slice(5, 7), 16) / 255;
@@ -51,6 +54,7 @@ export function ColorControls({
 
   const currentColorHex = hslToHex(color.hue, color.saturation, color.lightness, color.alpha);
 
+  
   const hslToRgb = (h: number, s: number, l: number): [number, number, number] => {
     s /= 100;
     l /= 100;
@@ -75,6 +79,8 @@ export function ColorControls({
 
     return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
   };
+
+  const backgroundColor = `rgba(${hslToRgb(color.hue, color.saturation, color.lightness).join(',')}, ${color.alpha})`;
 
   return (
     <div className="space-y-6">
@@ -145,11 +151,11 @@ export function ColorControls({
           min={0}
           max={1}
           step={0.01}
-          onValueChange={([value]) => {
+          onValueChange={([value]: number[]) => {
             onChange("alpha", value);
           }}
           className="h-2 rounded-full"
-          style={{ backgroundColor: `rgba(${hslToRgb(color.hue, color.saturation, color.lightness).join(',')}, ${color.alpha})` }}
+          style={{ backgroundColor }}
         />
       </div>
     </div>

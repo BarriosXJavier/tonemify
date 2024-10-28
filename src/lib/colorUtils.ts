@@ -13,7 +13,7 @@ export function hexToHSL(hex: string) {
     a = parseInt(hex.substring(6, 8), 16) / 255;
   }
 
-  // Calculate min, max, and delta
+
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);
   let h = 0,
