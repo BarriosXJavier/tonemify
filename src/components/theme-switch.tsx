@@ -19,10 +19,10 @@ export function ModeToggle() {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
           <Sun
-            className={`lucide lucide-sun h-[1.2rem] w-[1.2rem] transition-all ${theme === "dark" ? "-rotate-90 scale-0" : "rotate-0 scale-100"}`}
+            className={`h-[1.2rem] w-[1.2rem] transition-all ${theme === "dark" ? "-rotate-90 scale-0" : "rotate-0 scale-100"}`}
           />
           <Moon
-            className={`lucide lucide-moon absolute h-[1.2rem] w-[1.2rem] transition-all ${theme === "dark" ? "rotate-0 scale-100" : "rotate-90 scale-0"}`}
+            className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${theme === "dark" ? "rotate-0 scale-100" : "rotate-90 scale-0"}`}
           />
           <span className="sr-only">Toggle theme</span>
         </Button>

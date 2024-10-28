@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Palette, Coffee, Github } from "lucide-react";
+import { Coffee, Github } from "lucide-react";
 import { ModeToggle } from "./theme-switch";
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
- 
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import {
@@ -20,16 +19,17 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Gem } from "lucide-react";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between bg-background border-b border-gray-200 dark:border-gray-700">
+    <header className="px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between bg-background border-b border-gray-100 dark:border-gray-700 font-mono">
       {/* Logo and Brand Name */}
       <Link className="flex items-center justify-center" href="/">
-        <Palette className="h-6 w-6 text-blue-600" />
-        <span className="ml-3 text-xl sm:text-2xl font-bold">TonemifyLabs</span>
+        <Gem className="h-6 w-6 text-blue-950 dark:text-gray-300" />
+        <span className="ml-1 text-xl sm:text-2xl font-bold">TonemifyLabs</span>
       </Link>
 
       {/* Desktop Navigation */}
@@ -44,7 +44,11 @@ export default function Header() {
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="https://www.buymeacoffee.com" legacyBehavior passHref>
+              <Link
+                href="https://buymeacoffee.com/barrios"
+                legacyBehavior
+                passHref
+              >
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                   <Coffee className="h-5 w-5 mr-2" />
                   <span className="hidden xl:inline">Buy Me a Coffee</span>
@@ -52,7 +56,11 @@ export default function Header() {
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="https://github.com" legacyBehavior passHref>
+              <Link
+                href="https://github.com/BarriosXJavier/tonemify"
+                legacyBehavior
+                passHref
+              >
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                   <Github className="h-5 w-5 mr-2" />
                   <span className="hidden xl:inline">GitHub</span>
@@ -68,9 +76,9 @@ export default function Header() {
       <div className="lg:hidden">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="h-12 w-12">
               <svg
-                className="h-6 w-6"
+                className="h-8 w-8"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -84,35 +92,35 @@ export default function Header() {
               </svg>
             </Button>
           </SheetTrigger>
-          <SheetContent>
+          <SheetContent className="w-[300px]">
             <SheetHeader>
-              <SheetTitle>Navigation</SheetTitle>
+              <SheetTitle className="sr-only">Navigation</SheetTitle>
             </SheetHeader>
-            <div className="flex flex-col space-y-4 mt-4">
+            <div className="flex flex-col space-y-6 mt-8 font-mono">
               <Link
                 href="#contact"
-                className="flex items-center space-x-2 text-sm"
+                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary"
                 onClick={() => setIsOpen(false)}
               >
                 Contact
               </Link>
               <Link
-                href="https://www.buymeacoffee.com"
-                className="flex items-center space-x-2 text-sm"
+                href="https://www.buymeacoffee.com/barrios"
+                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary"
                 onClick={() => setIsOpen(false)}
               >
-                <Coffee className="h-5 w-5" />
+                <Coffee className="h-6 w-6" />
                 <span>Buy Me a Coffee</span>
               </Link>
               <Link
-                href="https://github.com"
-                className="flex items-center space-x-2 text-sm"
+                href="https://github.com/BarriosXJavier/tonemify"
+                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary"
                 onClick={() => setIsOpen(false)}
               >
-                <Github className="h-5 w-5" />
+                <Github className="h-6 w-6" />
                 <span>GitHub</span>
               </Link>
-              <div className="pt-2">
+              <div className="pt-4">
                 <ModeToggle />
               </div>
             </div>

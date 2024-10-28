@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Copy } from "lucide-react";
+import { Copy, RefreshCcw, Save, Clipboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import Link from "next/link";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +13,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ColorControls } from "@/components/color-controls";
+import { Input } from "@/components/ui/input"; // Ensure this import is present
+
 
 interface ColorConfig {
   hue: number;
@@ -47,7 +50,6 @@ const defaultColors: Record<string, ColorConfig> = {
   ring: { hue: 305, saturation: 18, lightness: 71, alpha: 1 },
 };
 
-
 function hslToHex(h: number, s: number, l: number): string {
   l /= 100;
   const a = (s * Math.min(l, 1 - l)) / 100;
@@ -65,22 +67,104 @@ export default function ThemeGenerator() {
   const [colors, setColors] =
     useState<Record<string, ColorConfig>>(defaultColors);
   const [activeColor, setActiveColor] = useState<string | null>(null);
+  const [pasteInput, setPasteInput] = useState<string>("");
+  const [isPasteDialogOpen, setIsPasteDialogOpen] = useState(false);
+  const [savedThemes, setSavedThemes] = useState<Record<string, string>>({});
+  const [themeName, setThemeName] = useState<string>("");
+
+  // Add a new state for the input value
+  const [themeInput, setThemeInput] = useState<string>("");
+
+  const [isViewSavedThemesOpen, setIsViewSavedThemesOpen] = useState(false);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false); // State for dialog visibility
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const themeParam = searchParams.get("theme");
-    if (themeParam) {
-      try {
-        const decodedTheme: Record<string, ColorConfig> = JSON.parse(
-          atob(themeParam)
-        );
-        setColors(decodedTheme);
-        updateCSSVariables(decodedTheme);
-      } catch (e) {
-        console.error("Invalid theme parameter");
+    const selectedThemeName = localStorage.getItem('selectedTheme');
+    if (selectedThemeName) {
+      const themeCSS = localStorage.getItem(selectedThemeName);
+      if (themeCSS) {
+        setPasteInput(themeCSS);
+        setThemeName(selectedThemeName); 
+        handlePasteTheme(themeCSS);
       }
     }
   }, []);
+
+  const handlePasteTheme = () => {
+    try {
+      const parsedColors: Record<string, ColorConfig> = {};
+      const regex = /--([\w-]+):\s*([\d-]+)\s+([\d]+)%\s+([\d]+)%/g;
+
+      // Match the :root and .dark selectors
+      const matches = pasteInput.match(/:root\s*{([^}]*)}/);
+      const darkMatches = pasteInput.match(/\.dark\s*{([^}]*)}/);
+
+      const addColorsFromMatch = (colorString: string) => {
+        let match;
+        while ((match = regex.exec(colorString)) !== null) {
+          const name = match[1];
+          const hue = parseInt(match[2], 10);
+          const saturation = parseInt(match[3], 10);
+          const lightness = parseInt(match[4], 10);
+          parsedColors[name] = { hue, saturation, lightness, alpha: 1 }; // Default alpha
+        }
+      };
+
+      if (matches) {
+        const rootColors = matches[1];
+        addColorsFromMatch(rootColors);
+      }
+
+      if (darkMatches) {
+        const darkColors = darkMatches[1];
+        addColorsFromMatch(darkColors);
+      }
+
+      
+      const expectedColors = [
+        "background",
+        "foreground",
+        "primary",
+        "primary-foreground",
+        "secondary",
+        "secondary-foreground",
+        "accent",
+        "accent-foreground",
+        "card",
+        "card-foreground",
+        "popover",
+        "popover-foreground",
+        "muted",
+        "muted-foreground",
+        "destructive",
+        "destructive-foreground",
+        "border",
+        "input",
+        "ring",
+      ];
+
+      expectedColors.forEach((color) => {
+        if (!parsedColors[color]) {
+          parsedColors[color] = {
+            hue: 0,
+            saturation: 0,
+            lightness: 0,
+            alpha: 1,
+          };
+        }
+      });
+
+      setColors(parsedColors);
+      updateCSSVariables(parsedColors);
+      toast.success("Theme updated successfully!");
+    } catch (error) {
+      console.error("Invalid theme format", error);
+      toast.error("Failed to parse theme. Please check the format.");
+    } finally {
+      setIsPasteDialogOpen(false);
+      setPasteInput("");
+    }
+  };
 
   const updateCSSVariables = (
     themeColors: Record<string, ColorConfig>
@@ -131,17 +215,80 @@ export default function ThemeGenerator() {
     toast.success("Theme CSS copied to clipboard!");
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-4xl mx-auto px-4 py-6">
-        <header className="text-center space-y-2 mb-8">
-          <h1 className="text-3xl font-bold">Tonemify</h1>
-          <p className="text-sm text-muted-foreground">
-            Stop tweaking, Start shipping!
-          </p>
-        </header>
+  const resetToDefault = (): void => {
+    if (JSON.stringify(colors) === JSON.stringify(defaultColors)) {
+      toast.info("Theme is already default!");
+    } else {
+      setColors(defaultColors);
+      updateCSSVariables(defaultColors);
+      toast.success("Theme reset to default!");
+    }
+  };
 
+  const saveTheme = (): void => {
+    const name = themeInput; // Use the input value
+    if (name) {
+      const themeCSS = generateThemeCSS();
+      localStorage.setItem(name, themeCSS); 
+      setSavedThemes((prev) => ({ ...prev, [name]: themeCSS }));
+      toast.success("Theme saved successfully!");
+      setThemeInput(""); // Clear the input after saving
+      setIsSaveDialogOpen(false); // Close the dialog
+    }
+  };
+
+  return (
+    <div className="min-h-screen">
+      <div className="container max-w-4xl mx-auto px-4 py-6">
         <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:space-x-4 items-center justify-center">
+            <Button
+              variant="outline"
+              onClick={() => setIsPasteDialogOpen(true)}
+              className="mb-2 sm:mb-0"
+            >
+              <Clipboard className="w-4 h-4 mr-2" /> {/* Icon for Paste */}
+              Paste CSS Theme
+            </Button>
+            <Button variant="outline" onClick={resetToDefault} className="mb-2 sm:mb-0">
+              <RefreshCcw className="w-4 h-4 mr-2" /> {/* Icon for Reset */}
+              Reset
+            </Button>
+            <Button variant="outline" onClick={() => setIsSaveDialogOpen(true)} className="mb-2 sm:mb-0">
+              <Save className="w-4 h-4 mr-2" /> {/* Icon for Save */}
+              Save
+            </Button>
+            <Button variant="outline" onClick={copyTheme} className="mb-2 sm:mb-0">
+              <Copy className="w-4 h-4 mr-2" /> {/* Icon for Copy */}
+              Copy Theme CSS
+            </Button>
+            <Button variant="outline">
+              <Link href="/saved">View Saved</Link>
+            </Button>
+          </div>
+          {/* Paste Theme Dialog */}
+          <Dialog open={isPasteDialogOpen} onOpenChange={setIsPasteDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Paste CSS Theme</DialogTitle>
+              </DialogHeader>
+              <textarea
+                value={pasteInput}
+                onChange={(e) => setPasteInput(e.target.value)}
+                className="w-full h-60 border rounded p-2" // Increased height for better visibility
+                placeholder="Paste your CSS theme here..."
+              />
+              <div className="flex justify-end space-x-2 mt-4">
+                <Button variant="outline" onClick={handlePasteTheme}>
+                  Done
+                </Button>
+                <Button variant="outline" onClick={() => setIsPasteDialogOpen(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {Object.entries(colors).map(([name, config]) => {
               const hexColor = hslToHex(
@@ -169,9 +316,7 @@ export default function ThemeGenerator() {
                       }}
                     />
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium capitalize">
-                        {name}
-                      </span>
+                      <span className="text-sm font-medium">{name}</span>
                       <span className="text-xs text-muted-foreground font-mono">
                         {hexColor}
                       </span>
@@ -181,11 +326,6 @@ export default function ThemeGenerator() {
               );
             })}
           </div>
-
-          <Button variant="outline" className="w-full" onClick={copyTheme}>
-            <Copy className="w-4 h-4 mr-2" />
-            Copy Theme CSS
-          </Button>
         </div>
       </div>
 
@@ -206,6 +346,47 @@ export default function ThemeGenerator() {
               onHexChange={() => {}}
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* View Saved Themes Dialog */}
+      <Dialog
+        open={isViewSavedThemesOpen}
+        onOpenChange={setIsViewSavedThemesOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Saved Themes</DialogTitle>
+          </DialogHeader>
+          <ul>
+            {Object.entries(savedThemes).map(([name, css]) => (
+              <li key={name}>
+                <strong>{name}</strong>: {css}
+              </li>
+            ))}
+          </ul>
+          <Button onClick={() => setIsViewSavedThemesOpen(false)}>Close</Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* Save Theme Dialog */}
+      <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enter a cool theme name</DialogTitle>
+          </DialogHeader>
+          <Input 
+            value={themeInput} 
+            onChange={(e) => setThemeInput(e.target.value)} 
+            placeholder="Enter a cool theme name" 
+            className="mb-4" 
+          />
+          <Button variant="outline" onClick={saveTheme}>
+            Save
+          </Button>
+          <Button variant="outline" onClick={() => setIsSaveDialogOpen(false)}>
+            Cancel
+          </Button>
         </DialogContent>
       </Dialog>
     </div>
