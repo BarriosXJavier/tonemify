@@ -1,41 +1,25 @@
-"use client";
+"use client"
 
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Bell,
-  ChevronDown,
-  Laptop,
   Moon,
   Sun,
-  Calendar,
-  Settings,
-  Search,
-  CheckCircle2,
-  Send,
+  Clipboard,
 } from "lucide-react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Toggle } from "@/components/ui/toggle";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -43,73 +27,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
-const PreviewPage = () => {
+const DocumentationPage = () => {
   const [notifications, setNotifications] = useState(true);
   const [date, setDate] = useState<Date>();
   const [progress, setProgress] = useState(60);
   const { toast } = useToast();
+  const [theme, setTheme] = useState("light");
 
   useEffect(() => {
-    // Create a style tag and append it to the document
     const styleSheet = document.createElement("style");
     document.head.appendChild(styleSheet);
 
     const handleThemeApplication = (event: CustomEvent) => {
-      // Set the styleSheet content directly to avoid duplicate tags
       styleSheet.textContent = event.detail;
     };
 
@@ -119,7 +51,6 @@ const PreviewPage = () => {
     );
 
     return () => {
-      // Clean up both event listener and appended styleSheet
       window.removeEventListener(
         "apply-theme",
         handleThemeApplication as EventListener
@@ -138,364 +69,247 @@ const PreviewPage = () => {
     });
   };
 
+  const handleCopyToClipboard = () => {
+    const themeStyles = document.querySelector("style")?.textContent || "";
+    navigator.clipboard.writeText(themeStyles).then(() => {
+      toast({
+        title: "Copied to Clipboard",
+        description: "Theme CSS has been copied successfully!",
+      });
+    });
+  };
+
+  const handleThemeChange = (value: string) => {
+    setTheme(value);
+    document.documentElement.setAttribute("data-theme", value);
+    toast({
+      title: "Theme Changed",
+      description: `Switched to ${value} mode`,
+    });
+  };
+
   return (
-    <div className="min-h-screen p-4 space-y-8 " id="preview">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="flex items-center gap-2">
-          {/* Theme Switcher */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Sun className="mr-2 h-4 w-4" />
-                Light
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Moon className="mr-2 h-4 w-4" />
-                Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Laptop className="mr-2 h-4 w-4" />
-                System
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+    <div className="min-h-screen p-8 space-y-12 bg-background/80 dark:bg-background/90 backdrop-blur-sm">
+      {/* Components Preview Section */}
+      <Card className="border-2 border-accent/20 bg-background/95 dark:bg-background/80 shadow-lg hover:shadow-accent/10 transition-all">
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold text-accent dark:text-accent/80">
+            Components Preview
+          </CardTitle>
+          <CardDescription className="text-lg text-primary dark:text-foreground/50">
+            Explore the theming of various UI components below.
+          </CardDescription>
+        </CardHeader>
+      </Card>
 
-          <Toggle
-            pressed={notifications}
-            onPressedChange={handleToggleNotifications}
-          >
-            <Bell className="h-4 w-4" />
-          </Toggle>
-
-          {/* Command Menu */}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Search className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogTitle>Search</DialogTitle>
-            <DialogContent className="sm:max-w-[425px]">
-              <Command>
-                <CommandInput placeholder="Type a command or search..." />
-                <CommandList>
-                  <CommandEmpty>No results found.</CommandEmpty>
-                  <CommandGroup heading="Suggestions">
-                    <CommandItem>
-                      <Calendar className="mr-2 h-4 w-4" />
-                      Calendar
-                    </CommandItem>
-                    <CommandItem>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </CommandItem>
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-
-      {/* Alert Section */}
-      <Alert>
-        <CheckCircle2 className="h-4 w-4" />
-        <AlertTitle>Welcome to the Component Showcase!</AlertTitle>
-        <AlertDescription>
-          This preview demonstrates the versatility of shadcn/ui components.
-        </AlertDescription>
-      </Alert>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column */}
-        <div className="space-y-6">
-          {/* User Profile Card */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src="/api/placeholder/40/40" alt="User" />
-                  <AvatarFallback>JD</AvatarFallback>
-                </Avatar>
-                <div>
-                  <CardTitle>John Doe</CardTitle>
-                  <CardDescription>Premium User</CardDescription>
-                </div>
+      {/* Components Showcase Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* User Profile Card */}
+        <Card className="border border-primary/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-primary dark:text-primary/80">
+              User Profile
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-4 justify-center">
+              <Avatar className="border-2 border-primary/20 shadow-inner dark:shadow-none dark:border-primary/10">
+                <AvatarImage src="/path/to/avatar.jpg" alt="User Avatar" />
+                <AvatarFallback className="bg-primary/10 dark:bg-primary/20 text-primary">
+                  U
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-lg font-medium text-foreground dark:text-foreground/80">
+                  John Doe
+                </p>
+                <p className="text-sm text-muted-foreground dark:text-muted-foreground/70">
+                  johndoe@example.com
+                </p>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                <Badge>Developer</Badge>
-                <Badge variant="secondary">Pro Plan</Badge>
-                <Badge variant="outline">Active</Badge>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Calendar Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Schedule</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CalendarComponent
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="rounded-md border"
-              />
-            </CardContent>
-          </Card>
+        {/* Calendar Card */}
+        <Card className="border border-secondary/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-secondary dark:text-secondary/80">
+              Calendar
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CalendarComponent
+              selected={date}
+              onSelect={(newDate) => setDate(newDate)}
+              className="rounded-lg border border-secondary/20 dark:border-secondary/10 shadow-inner dark:shadow-none"
+            />
+          </CardContent>
+        </Card>
 
-          {/* Progress Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Progress</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Progress value={progress} />
-              <Slider
-                value={[progress]}
-                onValueChange={(value) => setProgress(value[0])}
-                max={100}
-                step={1}
-              />
-            </CardContent>
-          </Card>
-        </div>
+        {/* Project Progress Card */}
+        <Card className="border border-accent/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-accent dark:text-accent/80">
+              Project Progress
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Progress
+              value={progress}
+              className="h-2 bg-accent/20 dark:bg-accent/30 shadow-inner dark:shadow-none"
+            />
+          </CardContent>
+        </Card>
 
-        {/* Middle Column */}
-        <div className="space-y-6">
-          {/* Settings Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Preferences</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Switch */}
+        {/* Settings Card */}
+        <Card className="border border-primary/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-primary dark:text-primary/80">
+              Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <Label htmlFor="notifications">Notifications</Label>
-                <Switch id="notifications" />
+                <Label className="text-muted-foreground dark:text-muted-foreground/70">
+                  Notifications
+                </Label>
+                <Switch
+                  checked={notifications}
+                  onCheckedChange={handleToggleNotifications}
+                  className="data-[state=checked]:bg-primary shadow-inner dark:shadow-none"
+                />
               </div>
-
-              {/* Select */}
-              <div className="space-y-2">
-                <Label>Theme</Label>
-                <Select>
-                  <SelectTrigger>
+              <div className="flex items-center justify-between">
+                <Label className="text-muted-foreground dark:text-muted-foreground/70">
+                  Theme
+                </Label>
+                <Select value={theme} onValueChange={handleThemeChange}>
+                  <SelectTrigger className="w-32 border-primary/20 shadow-inner dark:border-primary/10 dark:shadow-none">
                     <SelectValue placeholder="Select theme" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="light">Light</SelectItem>
                     <SelectItem value="dark">Dark</SelectItem>
-                    <SelectItem value="system">System</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          </CardContent>
+        </Card>
 
-              {/* Radio Group */}
-              <div className="space-y-2">
-                <Label>View Mode</Label>
-                <RadioGroup defaultValue="list">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="list" id="list" />
-                    <Label htmlFor="list">List</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="grid" id="grid" />
-                    <Label htmlFor="grid">Grid</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              {/* Checkbox */}
-              <div className="space-y-2">
-                <Label>Notifications</Label>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="email" />
-                    <Label htmlFor="email">Email</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="push" />
-                    <Label htmlFor="push">Push</Label>
-                  </div>
+        {/* Messages Card */}
+        <Card className="border border-secondary/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-secondary dark:text-secondary/80">
+              Messages
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4 p-3 rounded-lg bg-secondary/5 dark:bg-secondary/10 hover:bg-secondary/10 dark:hover:bg-secondary/20 transition-colors shadow-inner dark:shadow-none">
+                <Avatar className="border-2 border-secondary/20 dark:border-secondary/10">
+                  <AvatarImage src="/path/to/avatar1.jpg" alt="User Avatar" />
+                  <AvatarFallback className="bg-secondary/10 dark:bg-secondary/20">
+                    A
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-medium text-foreground dark:text-foreground/80">
+                    Alice
+                  </p>
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground/70">
+                    Hey, how are you?
+                  </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Collapsible Section */}
-          <Collapsible className="w-full">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Advanced Settings</CardTitle>
-                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </CollapsibleTrigger>
+              <div className="flex items-center space-x-4 p-3 rounded-lg bg-secondary/5 dark:bg-secondary/10 hover:bg-secondary/10 dark:hover:bg-secondary/20 transition-colors shadow-inner dark:shadow-none">
+                <Avatar className="border-2 border-secondary/20 dark:border-secondary/10">
+                  <AvatarImage src="/path/to/avatar2.jpg" alt="User Avatar" />
+                  <AvatarFallback className="bg-secondary/10 dark:bg-secondary/20">
+                    B
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-medium text-foreground dark:text-foreground/80">
+                    Bob
+                  </p>
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground/70">
+                    Let&apos;s catch up soon!
+                  </p>
                 </div>
-              </CardHeader>
-              <CollapsibleContent>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>API Key</Label>
-                    <Input type="password" value="••••••••••••••••" readOnly />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Webhook URL</Label>
-                    <Input placeholder="https://api.example.com/webhook" />
-                  </div>
-                </CardContent>
-              </CollapsibleContent>
-            </Card>
-          </Collapsible>
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-6">
-          {/* Messages Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Messages</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[200px] rounded-md border p-4">
-                <div className="space-y-4">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="flex items-start gap-4">
-                      <Avatar>
-                        <AvatarImage src={`/api/placeholder/${40 + i}/40`} />
-                        <AvatarFallback>U{i + 1}</AvatarFallback>
-                      </Avatar>
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">User {i + 1}</p>
-                        <p className="text-sm text-gray-500">
-                          Message content {i + 1}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </CardContent>
-            <CardFooter>
-              <div className="flex w-full gap-2">
-                <Input placeholder="Type a message..." />
-                <Button size="icon">
-                  <Send className="h-4 w-4" />
-                </Button>
               </div>
-            </CardFooter>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Accordion Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>FAQ</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible>
-                <AccordionItem value="item-1">
-                  <AccordionTrigger>Is it accessible?</AccordionTrigger>
-                  <AccordionContent>
-                    Yes. It adheres to the WAI-ARIA design pattern.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger>Is it responsive?</AccordionTrigger>
-                  <AccordionContent>
-                    Yes. It&apos;s built with a mobile-first approach.
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </CardContent>
-          </Card>
-
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            {/* Sheet */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline">Open Sheet</Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Edit Profile</SheetTitle>
-                  <SheetDescription>
-                    Make changes to your profile here.
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="py-4">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Name</Label>
-                      <Input placeholder="Enter your name" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Bio</Label>
-                      <Textarea placeholder="Tell us about yourself" />
-                    </div>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-
-            {/* Alert Dialog */}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive">Delete Account</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Are you sure you want to delete your account?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. Your account will be
-                    permanently removed.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction>Delete</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-
-          {/* New User Statistics Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>User Statistics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <p>Total Posts: 120</p>
-                <p>Total Comments: 350</p>
-                <p>Followers: 200</p>
+        {/* User Statistics Card */}
+        <Card className="border border-primary/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-primary dark:text-primary/80">
+              User Statistics
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors shadow-inner dark:shadow-none">
+                <Label className="text-muted-foreground dark:text-muted-foreground/70">
+                  Posts
+                </Label>
+                <Badge className="bg-primary/20 dark:bg-primary/30 text-primary">
+                  120
+                </Badge>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors shadow-inner dark:shadow-none">
+                <Label className="text-muted-foreground dark:text-muted-foreground/70">
+                  Followers
+                </Label>
+                <Badge className="bg-primary/20 dark:bg-primary/30 text-primary">
+                  300
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors shadow-inner dark:shadow-none">
+                <Label className="text-muted-foreground dark:text-muted-foreground/70">
+                  Following
+                </Label>
+                <Badge className="bg-primary/20 dark:bg-primary/30 text-primary">
+                  180
+                </Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Logout Button */}
-          <div className="flex justify-end">
-            <Button variant="destructive">Logout</Button>
-          </div>
+        {/* Action Buttons */}
+        <div className="col-span-full flex flex-wrap gap-4 justify-center mt-8">
+          <Button
+            variant="outline"
+            onClick={() => handleThemeChange("light")}
+            className="border-primary hover:bg-primary/10 dark:hover:bg-primary/20"
+          >
+            <Sun className="h-4 w-4 mr-2" /> Light Theme
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => handleThemeChange("dark")}
+            className="border-primary hover:bg-primary/10 dark:hover:bg-primary/20"
+          >
+            <Moon className="h-4 w-4 mr-2" /> Dark Theme
+          </Button>
+
+          {/* Copy Theme Button */}
+          <Button
+            variant="outline"
+            onClick={handleCopyToClipboard}
+            className="border-accent hover:bg-accent/10 dark:hover:bg-accent/20 shadow-md dark:shadow-none"
+          >
+            <Clipboard className="h-4 w-4 mr-2" /> Copy Theme
+          </Button>
         </div>
       </div>
     </div>
   );
 };
 
-export default PreviewPage;
+export default DocumentationPage;
