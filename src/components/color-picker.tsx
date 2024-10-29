@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { Input } from "./ui/input";
 
 interface ColorPickerProps {
   color: string;
@@ -40,14 +41,14 @@ export function ColorPicker({ color, onChange, className }: ColorPickerProps) {
         className="h-10 w-10 cursor-pointer rounded border border-input"
         aria-label="Select color"
       />
-      <input
+      <Input
         type="color"
         value={inputColor}
         ref={colorInputRef}
         onChange={(e) => handleColorChange(e.target.value)}
         className="hidden"
       />
-      <input
+      <Input
         type="text"
         value={inputColor}
         onChange={(e) => handleColorChange(e.target.value)}

@@ -15,72 +15,73 @@ export function ColorControls({
   onHexChange,
 }: ColorControlsProps) {
   const hslToHex = (h: number, s: number, l: number, a: number): string => {
+    h = ((h % 360) + 360) % 360; // Ensure hue is between 0-359
+    s = Math.min(Math.max(s, 0), 100); // Saturation between 0-100
+    l = Math.min(Math.max(l, 0), 100); // Lightness between 0-100
+    a = Math.min(Math.max(a, 0), 1); // Alpha between 0-1
     l /= 100;
-    const aHex = Math.round(a * 255).toString(16).padStart(2, "0");
     const f = (n: number) => {
       const k = (n + h / 30) % 12;
-      const color = l - (s / 100) * Math.min(l, 1 - l) * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-      return Math.round(255 * color).toString(16).padStart(2, "0");
+      const color =
+        l -
+        (a * (s / 100) * Math.min(l, 1 - l)) *
+          Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color)
+        .toString(16)
+        .padStart(2, "0");
     };
-    return `#${f(0)}${f(8)}${f(4)}${aHex}`;
+    return `#${f(0)}${f(8)}${f(4)}${Math.round(a * 255).toString(16).padStart(2, "0")}`;
   };
 
-  const hexToHsl = (hex: string): [number, number, number, number] => {
-    if (!/^#([0-9A-F]{3}){1,2}([0-9A-F]{2})?$/.test(hex)) {
-      throw new Error("Invalid hex color format");
+  const hexToHSL = (hex: string) => {
+    hex = hex.replace("#", "");
+    let r = parseInt(hex.substring(0, 2), 16) / 255;
+    let g = parseInt(hex.substring(2, 4), 16) / 255;
+    let b = parseInt(hex.substring(4, 6), 16) / 255;
+    let a = 1; // Default alpha value
+
+    // Check for alpha channel in hex (e.g., #RRGGBBAA)
+    if (hex.length === 8) {
+      a = parseInt(hex.substring(6, 8), 16) / 255;
     }
-    const r = parseInt(hex.slice(1, 3), 16) / 255;
-    const g = parseInt(hex.slice(3, 5), 16) / 255;
-    const b = parseInt(hex.slice(5, 7), 16) / 255;
-    const a = parseInt(hex.slice(7, 9), 16) / 255 || 1;
 
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
-    let h = 0, s = 0, l = (max + min) / 2;
+    let h = 0,
+      s = 0,
+      l = (max + min) / 2;
 
     if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      const delta = max - min;
+      s = l > 0.5 ? delta / (2 - max - min) : delta / (max + min);
       switch (max) {
-        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-        case g: h = (b - r) / d + 2; break;
-        case b: h = (r - g) / d + 4; break;
+        case r:
+          h = (g - b) / delta + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / delta + 2;
+          break;
+        case b:
+          h = (r - g) / delta + 4;
+          break;
       }
       h *= 60;
     }
 
-    return [Math.round(h), Math.round(s * 100), Math.round(l * 100), a];
+    return {
+      hue: Math.round(h),
+      saturation: Math.round(s * 100),
+      lightness: Math.round(l * 100),
+      alpha: Math.round(a * 100), // Return alpha as a percentage
+    };
   };
 
-  const currentColorHex = hslToHex(color.hue, color.saturation, color.lightness, color.alpha);
-
-  
-  const hslToRgb = (h: number, s: number, l: number): [number, number, number] => {
-    s /= 100;
-    l /= 100;
-    const c = (1 - Math.abs(2 * l - 1)) * s;
-    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-    const m = l - c / 2;
-
-    let r = 0, g = 0, b = 0;
-    if (h < 60) {
-      r = c; g = x; b = 0;
-    } else if (h < 120) {
-      r = x; g = c; b = 0;
-    } else if (h < 180) {
-      r = 0; g = c; b = x;
-    } else if (h < 240) {
-      r = 0; g = x; b = c;
-    } else if (h < 300) {
-      r = x; g = 0; b = c;
-    } else {
-      r = c; g = 0; b = x;
-    }
-
-    return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
-  };
-
-  const backgroundColor = `rgba(${hslToRgb(color.hue, color.saturation, color.lightness).join(',')}, ${color.alpha})`;
+  const currentColorHex = hslToHex(
+    color.hue,
+    color.saturation,
+    color.lightness,
+    color.alpha / 100 // Use alpha from color config
+  );
 
   return (
     <div className="space-y-6">
@@ -89,14 +90,13 @@ export function ColorControls({
         <ColorPicker
           color={currentColorHex}
           onChange={(hex) => {
-            const [h, s, l, a] = hexToHsl(hex);
-            onChange("hue", h);
-            onChange("saturation", s);
-            onChange("lightness", l);
-            onChange("alpha", a);
+            const { hue, saturation, lightness, alpha } = hexToHSL(hex);
+            onChange("hue", hue);
+            onChange("saturation", saturation);
+            onChange("lightness", lightness);
+            onChange("alpha", alpha); // Update alpha
             onHexChange(hex);
           }}
-          
         />
       </div>
       <div className="space-y-2">
@@ -108,10 +108,14 @@ export function ColorControls({
           step={1}
           onValueChange={([value]) => {
             onChange("hue", value);
-            onHexChange(hslToHex(value, color.saturation, color.lightness, color.alpha));
+            onHexChange(
+              hslToHex(value, color.saturation, color.lightness, color.alpha / 100)
+            );
           }}
           className="h-2 rounded-full"
-          style={{ backgroundColor: `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)` }}
+          style={{
+            backgroundColor: `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`,
+          }}
         />
       </div>
       <div className="space-y-2">
@@ -123,10 +127,14 @@ export function ColorControls({
           step={1}
           onValueChange={([value]) => {
             onChange("saturation", value);
-            onHexChange(hslToHex(color.hue, value, color.lightness, color.alpha));
+            onHexChange(
+              hslToHex(color.hue, value, color.lightness, color.alpha / 100)
+            );
           }}
           className="h-2 rounded-full"
-          style={{ backgroundColor: `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)` }}
+          style={{
+            backgroundColor: `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`,
+          }}
         />
       </div>
       <div className="space-y-2">
@@ -138,10 +146,14 @@ export function ColorControls({
           step={1}
           onValueChange={([value]) => {
             onChange("lightness", value);
-            onHexChange(hslToHex(color.hue, color.saturation, value, color.alpha));
+            onHexChange(
+              hslToHex(color.hue, color.saturation, value, color.alpha / 100)
+            );
           }}
           className="h-2 rounded-full"
-          style={{ backgroundColor: `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)` }}
+          style={{
+            backgroundColor: `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`,
+          }}
         />
       </div>
       <div className="space-y-2">
@@ -149,13 +161,18 @@ export function ColorControls({
         <Slider
           value={[color.alpha]}
           min={0}
-          max={1}
-          step={0.01}
-          onValueChange={([value]: number[]) => {
+          max={100}
+          step={1}
+          onValueChange={([value]) => {
             onChange("alpha", value);
+            onHexChange(
+              hslToHex(color.hue, color.saturation, color.lightness, value / 100)
+            );
           }}
           className="h-2 rounded-full"
-          style={{ backgroundColor }}
+          style={{
+            backgroundColor: `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${color.alpha / 100})`,
+          }}
         />
       </div>
     </div>

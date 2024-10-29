@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { ColorControls } from "@/components/color-controls";
 import { Input } from "@/components/ui/input";
+import PreviewPage from "@/components/preview";
+import { useRouter } from "next/navigation";
 
 interface ColorConfig {
   hue: number;
@@ -49,21 +51,27 @@ const defaultColors: Record<string, ColorConfig> = {
   ring: { hue: 305, saturation: 18, lightness: 71, alpha: 1 },
 };
 
-function hslToHex(h: number, s: number, l: number): string {
-  // Clamp values to valid ranges
+function hslToHex(h: number, s: number, l: number, a: number): string {
   h = ((h % 360) + 360) % 360; // Ensure hue is between 0-359
   s = Math.min(Math.max(s, 0), 100); // Saturation between 0-100
   l = Math.min(Math.max(l, 0), 100); // Lightness between 0-100
+  a = Math.min(Math.max(a, 0), 1); // Alpha between 0-1
   l /= 100;
-  const a = (s * Math.min(l, 1 - l)) / 100;
   const f = (n: number) => {
     const k = (n + h / 30) % 12;
-    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    const color =
+      l -
+      a *
+        (s / 100) *
+        Math.min(l, 1 - l) *
+        Math.max(Math.min(k - 3, 9 - k, 1), -1);
     return Math.round(255 * color)
       .toString(16)
       .padStart(2, "0");
   };
-  return `#${f(0)}${f(8)}${f(4)}`;
+  return `#${f(0)}${f(8)}${f(4)}${Math.round(a * 255)
+    .toString(16)
+    .padStart(2, "0")}`;
 }
 
 export default function ThemeGenerator() {
@@ -79,7 +87,7 @@ export default function ThemeGenerator() {
   const [themeInput, setThemeInput] = useState<string>("");
 
   const [isViewSavedThemesOpen, setIsViewSavedThemesOpen] = useState(false);
-  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false); //
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
   useEffect(() => {
     const selectedThemeName = localStorage.getItem("selectedTheme");
@@ -96,9 +104,9 @@ export default function ThemeGenerator() {
   const handlePasteTheme = () => {
     try {
       const parsedColors: Record<string, ColorConfig> = {};
-      const regex = /--([\w-]+):\s*([\d-]+)\s+([\d]+)%\s+([\d]+)%/g;
+      const regex =
+        /--([\w-]+):\s*([\d-]+)\s+([\d]+)%\s+([\d]+)%\s+([\d]+)%\s+([\d]+)%/g;
 
-      // Match the :root and .dark selectors
       const matches = pasteInput.match(/:root\s*{([^}]*)}/);
       const darkMatches = pasteInput.match(/\.dark\s*{([^}]*)}/);
 
@@ -109,7 +117,8 @@ export default function ThemeGenerator() {
           const hue = parseInt(match[2], 10);
           const saturation = parseInt(match[3], 10);
           const lightness = parseInt(match[4], 10);
-          parsedColors[name] = { hue, saturation, lightness, alpha: 1 };
+          const alpha = parseInt(match[5], 10) / 100;
+          parsedColors[name] = { hue, saturation, lightness, alpha };
         }
       };
 
@@ -173,10 +182,9 @@ export default function ThemeGenerator() {
   ): void => {
     const root = document.documentElement;
     Object.entries(themeColors).forEach(([name, config]) => {
-      root.style.setProperty(
-        `--${name}`,
-        `hsla(${config.hue}, ${config.saturation}%, ${config.lightness}%, ${config.alpha})`
-      );
+      const cssValue = `hsla(${config.hue}, ${config.saturation}%, ${config.lightness}%, ${config.alpha})`;
+      console.log(`Setting CSS variable --${name}: ${cssValue}`); // Debugging log
+      root.style.setProperty(`--${name}`, cssValue);
     });
   };
 
@@ -204,7 +212,9 @@ export default function ThemeGenerator() {
     ${Object.entries(colors)
       .map(
         ([name, config]) =>
-          `--${name}: ${config.hue} ${config.saturation}% ${config.lightness}% ${config.alpha};`
+          `--${name}: ${config.hue} ${config.saturation}% ${
+            config.lightness
+          }% ${config.alpha * 100}%`
       )
       .join("\n    ")}
   }
@@ -237,6 +247,12 @@ export default function ThemeGenerator() {
       setThemeInput("");
       setIsSaveDialogOpen(false);
     }
+  };
+
+  const applyThemePreview = () => {
+    const themeCSS = generateThemeCSS();
+    const event = new CustomEvent("apply-theme", { detail: themeCSS });
+    window.dispatchEvent(event);
   };
 
   return (
@@ -279,6 +295,13 @@ export default function ThemeGenerator() {
             <Button variant="outline">
               <Link href="/saved">View Saved</Link>
             </Button>
+            <Button
+              variant="outline"
+              onClick={applyThemePreview}
+              className="mb-2 sm:mb-0"
+            >
+              Apply Theme Preview
+            </Button>
           </div>
           {/* Paste Theme Dialog */}
           <Dialog open={isPasteDialogOpen} onOpenChange={setIsPasteDialogOpen}>
@@ -311,7 +334,8 @@ export default function ThemeGenerator() {
               const hexColor = hslToHex(
                 config.hue,
                 config.saturation,
-                config.lightness
+                config.lightness,
+                config.alpha
               );
               return (
                 <Card

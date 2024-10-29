@@ -20,7 +20,7 @@
   --destructive: 0 88% 30%;
   --destructive-foreground: 26 5% 90%;
   --border: 26 30% 50%;
-  --input: 26 30% 23%;
+  --input: 26 30% 29%;
   --ring: 26 95% 44%;
   --radius: 0rem;
 }
@@ -36,15 +36,21 @@
   --primary-foreground: 0 0% 100%;
   --secondary: 26 30% 20%;
   --secondary-foreground: 0 0% 100%;
-  --muted: -12 30% 23%;
+  --muted: -12 30% 25%;
   --muted-foreground: 26 5% 60%;
-  --accent: -12 30% 23%;
+  --accent: -12 30% 25%;
   --accent-foreground: 26 5% 90%;
   --destructive: 0 88% 30%;
   --destructive-foreground: 26 5% 90%;
-  --border: 26 30% 23%;
-  --input: 26 30% 23%;
+  --border: 26 30% 29%;
+  --input: 26 30% 29%;
   --ring: 26 95% 44%;
   --radius: 0rem;
 }
 
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}
