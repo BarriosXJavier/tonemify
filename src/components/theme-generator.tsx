@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Copy, RefreshCcw, Save, Clipboard } from "lucide-react";
+import { Copy, RefreshCcw, Save, Clipboard, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { ColorControls } from "@/components/color-controls";
 import { Input } from "@/components/ui/input";
+import { useTheme } from "next-themes";
 import PreviewPage from "@/components/preview";
 import { useRouter } from "next/navigation";
 
@@ -88,6 +89,8 @@ export default function ThemeGenerator() {
 
   const [isViewSavedThemesOpen, setIsViewSavedThemesOpen] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [activeMode, setActiveMode] = useState<"light" | "dark">("light");
+  const { setTheme } = useTheme();
 
   useEffect(() => {
     const selectedThemeName = localStorage.getItem("selectedTheme");
@@ -103,75 +106,96 @@ export default function ThemeGenerator() {
 
   const handlePasteTheme = () => {
     try {
-        const parsedColors: Record<string, ColorConfig> = {};
-        const regex = /--([\w-]+):\s*([\d-]+)\s+([\d]+)%\s+([\d]+)%\s+([\d]+)%\s+([\d]+)%/g;
+      const parsedColors: Record<string, ColorConfig> = {};
+      const regex = /--([\w-]+):\s*([\d]+)\s+([\d]+)%\s+([\d]+)%\s*;?/g;
 
-        const matches = pasteInput.match(/:root\s*{([^}]*)}/);
-        const darkMatches = pasteInput.match(/\.dark\s*{([^}]*)}/);
+      const matches = pasteInput.match(/:root\s*{([^}]*)}/);
+      const darkMatches = pasteInput.match(/\.dark\s*{([^}]*)}/);
 
-        const addColorsFromMatch = (colorString: string) => {
-            let match;
-            while ((match = regex.exec(colorString)) !== null) {
-                const name = match[1];
-                const hue = parseInt(match[2], 10);
-                const saturation = parseInt(match[3], 10);
-                const lightness = parseInt(match[4], 10);
-                const alpha = parseInt(match[5], 10) / 100;
-                parsedColors[name] = { hue, saturation, lightness, alpha };
-            }
-        };
-
-        if (matches) {
-            const rootColors = matches[1];
-            addColorsFromMatch(rootColors);
+      const addColorsFromMatch = (colorString: string) => {
+        let match;
+        while ((match = regex.exec(colorString)) !== null) {
+          const name = match[1];
+          const hue = parseInt(match[2], 10);
+          const saturation = parseInt(match[3], 10);
+          const lightness = parseInt(match[4], 10);
+          const alpha = 1;
+          parsedColors[name] = { hue, saturation, lightness, alpha };
         }
+      };
 
-        if (darkMatches) {
-            const darkColors = darkMatches[1];
-            addColorsFromMatch(darkColors);
-        }
+      if (matches) {
+        const rootColors = matches[1];
+        addColorsFromMatch(rootColors);
+      }
 
-        // Validate parsed colors
-        const expectedColors = [
-            "background", "foreground", "primary", "primary-foreground",
-            "secondary", "secondary-foreground", "accent", "accent-foreground",
-            "card", "card-foreground", "popover", "popover-foreground",
-            "muted", "muted-foreground", "destructive", "destructive-foreground",
-            "border", "input", "ring"
-        ];
+      if (darkMatches) {
+        const darkColors = darkMatches[1];
+        addColorsFromMatch(darkColors);
+      }
 
-        const isValidTheme = expectedColors.every(color => parsedColors[color]);
+      // Validate parsed colors
+      const expectedColors = [
+        "background",
+        "foreground",
+        "primary",
+        "primary-foreground",
+        "secondary",
+        "secondary-foreground",
+        "accent",
+        "accent-foreground",
+        "card",
+        "card-foreground",
+        "popover",
+        "popover-foreground",
+        "muted",
+        "muted-foreground",
+        "destructive",
+        "destructive-foreground",
+        "border",
+        "input",
+        "ring",
+      ];
 
-        if (isValidTheme) {
-            setColors(parsedColors);
-            updateCSSVariables(parsedColors);
-            toast.success("Theme updated successfully!");
-        } else {
-            toast.error("Parsed theme is missing some colors. Theme remains unchanged.");
-        }
+      const isValidTheme = expectedColors.every((color) => parsedColors[color]);
+
+      if (isValidTheme) {
+        setColors(parsedColors);
+        updateCSSVariables(parsedColors);
+        toast.success("Theme updated successfully!");
+      } else {
+        toast.error(
+          "Parsed theme is missing some colors. Theme remains unchanged."
+        );
+      }
     } catch (error) {
-        console.error("Invalid theme format", error);
-        toast.error("Failed to parse theme. Please check the format.");
+      console.error("Invalid theme format", error);
+      toast.error("Failed to parse theme. Please check the format.");
     } finally {
-        setIsPasteDialogOpen(false);
-        setPasteInput("");
+      setIsPasteDialogOpen(false);
+      setPasteInput("");
     }
-};
+  };
 
   const updateCSSVariables = (
     themeColors: Record<string, ColorConfig>
   ): void => {
     const root = document.documentElement;
+    const isDarkMode = activeMode === "dark";
+
     Object.entries(themeColors).forEach(([name, config]) => {
       const defaultConfig = defaultColors[name];
-      if (defaultConfig && 
-          (defaultConfig.hue !== config.hue || 
-           defaultConfig.saturation !== config.saturation || 
-           defaultConfig.lightness !== config.lightness || 
-           defaultConfig.alpha !== config.alpha)) {
-        const cssValue = `hsla(${config.hue}, ${config.saturation}%, ${config.lightness}%, ${config.alpha})`;
-        console.log(`Setting CSS variable --${name}: ${cssValue}`); // Debugging log
-        root.style.setProperty(`--${name}`, cssValue);
+      if (
+        defaultConfig &&
+        (defaultConfig.hue !== config.hue ||
+          defaultConfig.saturation !== config.saturation ||
+          defaultConfig.lightness !== config.lightness ||
+          defaultConfig.alpha !== config.alpha)
+      ) {
+        root.style.setProperty(
+          `--${name}`,
+          `${config.hue} ${config.saturation}% ${config.lightness}%`
+        );
       }
     });
   };
@@ -195,18 +219,22 @@ export default function ThemeGenerator() {
   };
 
   const generateThemeCSS = (): string => {
-    return `@layer base {
-  :root {
-    ${Object.entries(colors)
-      .map(
-        ([name, config]) =>
-          `--${name}: ${config.hue} ${config.saturation}% ${
-            config.lightness
-          }% ${config.alpha * 100}%`
-      )
-      .join("\n    ")}
-  }
-}`;
+    return `:root {
+      ${Object.entries(colors)
+        .map(
+          ([name, { hue, saturation, lightness }]) =>
+            `--${name}: ${hue} ${saturation}% ${lightness}%;`
+        )
+        .join("\n      ")}
+    }
+    .dark {
+      ${Object.entries(colors)
+        .map(
+          ([name, { hue, saturation, lightness }]) =>
+            `--${name}: ${hue} ${saturation}% ${lightness}%;`
+        )
+        .join("\n      ")}
+    }`;
   };
 
   const copyTheme = (): void => {
@@ -237,12 +265,6 @@ export default function ThemeGenerator() {
     }
   };
 
-  const applyThemePreview = () => {
-    const themeCSS = generateThemeCSS();
-    const event = new CustomEvent("apply-theme", { detail: themeCSS });
-    window.dispatchEvent(event);
-  };
-
   return (
     <div className="min-h-screen">
       <div className="container max-w-4xl mx-auto px-4 py-6">
@@ -251,44 +273,49 @@ export default function ThemeGenerator() {
             <Button
               variant="outline"
               onClick={() => setIsPasteDialogOpen(true)}
-              className="mb-2 sm:mb-0"
+              className="mb-2 sm:mb-0 flex items-center"
             >
-              <Clipboard className="w-4 h-4 mr-2" />
-              Paste CSS theme
+              <Clipboard className="w-4 h-4 mr-2 mx-auto" />
             </Button>
             <Button
               variant="outline"
               onClick={resetToDefault}
-              className="mb-2 sm:mb-0"
+              className="mb-2 sm:mb-0 flex items-center"
             >
-              <RefreshCcw className="w-4 h-4 mr-2" />
-              Reset
+              <RefreshCcw className="w-4 h-4 mr-2 mx-auto" />
             </Button>
             <Button
               variant="outline"
               onClick={() => setIsSaveDialogOpen(true)}
-              className="mb-2 sm:mb-0"
+              className="mb-2 sm:mb-0 flex items-center"
             >
-              <Save className="w-4 h-4 mr-2" />
-              Save
+              <Save className="w-4 h-4 mr-2 mx-auto" />
             </Button>
             <Button
               variant="outline"
               onClick={copyTheme}
-              className="mb-2 sm:mb-0"
+              className="mb-2 sm:mb-0 bg-secondary text-secondary-foreground flex items-center"
             >
-              <Copy className="w-4 h-4 mr-2" />
-              Copy Theme CSS
-            </Button>
-            <Button variant="outline">
-              <Link href="/saved">View Saved</Link>
+              <Copy className="w-4 h-4 mr-2 mx-auto" />
             </Button>
             <Button
               variant="outline"
-              onClick={applyThemePreview}
-              className="mb-2 sm:mb-0"
+              className="mb-2 sm:mb-0 flex items-center"
             >
-              Apply Theme Preview
+              <Link href="/saved">View Saved</Link>
+            </Button>
+
+            <Button
+              onClick={() => setTheme("light")}
+              className="rounded-lg mb-2 sm:mb-0 flex items-center"
+            >
+              <Sun className="h-4 w-4 mr-2 mx-auto" />
+            </Button>
+            <Button
+              onClick={() => setTheme("dark")}
+              className="rounded-lg mb-2 sm:mb-0 flex items-center"
+            >
+              <Moon className="h-4 w-4 mr-2 mx-auto" />
             </Button>
           </div>
           {/* Paste Theme Dialog */}
@@ -317,7 +344,7 @@ export default function ThemeGenerator() {
             </DialogContent>
           </Dialog>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {Object.entries(colors).map(([name, config]) => {
               const hexColor = hslToHex(
                 config.hue,

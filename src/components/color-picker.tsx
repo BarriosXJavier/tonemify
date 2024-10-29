@@ -11,19 +11,24 @@ interface ColorPickerProps {
 }
 
 export function ColorPicker({ color, onChange, className }: ColorPickerProps) {
-  const [inputColor, setInputColor] = useState(color);
+  // Strip alpha channel if present for display
+  const displayColor = color.length === 9 ? color.slice(0, 7) : color;
+  const [inputColor, setInputColor] = useState(displayColor);
   const [isValidColor, setIsValidColor] = useState(true);
   const colorInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setInputColor(color);
+    const newDisplayColor = color.length === 9 ? color.slice(0, 7) : color;
+    setInputColor(newDisplayColor);
   }, [color]);
 
   const handleColorChange = (newColor: string) => {
     setInputColor(newColor);
     if (/^#[0-9A-F]{6}$/i.test(newColor)) {
       setIsValidColor(true);
-      onChange(newColor);
+      // Preserve alpha from original color if it exists
+      const alpha = color.length === 9 ? color.slice(7) : "ff";
+      onChange(newColor + alpha);
     } else {
       setIsValidColor(false);
     }
@@ -37,13 +42,16 @@ export function ColorPicker({ color, onChange, className }: ColorPickerProps) {
     <div className={cn("flex items-center gap-2", className)}>
       <div
         onClick={openColorPicker}
-        style={{ backgroundColor: inputColor }}
+        style={{
+          backgroundColor: displayColor,
+          opacity: color.length === 9 ? parseInt(color.slice(7), 16) / 255 : 1,
+        }}
         className="h-10 w-10 cursor-pointer rounded border border-input"
         aria-label="Select color"
       />
       <Input
         type="color"
-        value={inputColor}
+        value={displayColor}
         ref={colorInputRef}
         onChange={(e) => handleColorChange(e.target.value)}
         className="hidden"
