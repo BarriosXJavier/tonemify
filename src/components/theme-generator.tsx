@@ -103,88 +103,76 @@ export default function ThemeGenerator() {
 
   const handlePasteTheme = () => {
     try {
-      const parsedColors: Record<string, ColorConfig> = {};
-      const regex =
-        /--([\w-]+):\s*([\d-]+)\s+([\d]+)%\s+([\d]+)%\s+([\d]+)%\s+([\d]+)%/g;
+        const parsedColors: Record<string, ColorConfig> = {};
+        const regex = /--([\w-]+):\s*([\d-]+)\s+([\d]+)%\s+([\d]+)%\s+([\d]+)%\s+([\d]+)%/g;
 
-      const matches = pasteInput.match(/:root\s*{([^}]*)}/);
-      const darkMatches = pasteInput.match(/\.dark\s*{([^}]*)}/);
+        const matches = pasteInput.match(/:root\s*{([^}]*)}/);
+        const darkMatches = pasteInput.match(/\.dark\s*{([^}]*)}/);
 
-      const addColorsFromMatch = (colorString: string) => {
-        let match;
-        while ((match = regex.exec(colorString)) !== null) {
-          const name = match[1];
-          const hue = parseInt(match[2], 10);
-          const saturation = parseInt(match[3], 10);
-          const lightness = parseInt(match[4], 10);
-          const alpha = parseInt(match[5], 10) / 100;
-          parsedColors[name] = { hue, saturation, lightness, alpha };
+        const addColorsFromMatch = (colorString: string) => {
+            let match;
+            while ((match = regex.exec(colorString)) !== null) {
+                const name = match[1];
+                const hue = parseInt(match[2], 10);
+                const saturation = parseInt(match[3], 10);
+                const lightness = parseInt(match[4], 10);
+                const alpha = parseInt(match[5], 10) / 100;
+                parsedColors[name] = { hue, saturation, lightness, alpha };
+            }
+        };
+
+        if (matches) {
+            const rootColors = matches[1];
+            addColorsFromMatch(rootColors);
         }
-      };
 
-      if (matches) {
-        const rootColors = matches[1];
-        addColorsFromMatch(rootColors);
-      }
-
-      if (darkMatches) {
-        const darkColors = darkMatches[1];
-        addColorsFromMatch(darkColors);
-      }
-
-      const expectedColors = [
-        "background",
-        "foreground",
-        "primary",
-        "primary-foreground",
-        "secondary",
-        "secondary-foreground",
-        "accent",
-        "accent-foreground",
-        "card",
-        "card-foreground",
-        "popover",
-        "popover-foreground",
-        "muted",
-        "muted-foreground",
-        "destructive",
-        "destructive-foreground",
-        "border",
-        "input",
-        "ring",
-      ];
-
-      expectedColors.forEach((color) => {
-        if (!parsedColors[color]) {
-          parsedColors[color] = {
-            hue: 0,
-            saturation: 0,
-            lightness: 0,
-            alpha: 1,
-          };
+        if (darkMatches) {
+            const darkColors = darkMatches[1];
+            addColorsFromMatch(darkColors);
         }
-      });
 
-      setColors(parsedColors);
-      updateCSSVariables(parsedColors);
-      toast.success("Theme updated successfully!");
+        // Validate parsed colors
+        const expectedColors = [
+            "background", "foreground", "primary", "primary-foreground",
+            "secondary", "secondary-foreground", "accent", "accent-foreground",
+            "card", "card-foreground", "popover", "popover-foreground",
+            "muted", "muted-foreground", "destructive", "destructive-foreground",
+            "border", "input", "ring"
+        ];
+
+        const isValidTheme = expectedColors.every(color => parsedColors[color]);
+
+        if (isValidTheme) {
+            setColors(parsedColors);
+            updateCSSVariables(parsedColors);
+            toast.success("Theme updated successfully!");
+        } else {
+            toast.error("Parsed theme is missing some colors. Theme remains unchanged.");
+        }
     } catch (error) {
-      console.error("Invalid theme format", error);
-      toast.error("Failed to parse theme. Please check the format.");
+        console.error("Invalid theme format", error);
+        toast.error("Failed to parse theme. Please check the format.");
     } finally {
-      setIsPasteDialogOpen(false);
-      setPasteInput("");
+        setIsPasteDialogOpen(false);
+        setPasteInput("");
     }
-  };
+};
 
   const updateCSSVariables = (
     themeColors: Record<string, ColorConfig>
   ): void => {
     const root = document.documentElement;
     Object.entries(themeColors).forEach(([name, config]) => {
-      const cssValue = `hsla(${config.hue}, ${config.saturation}%, ${config.lightness}%, ${config.alpha})`;
-      console.log(`Setting CSS variable --${name}: ${cssValue}`); // Debugging log
-      root.style.setProperty(`--${name}`, cssValue);
+      const defaultConfig = defaultColors[name];
+      if (defaultConfig && 
+          (defaultConfig.hue !== config.hue || 
+           defaultConfig.saturation !== config.saturation || 
+           defaultConfig.lightness !== config.lightness || 
+           defaultConfig.alpha !== config.alpha)) {
+        const cssValue = `hsla(${config.hue}, ${config.saturation}%, ${config.lightness}%, ${config.alpha})`;
+        console.log(`Setting CSS variable --${name}: ${cssValue}`); // Debugging log
+        root.style.setProperty(`--${name}`, cssValue);
+      }
     });
   };
 
