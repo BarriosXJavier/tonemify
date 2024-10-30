@@ -25,11 +25,13 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between bg-background border-b border-gray-100 dark:border-gray-700 font-mono">
+    <header className="px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between bg-background dark:bg-dark-background border-b border-border dark:border-dark-border font-mono">
       {/* Logo and Brand Name */}
       <Link className="flex items-center justify-center" href="/">
-        <Gem className="h-6 w-6 text-blue-950 dark:text-gray-300" />
-        <span className="ml-1 text-xl sm:text-2xl font-bold">TonemifyLabs</span>
+        <Gem className="h-6 w-6 text-foreground dark:text-dark-foreground" />
+        <span className="ml-1 text-xl sm:text-2xl font-bold text-foreground dark:text-dark-foreground">
+          TonemifyLabs
+        </span>
       </Link>
 
       {/* Desktop Navigation */}
@@ -50,7 +52,7 @@ export default function Header() {
                 passHref
               >
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  <Coffee className="h-5 w-5 mr-2" />
+                  <Coffee className="h-5 w-5 mr-2 text-foreground dark:text-dark-foreground" />
                   <span className="hidden xl:inline">Buy Me a Coffee</span>
                 </NavigationMenuLink>
               </Link>
@@ -62,7 +64,7 @@ export default function Header() {
                 passHref
               >
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  <Github className="h-5 w-5 mr-2" />
+                  <Github className="h-5 w-5 mr-2 text-foreground dark:text-dark-foreground" />
                   <span className="hidden xl:inline">GitHub</span>
                 </NavigationMenuLink>
               </Link>
@@ -78,7 +80,7 @@ export default function Header() {
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="h-12 w-12">
               <svg
-                className="h-8 w-8"
+                className="h-8 w-8 text-foreground dark:text-dark-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -92,32 +94,32 @@ export default function Header() {
               </svg>
             </Button>
           </SheetTrigger>
-          <SheetContent className="w-[300px]">
+          <SheetContent className="w-[300px] bg-background dark:bg-dark-background">
             <SheetHeader>
               <SheetTitle className="sr-only">Navigation</SheetTitle>
             </SheetHeader>
             <div className="flex flex-col space-y-6 mt-8 font-mono">
               <Link
                 href="#contact"
-                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary"
+                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary dark:hover:text-dark-primary"
                 onClick={() => setIsOpen(false)}
               >
                 Contact
               </Link>
               <Link
                 href="https://www.buymeacoffee.com/barrios"
-                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary"
+                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary dark:hover:text-dark-primary"
                 onClick={() => setIsOpen(false)}
               >
-                <Coffee className="h-6 w-6" />
+                <Coffee className="h-6 w-6 text-foreground dark:text-dark-foreground" />
                 <span>Buy Me a Coffee</span>
               </Link>
               <Link
                 href="https://github.com/BarriosXJavier/tonemify"
-                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary"
+                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary dark:hover:text-dark-primary"
                 onClick={() => setIsOpen(false)}
               >
-                <Github className="h-6 w-6" />
+                <Github className="h-6 w-6 text-foreground dark:text-dark-foreground" />
                 <span>GitHub</span>
               </Link>
               <div className="pt-4">
