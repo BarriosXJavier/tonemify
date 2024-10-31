@@ -239,7 +239,6 @@ export default function ThemeGenerator() {
     switchTheme: (mode: "light" | "dark") => {
       setTheme(mode);
       setActiveMode(mode);
-      updateCSSVariables(mode === "light" ? colorsLight : colorsDark);
     },
   };
 
@@ -296,22 +295,36 @@ export default function ThemeGenerator() {
             >
               View Saved
             </Button>
-            <Button
-              onClick={() => actions.switchTheme("light")}
-              className="flex items-center"
-              variant={activeMode === "light" ? "default" : "outline"}
-            >
-              <Sun className="w-4 h-4 mr-2" />
-              Light
-            </Button>
-            <Button
-              onClick={() => actions.switchTheme("dark")}
-              className="flex items-center"
-              variant={activeMode === "dark" ? "default" : "outline"}
-            >
-              <Moon className="w-4 h-4 mr-2" />
-              Dark
-            </Button>
+            <div className="flex gap-2">
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => actions.switchTheme("light")}
+                  className="relative flex items-center min-w-[100px] justify-start"
+                  variant={activeMode === "light" ? "default" : "secondary"}
+                >
+                  <Sun className="w-4 h-4 mr-2" />
+                  Light
+                  {activeMode === "light" && (
+                    <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
+                      active
+                    </span>
+                  )}
+                </Button>
+                <Button
+                  onClick={() => actions.switchTheme("dark")}
+                  className="relative flex items-center min-w-[100px] justify-start"
+                  variant={activeMode === "dark" ? "default" : "secondary"}
+                >
+                  <Moon className="w-4 h-4 mr-2" />
+                  Dark
+                  {activeMode === "dark" && (
+                    <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
+                      active
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
 
           {/* Color Cards Grid */}
