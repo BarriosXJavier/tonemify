@@ -2,7 +2,7 @@ export interface ColorConfig {
   hue: number;
   saturation: number;
   lightness: number;
-  alpha: number;
+  alpha?: number;
 }
 
 export interface ThemeColors {

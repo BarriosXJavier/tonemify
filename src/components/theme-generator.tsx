@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Copy, RefreshCcw, Save, Clipboard, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,12 +16,14 @@ import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
 import { Checkbox } from "@/components/ui/checkbox";
 import { hslToHex } from "@/lib/colorUtils";
-import { defaults } from "@/lib/colorUtils";
+import { defaults, defaultsDark } from "@/lib/colorUtils";
 import { ColorConfig } from "@/lib/types";
 
 export default function ThemeGenerator() {
-  // State Management
-  const [colors, setColors] = useState<Record<string, ColorConfig>>(defaults);
+  const [colorsLight, setColorsLight] =
+    useState<Record<string, ColorConfig>>(defaults);
+  const [colorsDark, setColorsDark] =
+    useState<Record<string, ColorConfig>>(defaultsDark);
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [pasteInput, setPasteInput] = useState("");
   const [dialogState, setDialogState] = useState({
@@ -35,27 +37,14 @@ export default function ThemeGenerator() {
   const { setTheme } = useTheme();
   const [activeMode, setActiveMode] = useState<"light" | "dark">("light");
 
-  // Load saved theme on mount
-  useEffect(() => {
-    const selectedTheme = localStorage.getItem("selectedTheme");
-    if (selectedTheme) {
-      const themeCSS = localStorage.getItem(selectedTheme);
-      if (themeCSS) {
-        handlePasteTheme(themeCSS);
-      }
-    }
-
-    // Load all saved themes
-    const themes: Record<string, string> = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key !== "selectedTheme") {
-        const value = localStorage.getItem(key);
-        if (value) themes[key] = value;
-      }
-    }
-    setSavedThemes(themes);
-  }, []);
+  const isValidColor = (config: ColorConfig): boolean => {
+    return (
+      !isNaN(config.hue) &&
+      !isNaN(config.saturation) &&
+      !isNaN(config.lightness) &&
+      !isNaN(config.alpha)
+    );
+  };
 
   const handlePasteTheme = (input?: string) => {
     try {
@@ -64,7 +53,6 @@ export default function ThemeGenerator() {
       const failedVariables: string[] = [];
       const inputString = input || pasteInput;
 
-      // Regex patterns
       const variableRegex =
         /--([a-zA-Z0-9-]+):\s*((?:hsl|hsla)\([^)]+\)|[\d.]+\s+[\d.]+%\s+[\d.]+%(?:\s*\/\s*[\d.]+%?)?);/g;
       const rootSection = inputString.match(/:root\s*{([^}]*)}/s);
@@ -72,7 +60,7 @@ export default function ThemeGenerator() {
 
       const parseColorValue = (value: string): ColorConfig | null => {
         const hslRegex =
-          /^(?:hsl|hsla)\(\s*([\d.-]+)\s*,?\s*([\d.]+)%\s*,?\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/;
+          /^(?:hsl|hsla)\(\s*([\d.-]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/;
         const spaceRegex =
           /^([\d.-]+)\s+([\d.]+)%\s+([\d.]+)%(?:\s*\/\s*([\d.]+%?))?$/;
 
@@ -98,7 +86,7 @@ export default function ThemeGenerator() {
         let match;
         while ((match = variableRegex.exec(section)) !== null) {
           const [, name, value] = match;
-          if (!defaults[name]) continue; // Skip unknown variables
+          if (!defaults[name]) continue;
           const colorConfig = parseColorValue(value.trim());
           if (colorConfig) {
             target[name] = colorConfig;
@@ -108,16 +96,21 @@ export default function ThemeGenerator() {
         }
       };
 
-      if (rootSection) parseSection(rootSection[1], parsedColors);
-      if (darkSection) parseSection(darkSection[1], parsedDarkColors);
-
-      const finalColors = { ...defaults, ...parsedColors };
-      setColors(finalColors);
-      updateCSSVariables(finalColors, ":root");
-
+      if (rootSection) {
+        parseSection(rootSection[1], parsedColors);
+        const finalColors = { ...defaults, ...parsedColors };
+        setColorsLight(finalColors);
+        if (activeMode === "light") {
+          updateCSSVariables(finalColors);
+        }
+      }
       if (darkSection) {
-        const finalDarkColors = { ...defaults, ...parsedDarkColors };
-        updateCSSVariables(finalDarkColors, ".dark");
+        parseSection(darkSection[1], parsedDarkColors);
+        const finalDarkColors = { ...defaultsDark, ...parsedDarkColors };
+        setColorsDark(finalDarkColors);
+        if (activeMode === "dark") {
+          updateCSSVariables(finalDarkColors);
+        }
       }
 
       if (failedVariables.length > 0) {
@@ -139,13 +132,9 @@ export default function ThemeGenerator() {
   };
 
   const updateCSSVariables = (
-    themeColors: Record<string, ColorConfig>,
-    selector: string
+    themeColors: Record<string, ColorConfig>
   ): void => {
-    const style =
-      selector === ":root"
-        ? document.documentElement.style
-        : document.documentElement.style;
+    const style = document.documentElement.style;
     Object.entries(themeColors).forEach(([name, config]) => {
       const value = `${config.hue} ${config.saturation}% ${config.lightness}%${
         includeAlpha && config.alpha < 1 ? ` / ${config.alpha * 100}%` : ""
@@ -159,14 +148,25 @@ export default function ThemeGenerator() {
     property: keyof ColorConfig,
     value: number
   ): void => {
-    setColors((prev) => {
-      const newColors = {
-        ...prev,
-        [colorName]: { ...prev[colorName], [property]: value },
-      };
-      updateCSSVariables(newColors, activeMode === "dark" ? ".dark" : ":root");
-      return newColors;
-    });
+    if (activeMode === "light") {
+      setColorsLight((prev) => {
+        const newColors = {
+          ...prev,
+          [colorName]: { ...prev[colorName], [property]: value },
+        };
+        updateCSSVariables(newColors);
+        return newColors;
+      });
+    } else {
+      setColorsDark((prev) => {
+        const newColors = {
+          ...prev,
+          [colorName]: { ...prev[colorName], [property]: value },
+        };
+        updateCSSVariables(newColors);
+        return newColors;
+      });
+    }
   };
 
   const generateThemeCSS = (): string => {
@@ -181,11 +181,15 @@ export default function ThemeGenerator() {
         : `hsl(${hue}, ${saturation}%, ${lightness}%)`;
     };
 
-    const cssVariables = Object.entries(colors)
+    const lightVariables = Object.entries(colorsLight)
       .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
       .join("\n");
 
-    return `:root {\n${cssVariables}\n}\n\n.dark {\n${cssVariables}\n}`;
+    const darkVariables = Object.entries(colorsDark)
+      .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
+      .join("\n");
+
+    return `:root {\n${lightVariables}\n}\n\n.dark {\n${darkVariables}\n}`;
   };
 
   const actions = {
@@ -195,12 +199,16 @@ export default function ThemeGenerator() {
     },
 
     resetToDefault: () => {
-      if (JSON.stringify(colors) === JSON.stringify(defaults)) {
+      if (
+        JSON.stringify(colorsLight) === JSON.stringify(defaults) &&
+        JSON.stringify(colorsDark) === JSON.stringify(defaultsDark)
+      ) {
         toast.info("Theme is already at default!");
         return;
       }
-      setColors(defaults);
-      updateCSSVariables(defaults, activeMode === "dark" ? ".dark" : ":root");
+      setColorsLight(defaults);
+      setColorsDark(defaultsDark);
+      updateCSSVariables(activeMode === "light" ? defaults : defaultsDark);
       toast.success("Theme reset to default!");
     },
 
@@ -221,9 +229,11 @@ export default function ThemeGenerator() {
     switchTheme: (mode: "light" | "dark") => {
       setTheme(mode);
       setActiveMode(mode);
-      updateCSSVariables(colors, mode === "dark" ? ".dark" : ":root");
+      updateCSSVariables(mode === "light" ? colorsLight : colorsDark);
     },
   };
+
+  const currentColors = activeMode === "light" ? colorsLight : colorsDark;
 
   return (
     <div className="min-h-screen font-mono">
@@ -296,51 +306,59 @@ export default function ThemeGenerator() {
 
           {/* Color Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {Object.entries(colors).map(([name, config]) => (
-              <Card
-                key={name}
-                className="group relative overflow-hidden hover:ring-2 hover:ring-primary/50 transition-all cursor-pointer"
-                onClick={() => setActiveColor(name)}
-              >
-                <div
-                  className="absolute inset-0 opacity-20"
-                  style={{
-                    backgroundColor: `hsl(${config.hue}, ${
-                      config.saturation
-                    }%, ${config.lightness}%${
-                      includeAlpha && config.alpha < 1
-                        ? ` / ${config.alpha * 100}%`
-                        : ""
-                    })`,
-                  }}
-                />
-                <div className="relative p-4 space-y-2">
-                  <div
-                    className="w-full h-8 rounded shadow-sm"
-                    style={{
-                      backgroundColor: `hsl(${config.hue}, ${
-                        config.saturation
-                      }%, ${config.lightness}%${
-                        includeAlpha && config.alpha < 1
-                          ? ` / ${config.alpha * 100}%`
-                          : ""
-                      })`,
-                    }}
-                  />
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">{name}</span>
-                    <span className="text-xs text-muted-foreground font-mono">
-                      {hslToHex(
-                        config.hue,
-                        config.saturation,
-                        config.lightness,
-                        config.alpha
-                      )}
-                    </span>
+            {Object.entries(currentColors).map(([name, config]) => {
+              const validColor = isValidColor(config);
+              const backgroundColor = validColor
+                ? `hsl(${config.hue}, ${config.saturation}%, ${
+                    config.lightness
+                  }%${
+                    includeAlpha && config.alpha < 1
+                      ? ` / ${config.alpha * 100}%`
+                      : ""
+                  })`
+                : "transparent";
+
+              const hexValue = validColor
+                ? hslToHex(
+                    config.hue,
+                    config.saturation,
+                    config.lightness,
+                    config.alpha
+                  )
+                : "N/A";
+
+              // Determine text color based on background lightness
+              const textColor =
+                config.lightness > 50 ? "text-black" : "text-white";
+
+              return (
+                <Card
+                  key={name}
+                  className={`
+            p-4 
+            flex 
+            flex-col 
+            items-center 
+            justify-center 
+            ${textColor}
+            transition-all 
+            duration-300 
+            ease-in-out
+            hover:scale-105 
+            hover:shadow-xl 
+            cursor-pointer
+            active:scale-95
+          `}
+                  style={{ backgroundColor }}
+                  onClick={() => setActiveColor(name)}
+                >
+                  <div className="text-center">
+                    <p className="text-sm font-medium">{name}</p>
+                    <p className="text-xs">{hexValue}</p>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -355,7 +373,7 @@ export default function ThemeGenerator() {
       >
         <DialogContent className="bg-background/60">
           <DialogHeader>
-            <DialogTitle>Paste CSS Theme</DialogTitle>
+            <DialogTitle>Paste Theme</DialogTitle>
           </DialogHeader>
           <textarea
             value={pasteInput}
@@ -366,11 +384,11 @@ export default function ThemeGenerator() {
 Expected format:
 :root {
   --color-name: hsl(255, 81%, 95%);
-  /* ... */
+  /* other classes */
 }
 .dark {
   --color-name: hsla(255, 50%, 10%, 0.9);
-  /* ... */
+  /* other classes */
 }`}
           />
           <div className="flex justify-end space-x-2 mt-4">
@@ -516,7 +534,7 @@ Expected format:
           </DialogHeader>
           {activeColor && (
             <ColorControls
-              color={colors[activeColor]}
+              color={currentColors[activeColor]}
               onChange={(property, value) =>
                 updateColor(activeColor, property, value)
               }

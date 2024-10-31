@@ -1,9 +1,5 @@
 import { ColorConfig } from "./types";
 
-
-
-
-
 export function hexToHSL(hex: string) {
   hex = hex.replace("#", "");
 
@@ -101,3 +97,37 @@ export const defaults: Record<string, ColorConfig> = {
   "chart-4": { hue: 260, saturation: 50, lightness: 50, alpha: 1 },
   "chart-5": { hue: 280, saturation: 50, lightness: 50, alpha: 1 },
 };
+
+export const defaultsDark: Record<string, ColorConfig> = {
+  background: { hue: 305, saturation: 33, lightness: 10, alpha: 1 },
+  foreground: { hue: 305, saturation: 50, lightness: 100, alpha: 1 },
+  primary: { hue: 305, saturation: 18, lightness: 60, alpha: 1 },
+  "primary-foreground": { hue: 305, saturation: 18, lightness: 90, alpha: 1 },
+  secondary: { hue: 275, saturation: 18, lightness: 60, alpha: 1 },
+  "secondary-foreground": { hue: 275, saturation: 18, lightness: 90, alpha: 1 },
+  accent: { hue: 335, saturation: 18, lightness: 60, alpha: 1 },
+  "accent-foreground": { hue: 335, saturation: 18, lightness: 90, alpha: 1 },
+  card: { hue: 305, saturation: 33, lightness: 10, alpha: 1 },
+  "card-foreground": { hue: 305, saturation: 50, lightness: 100, alpha: 1 },
+  popover: { hue: 305, saturation: 33, lightness: 10, alpha: 1 },
+  "popover-foreground": { hue: 305, saturation: 50, lightness: 100, alpha: 1 },
+  muted: { hue: 275, saturation: 28, lightness: 20, alpha: 1 },
+  "muted-foreground": { hue: 275, saturation: 7, lightness: 80, alpha: 1 },
+  destructive: { hue: 21, saturation: 83, lightness: 50, alpha: 1 },
+  "destructive-foreground": {
+    hue: 21,
+    saturation: 83,
+    lightness: 90,
+    alpha: 1,
+  },
+  border: { hue: 305, saturation: 13, lightness: 20, alpha: 1 },
+  input: { hue: 305, saturation: 13, lightness: 20, alpha: 1 },
+  ring: { hue: 305, saturation: 18, lightness: 60, alpha: 1 },
+  "chart-1": { hue: 200, saturation: 50, lightness: 40, alpha: 1 },
+  "chart-2": { hue: 220, saturation: 50, lightness: 40, alpha: 1 },
+  "chart-3": { hue: 240, saturation: 50, lightness: 40, alpha: 1 },
+  "chart-4": { hue: 260, saturation: 50, lightness: 40, alpha: 1 },
+  "chart-5": { hue: 280, saturation: 50, lightness: 40, alpha: 1 },
+};
+
+
