@@ -1,9 +1,8 @@
 import Faqs from "@/components/faqs";
 import FeaturesSection from "@/components/features";
 import Hero from "@/components/hero";
-import PreviewPage from "@/components/preview";
 import ThemeGenerator from "@/components/theme-generator";
-
+import TonemifyDashboard from "../components/mock-dashboard";
 
 export default function Home() {
   return (
@@ -11,8 +10,9 @@ export default function Home() {
       <Hero />
       <ThemeGenerator />
       <Faqs />
-      <FeaturesSection /> 
-      <PreviewPage />
+      <FeaturesSection />
+
+      <TonemifyDashboard />
     </main>
   );
 }

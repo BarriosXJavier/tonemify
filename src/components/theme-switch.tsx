@@ -11,13 +11,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function ModeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Show loading state before mounting
   if (!mounted) {
     return (
       <Button
@@ -25,7 +26,8 @@ export function ModeToggle() {
         size="icon"
         className="w-10 h-10 rounded-full transition-colors"
       >
-        <span className="sr-only">Toggle theme</span>
+        <Sun className="h-5 w-5" />
+        <span className="sr-only">Toggle mode</span>
       </Button>
     );
   }
@@ -39,48 +41,63 @@ export function ModeToggle() {
           className="relative w-10 h-10 rounded-full transition-colors duration-300 hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <Sun
-            className={`h-5 w-5 absolute transition-all duration-300 rotate-0 scale-100 ${
-              theme === "dark" ? "opacity-0 scale-0 rotate-90" : "opacity-100"
-            }`}
+            className={`h-5 w-5 absolute transition-transform duration-300 
+              ${
+                resolvedTheme === "dark"
+                  ? "scale-0 rotate-90"
+                  : "scale-100 rotate-0"
+              }`}
           />
           <Moon
-            className={`h-5 w-5 absolute transition-all duration-300 rotate-0 scale-100 ${
-              theme === "dark" ? "opacity-100" : "opacity-0 scale-0 rotate-90"
-            }`}
+            className={`h-5 w-5 absolute transition-transform duration-300 
+              ${
+                resolvedTheme === "dark"
+                  ? "scale-100 rotate-0"
+                  : "scale-0 rotate-90"
+              }`}
           />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="w-40 transition-colors duration-300"
-      >
+      <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem
           onClick={() => setTheme("light")}
-          className={`flex items-center gap-2 cursor-pointer transition-colors duration-200 ${
-            theme === "light" ? "bg-accent text-accent-foreground" : ""
-          }`}
+          className="flex items-center gap-2 cursor-pointer"
+          data-state={theme === "light" ? "active" : ""}
         >
           <Sun className="h-4 w-4" />
           <span>Light</span>
+          {theme === "light" && (
+            <span className="ml-auto text-[10px] font-medium opacity-60">
+              active
+            </span>
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme("dark")}
-          className={`flex items-center gap-2 cursor-pointer transition-colors duration-200 ${
-            theme === "dark" ? "bg-accent text-accent-foreground" : ""
-          }`}
+          className="flex items-center gap-2 cursor-pointer"
+          data-state={theme === "dark" ? "active" : ""}
         >
           <Moon className="h-4 w-4" />
           <span>Dark</span>
+          {theme === "dark" && (
+            <span className="ml-auto text-[10px] font-medium opacity-60">
+              active
+            </span>
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme("system")}
-          className={`flex items-center gap-2 cursor-pointer transition-colors duration-200 ${
-            theme === "system" ? "bg-accent text-accent-foreground" : ""
-          }`}
+          className="flex items-center gap-2 cursor-pointer"
+          data-state={theme === "system" ? "active" : ""}
         >
           <Monitor className="h-4 w-4" />
           <span>System</span>
+          {theme === "system" && (
+            <span className="ml-auto text-[10px] font-medium opacity-60">
+              active
+            </span>
+          )}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

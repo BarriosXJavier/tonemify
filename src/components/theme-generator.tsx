@@ -58,15 +58,19 @@ export default function ThemeGenerator() {
 
   const handlePasteTheme = (input?: string) => {
     try {
-      const parsedColors: Record<string, ColorConfig> = {};
-      const parsedDarkColors: Record<string, ColorConfig> = {};
+      const parsedColorsLight: Record<string, ColorConfig> = {};
+      const parsedColorsDark: Record<string, ColorConfig> = {};
       const failedVariables: string[] = [];
       const inputString = input || pasteInput;
 
       const variableRegex =
-        /--([a-zA-Z0-9-]+):\s*((?:hsl|hsla)\([^)]+\)|[\d.]+\s+[\d.]+%\s+[\d.]+%(?:\s*\/\s*[\d.]+%?)?);/g;
-      const rootSection = inputString.match(/:root\s*{([^}]*)}/s);
-      const darkSection = inputString.match(/\.dark\s*{([^}]*)}/s);
+        /--([a-zA-Z0-9-]+):\s*((?:hsl|hsla)\([^)]+\)|[\d.-]+\s+[\d.]+%\s+[\d.]+%(?:\s*\/\s*[\d.]+%?)?);/g;
+
+      const lightSectionRegex = /:root\s*{([^}]*)}/s;
+      const darkSectionRegex = /\.dark\s*{([^}]*)}/s;
+
+      const lightSectionMatch = inputString.match(lightSectionRegex);
+      const darkSectionMatch = inputString.match(darkSectionRegex);
 
       const parseColorValue = (value: string): ColorConfig | null => {
         const hslRegex =
@@ -106,31 +110,45 @@ export default function ThemeGenerator() {
         }
       };
 
-      if (rootSection) {
-        parseSection(rootSection[1], parsedColors);
-        const finalColors = { ...defaults, ...parsedColors };
-        setColorsLight(finalColors);
-        if (activeMode === "light") {
-          updateCSSVariables(finalColors);
-        }
-      }
-      if (darkSection) {
-        parseSection(darkSection[1], parsedDarkColors);
-        const finalDarkColors = { ...defaultsDark, ...parsedDarkColors };
-        setColorsDark(finalDarkColors);
-        if (activeMode === "dark") {
-          updateCSSVariables(finalDarkColors);
-        }
+      if (lightSectionMatch) {
+        parseSection(lightSectionMatch[1], parsedColorsLight);
       }
 
-      if (failedVariables.length > 0) {
-        toast.error(
-          `Failed to parse the following variables: ${failedVariables.join(
-            ", "
-          )}. Others were updated successfully.`
-        );
+      if (darkSectionMatch) {
+        parseSection(darkSectionMatch[1], parsedColorsDark);
+      }
+
+      if (
+        Object.keys(parsedColorsLight).length === 0 &&
+        Object.keys(parsedColorsDark).length === 0
+      ) {
+        toast.error("No valid colors found in the pasted theme.");
       } else {
-        toast.success("Theme updated successfully!");
+        if (Object.keys(parsedColorsLight).length > 0) {
+          const finalColorsLight = { ...colorsLight, ...parsedColorsLight };
+          setColorsLight(finalColorsLight);
+          if (activeMode === "light") {
+            updateCSSVariables(finalColorsLight);
+          }
+        }
+
+        if (Object.keys(parsedColorsDark).length > 0) {
+          const finalColorsDark = { ...colorsDark, ...parsedColorsDark };
+          setColorsDark(finalColorsDark);
+          if (activeMode === "dark") {
+            updateCSSVariables(finalColorsDark);
+          }
+        }
+
+        if (failedVariables.length > 0) {
+          toast.error(
+            `Failed to parse the following variables: ${failedVariables.join(
+              ", "
+            )}. Others were updated successfully.`
+          );
+        } else {
+          toast.success("Theme updated successfully!");
+        }
       }
     } catch (error) {
       console.error("Theme parsing error:", error);
@@ -239,6 +257,7 @@ export default function ThemeGenerator() {
     switchTheme: (mode: "light" | "dark") => {
       setTheme(mode);
       setActiveMode(mode);
+      updateCSSVariables(mode === "light" ? colorsLight : colorsDark);
     },
   };
 
@@ -256,14 +275,15 @@ export default function ThemeGenerator() {
                 setDialogState((prev) => ({ ...prev, paste: true }))
               }
               className="flex items-center"
+              title="Paste Theme"
             >
               <Clipboard className="w-4 h-4 mr-2" />
-              Paste
             </Button>
             <Button
               variant="outline"
               onClick={actions.resetToDefault}
               className="flex items-center"
+              title="Reset Theme"
             >
               <RefreshCcw className="w-4 h-4 mr-2" />
               Reset
@@ -274,17 +294,17 @@ export default function ThemeGenerator() {
                 setDialogState((prev) => ({ ...prev, save: true }))
               }
               className="flex items-center"
+              title="Save Theme"
             >
               <Save className="w-4 h-4 mr-2" />
-              Save
             </Button>
             <Button
               variant="outline"
               onClick={actions.copyTheme}
               className="flex items-center bg-secondary text-secondary-foreground"
+              title="Copy Theme"
             >
               <Copy className="w-4 h-4 mr-2" />
-              Copy
             </Button>
             <Button
               variant="outline"
@@ -292,6 +312,7 @@ export default function ThemeGenerator() {
                 setDialogState((prev) => ({ ...prev, viewSaved: true }))
               }
               className="flex items-center"
+              title="View Saved Themes"
             >
               View Saved
             </Button>
@@ -301,9 +322,10 @@ export default function ThemeGenerator() {
                   onClick={() => actions.switchTheme("light")}
                   className="relative flex items-center min-w-[100px] justify-start"
                   variant={activeMode === "light" ? "default" : "secondary"}
+                  title="Light Mode"
                 >
                   <Sun className="w-4 h-4 mr-2" />
-                  Light
+
                   {activeMode === "light" && (
                     <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
                       active
@@ -314,9 +336,10 @@ export default function ThemeGenerator() {
                   onClick={() => actions.switchTheme("dark")}
                   className="relative flex items-center min-w-[100px] justify-start"
                   variant={activeMode === "dark" ? "default" : "secondary"}
+                  title="Dark Mode"
                 >
                   <Moon className="w-4 h-4 mr-2" />
-                  Dark
+
                   {activeMode === "dark" && (
                     <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
                       active
@@ -358,20 +381,20 @@ export default function ThemeGenerator() {
                 <Card
                   key={name}
                   className={`
-            p-4 
-            flex 
-            flex-col 
-            items-center 
-            justify-center 
-            ${textColor}
-            transition-all 
-            duration-300 
-            ease-in-out
-            hover:scale-105 
-            hover:shadow-xl 
-            cursor-pointer
-            active:scale-95
-          `}
+                p-4 
+                flex 
+                flex-col 
+                items-center 
+                justify-center 
+                ${textColor}
+                transition-all 
+                duration-300 
+                ease-in-out
+                hover:scale-105 
+                hover:shadow-xl 
+                cursor-pointer
+                active:scale-95
+              `}
                   style={{ backgroundColor }}
                   onClick={() => setActiveColor(name)}
                 >
