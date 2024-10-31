@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Copy, RefreshCcw, Save, Clipboard, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,16 @@ export default function ThemeGenerator() {
   const [includeAlpha, setIncludeAlpha] = useState(false);
   const { setTheme } = useTheme();
   const [activeMode, setActiveMode] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const themes = Object.keys(localStorage).reduce((acc, key) => {
+      if (key.startsWith("theme-")) {
+        acc[key] = localStorage.getItem(key) || "";
+      }
+      return acc;
+    }, {} as Record<string, string>);
+    setSavedThemes(themes);
+  }, []);
 
   const isValidColor = (config: ColorConfig): boolean => {
     return (
@@ -218,9 +228,9 @@ export default function ThemeGenerator() {
         return;
       }
       const css = generateThemeCSS();
-      localStorage.setItem(themeInput, css);
-      setSavedThemes((prev) => ({ ...prev, [themeInput]: css }));
-      localStorage.setItem("selectedTheme", themeInput);
+      const themeKey = `theme-${themeInput.trim()}`;
+      localStorage.setItem(themeKey, css);
+      setSavedThemes((prev) => ({ ...prev, [themeKey]: css }));
       toast.success("Theme saved successfully!");
       setThemeInput("");
       setDialogState((prev) => ({ ...prev, save: false }));
