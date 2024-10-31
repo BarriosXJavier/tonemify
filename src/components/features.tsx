@@ -9,7 +9,16 @@ import {
   Layers,
 } from "lucide-react";
 
-const FeatureItem = ({ icon: Icon, title, description, color }) => (
+import { FC } from "react";
+
+interface FeatureItemProps {
+  icon: FC<{ className?: string }>;
+  title: string;
+  description: string;
+  color: string;
+}
+
+const FeatureItem: FC<FeatureItemProps> = ({ icon: Icon, title, description, color }) => (
   <li className="group p-4 rounded-lg bg-background/50 dark:bg-background/20 border border-primary/10 dark:border-primary/5 hover:border-primary/20 dark:hover:border-primary/10 transition-all">
     <div className="flex items-start space-x-4">
       <div
@@ -43,7 +52,7 @@ const FeaturesSection = () => {
       title: "Advanced Customization",
       description:
         "Fine-tune every aspect of your theme with precise controls. Adjust colors, spacing, and more with real-time preview.",
-      color: "secondary",
+      color: "primary",
     },
 
     {
@@ -58,14 +67,14 @@ const FeaturesSection = () => {
       title: "Quick Export",
       description:
         "Copy your theme directly to clipboard in various formats. Seamlessly integrate with your existing projects.",
-      color: "secondary",
+      color: "primary",
     },
     {
       icon: Palette,
       title: "Color Harmonies",
       description:
         "Generate beautiful color palettes with our color harmony system. Create cohesive and balanced designs.",
-      color: "accent",
+      color: "primary",
     },
 
     {
@@ -73,14 +82,14 @@ const FeaturesSection = () => {
       title: "Easy Sharing",
       description:
         "Share your themes with team members or the community. Collaborate on design systems effortlessly.",
-      color: "secondary",
+      color: "primary",
     },
     {
       icon: Layers,
       title: "Component Preview",
       description:
         "Preview your theme across all ShadcnUI components in real-time. Ensure consistency throughout your design.",
-      color: "accent",
+      color: "primary",
     },
   ];
 

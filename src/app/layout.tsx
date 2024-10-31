@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { Montserrat } from "next/font/google";
+import Footer from "@/components/footer";
 
 const montserrat = Montserrat({
   weight: ["300", "400", "500", "700"],
@@ -33,6 +34,7 @@ export default function RootLayout({
         >
           <Header />
           {children}
+          <Footer />
           <Toaster position="bottom-right" />
         </ThemeProvider>
       </body>

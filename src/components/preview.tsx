@@ -1,16 +1,31 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  Moon,
-  Sun,
-  Clipboard,
+  Area,
+  AreaChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+} from "recharts";
+import {
+  ArrowDown,
+  ArrowUp,
+  Users,
+  Palette,
+  Download,
+  TrendingUp,
+  Calendar,
+  Filter,
+  RefreshCcw,
 } from "lucide-react";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
   Card,
   CardContent,
@@ -18,8 +33,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -27,289 +40,310 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+} from "@/components/ui/chart";
+import PerformanceMetrics from "./perfomance-chart";
+import { MarketShare } from "./market-share";
 
-const DocumentationPage = () => {
-  const [notifications, setNotifications] = useState(true);
-  const [date, setDate] = useState<Date>();
-  const [progress, setProgress] = useState(60);
-  const { toast } = useToast();
-  const [theme, setTheme] = useState("light");
+const Preview = () => {
+  const [timeRange, setTimeRange] = useState("7d");
+  const [selectedFilter, setSelectedFilter] = useState("all");
 
-  useEffect(() => {
-    const styleSheet = document.createElement("style");
-    document.head.appendChild(styleSheet);
+  // Sample data
+  const revenueData = [
+    { name: "Jan", revenue: 4000, profit: 2400 },
+    { name: "Feb", revenue: 3000, profit: 1398 },
+    { name: "Mar", revenue: 2000, profit: 9800 },
+    { name: "Apr", revenue: 2780, profit: 3908 },
+    { name: "May", revenue: 1890, profit: 4800 },
+    { name: "Jun", revenue: 2390, profit: 3800 },
+  ];
 
-    const handleThemeApplication = (event: CustomEvent) => {
-      styleSheet.textContent = event.detail;
-    };
+  const marketShare = [
+    { name: "Service A", value: 400 },
+    { name: "Service B", value: 300 },
+    { name: "Service C", value: 300 },
+    { name: "Service D", value: 200 },
+  ];
 
-    window.addEventListener(
-      "apply-theme",
-      handleThemeApplication as EventListener
-    );
+  const topPerformers = [
+    { name: "Alice Johnson", projects: 24, status: "Excellent" },
+    { name: "Bob Smith", projects: 19, status: "Good" },
+    { name: "Carol White", projects: 17, status: "Good" },
+    { name: "David Brown", projects: 15, status: "Average" },
+  ];
 
-    return () => {
-      window.removeEventListener(
-        "apply-theme",
-        handleThemeApplication as EventListener
-      );
-      if (styleSheet.parentNode) {
-        styleSheet.parentNode.removeChild(styleSheet);
-      }
-    };
-  }, []);
+  const pieColors = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4"];
 
-  const handleToggleNotifications = (pressed: boolean) => {
-    setNotifications(pressed);
-    toast({
-      title: "Notifications",
-      description: pressed ? "Notifications enabled" : "Notifications disabled",
-    });
-  };
+  const stats = [
+    {
+      title: "Total Projects",
+      value: "54",
+      change: "+14.5%",
+      icon: TrendingUp,
+      trend: "up",
+    },
+    {
+      title: "Active Clients",
+      value: "27",
+      change: "+28.4%",
+      icon: Users,
+      trend: "up",
+    },
+    {
+      title: "Downloads",
+      value: "128",
+      change: "-3.2%",
+      icon: Download,
+      trend: "down",
+    },
+    {
+      title: "Engagement",
+      value: "89%",
+      change: "+7.3%",
+      icon: Palette,
+      trend: "up",
+    },
+  ];
 
-  const handleCopyToClipboard = () => {
-    const themeStyles = document.querySelector("style")?.textContent || "";
-    navigator.clipboard.writeText(themeStyles).then(() => {
-      toast({
-        title: "Copied to Clipboard",
-        description: "Theme CSS has been copied successfully!",
-      });
-    });
-  };
-
-  const handleThemeChange = (value: string) => {
-    setTheme(value);
-    document.documentElement.setAttribute("data-theme", value);
-    toast({
-      title: "Theme Changed",
-      description: `Switched to ${value} mode`,
-    });
+  const chartConfig: ChartConfig = {
+    revenue: {
+      label: "Revenue",
+      color: "hsl(var(--chart-1))",
+    },
+    profit: {
+      label: "Profit",
+      color: "hsl(var(--chart-2))",
+    },
   };
 
   return (
-    <div className="min-h-screen p-8 space-y-12 bg-background/80 dark:bg-background/90 backdrop-blur-sm">
-      {/* Components Preview Section */}
-      <Card className="border-2 border-accent/20 bg-background/95 dark:bg-background/80 shadow-lg hover:shadow-accent/10 transition-all">
+    <div className="p-8 space-y-6">
+      <Card className="my-10 border-2 border-accent/20 bg-background/95 dark:bg-background/80 shadow-lg hover:shadow-accent/10 transition-all">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-accent dark:text-accent/80">
+          <CardTitle className="text-3xl font-bold text-center text-accent dark:text-primary">
             Components Preview
           </CardTitle>
-          <CardDescription className="text-lg text-primary dark:text-foreground/50">
+          <CardDescription className="text-lg text-center text-primary/20 dark:text-foreground/50">
             Explore the theming of various UI components below.
           </CardDescription>
         </CardHeader>
       </Card>
+      {/* Header Section */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Tonenemify Dashboard</h1>
+          <p className="text-muted-foreground">Complete overview</p>
+        </div>
+        <div className="flex gap-4">
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-36">
+              <Calendar className="w-4 h-4 mr-2" />
+              <SelectValue placeholder="Select range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">Last 7 days</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="icon">
+            <RefreshCcw className="w-4 h-4" />
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Filter className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setSelectedFilter("all")}>
+                All Data
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedFilter("projects")}>
+                Projects Only
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedFilter("clients")}>
+                Clients Only
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
 
-      {/* Components Showcase Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {/* User Profile Card */}
-        <Card className="border border-primary/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-primary dark:text-primary/80">
-              User Profile
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-4 justify-center">
-              <Avatar className="border-2 border-primary/20 shadow-inner dark:shadow-none dark:border-primary/10">
-                <AvatarImage src="/path/to/avatar.jpg" alt="User Avatar" />
-                <AvatarFallback className="bg-primary/10 dark:bg-primary/20 text-primary">
-                  U
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-lg font-medium text-foreground dark:text-foreground/80">
-                  John Doe
-                </p>
-                <p className="text-sm text-muted-foreground dark:text-muted-foreground/70">
-                  johndoe@example.com
-                </p>
+      {/* Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat, index) => (
+          <Card key={index}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">
+                {stat.title}
+              </CardTitle>
+              <stat.icon className="w-4 h-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="flex items-center text-xs">
+                {stat.trend === "up" ? (
+                  <ArrowUp className="w-4 h-4 text-green-500 mr-1" />
+                ) : (
+                  <ArrowDown className="w-4 h-4 text-red-500 mr-1" />
+                )}
+                <span
+                  className={
+                    stat.trend === "up" ? "text-green-500" : "text-red-500"
+                  }
+                >
+                  {stat.change}
+                </span>
               </div>
-            </div>
-          </CardContent>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Main Charts Section */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Revenue Overview</CardTitle>
+            <CardDescription>
+              Monthly revenue and profit analysis
+            </CardDescription>
+          </CardHeader>
+          <CardContent>{/* Revenue Chart */}</CardContent>
         </Card>
 
-        {/* Calendar Card */}
-        <Card className="border border-secondary/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
+        {/* Market Share Pie Chart */}
+
+        <Card>
           <CardHeader>
-            <CardTitle className="text-2xl text-secondary dark:text-secondary/80">
-              Calendar
-            </CardTitle>
+            <CardTitle>Market Distribution</CardTitle>
+            <CardDescription>Service market share</CardDescription>
           </CardHeader>
           <CardContent>
-            <CalendarComponent
-              selected={date}
-              onSelect={(newDate) => setDate(newDate)}
-              className="rounded-lg border border-secondary/20 dark:border-secondary/10 shadow-inner dark:shadow-none"
-            />
+            <MarketShare />
           </CardContent>
         </Card>
+      </div>
 
-        {/* Project Progress Card */}
-        <Card className="border border-accent/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Bar Chart */}
+        <Card>
           <CardHeader>
-            <CardTitle className="text-2xl text-accent dark:text-accent/80">
-              Project Progress
-            </CardTitle>
+            <CardTitle>Performance Metrics</CardTitle>
+            <CardDescription>Quarterly performance breakdown</CardDescription>
           </CardHeader>
-          <CardContent>
-            <Progress
-              value={progress}
-              className="h-2 bg-accent/20 dark:bg-accent/30 shadow-inner dark:shadow-none"
-            />
-          </CardContent>
+          <CardContent>{/* Perfomance chart */}</CardContent>
         </Card>
 
-        {/* Settings Card */}
-        <Card className="border border-primary/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
+        {/* Top Performers */}
+        <Card>
           <CardHeader>
-            <CardTitle className="text-2xl text-primary dark:text-primary/80">
-              Settings
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <Label className="text-muted-foreground dark:text-muted-foreground/70">
-                  Notifications
-                </Label>
-                <Switch
-                  checked={notifications}
-                  onCheckedChange={handleToggleNotifications}
-                  className="data-[state=checked]:bg-primary shadow-inner dark:shadow-none"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label className="text-muted-foreground dark:text-muted-foreground/70">
-                  Theme
-                </Label>
-                <Select value={theme} onValueChange={handleThemeChange}>
-                  <SelectTrigger className="w-32 border-primary/20 shadow-inner dark:border-primary/10 dark:shadow-none">
-                    <SelectValue placeholder="Select theme" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">Light</SelectItem>
-                    <SelectItem value="dark">Dark</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Messages Card */}
-        <Card className="border border-secondary/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-secondary dark:text-secondary/80">
-              Messages
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4 p-3 rounded-lg bg-secondary/5 dark:bg-secondary/10 hover:bg-secondary/10 dark:hover:bg-secondary/20 transition-colors shadow-inner dark:shadow-none">
-                <Avatar className="border-2 border-secondary/20 dark:border-secondary/10">
-                  <AvatarImage src="/path/to/avatar1.jpg" alt="User Avatar" />
-                  <AvatarFallback className="bg-secondary/10 dark:bg-secondary/20">
-                    A
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium text-foreground dark:text-foreground/80">
-                    Alice
-                  </p>
-                  <p className="text-sm text-muted-foreground dark:text-muted-foreground/70">
-                    Hey, how are you?
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4 p-3 rounded-lg bg-secondary/5 dark:bg-secondary/10 hover:bg-secondary/10 dark:hover:bg-secondary/20 transition-colors shadow-inner dark:shadow-none">
-                <Avatar className="border-2 border-secondary/20 dark:border-secondary/10">
-                  <AvatarImage src="/path/to/avatar2.jpg" alt="User Avatar" />
-                  <AvatarFallback className="bg-secondary/10 dark:bg-secondary/20">
-                    B
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium text-foreground dark:text-foreground/80">
-                    Bob
-                  </p>
-                  <p className="text-sm text-muted-foreground dark:text-muted-foreground/70">
-                    Let&apos;s catch up soon!
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* User Statistics Card */}
-        <Card className="border border-primary/10 bg-background/90 dark:bg-background/80 hover:bg-background/95 dark:hover:bg-background/75 transition-all shadow-sm hover:shadow-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-primary dark:text-primary/80">
-              User Statistics
-            </CardTitle>
+            <CardTitle>Top Performers</CardTitle>
+            <CardDescription>Best performing team members</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-2 rounded-lg bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors shadow-inner dark:shadow-none">
-                <Label className="text-muted-foreground dark:text-muted-foreground/70">
-                  Posts
-                </Label>
-                <Badge className="bg-primary/20 dark:bg-primary/30 text-primary">
-                  120
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors shadow-inner dark:shadow-none">
-                <Label className="text-muted-foreground dark:text-muted-foreground/70">
-                  Followers
-                </Label>
-                <Badge className="bg-primary/20 dark:bg-primary/30 text-primary">
-                  300
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors shadow-inner dark:shadow-none">
-                <Label className="text-muted-foreground dark:text-muted-foreground/70">
-                  Following
-                </Label>
-                <Badge className="bg-primary/20 dark:bg-primary/30 text-primary">
-                  180
-                </Badge>
-              </div>
+              {topPerformers.map((performer, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Avatar>
+                      <AvatarImage src={`/api/placeholder/${40 + index}/40`} />
+                      <AvatarFallback>
+                        {performer.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{performer.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {performer.projects} projects
+                      </p>
+                    </div>
+                  </div>
+                  <Badge
+                    variant={
+                      performer.status === "Excellent"
+                        ? "default"
+                        : performer.status === "Good"
+                        ? "secondary"
+                        : "outline"
+                    }
+                  >
+                    {performer.status}
+                  </Badge>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
-
-        {/* Action Buttons */}
-        <div className="col-span-full flex flex-wrap gap-4 justify-center mt-8">
-          <Button
-            variant="outline"
-            onClick={() => handleThemeChange("light")}
-            className="border-primary hover:bg-primary/10 dark:hover:bg-primary/20"
-          >
-            <Sun className="h-4 w-4 mr-2" /> Light Theme
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => handleThemeChange("dark")}
-            className="border-primary hover:bg-primary/10 dark:hover:bg-primary/20"
-          >
-            <Moon className="h-4 w-4 mr-2" /> Dark Theme
-          </Button>
-
-          {/* Copy Theme Button */}
-          <Button
-            variant="outline"
-            onClick={handleCopyToClipboard}
-            className="border-accent hover:bg-accent/10 dark:hover:bg-accent/20 shadow-md dark:shadow-none"
-          >
-            <Clipboard className="h-4 w-4 mr-2" /> Copy Theme
-          </Button>
-        </div>
       </div>
+
+      {/* Tabs Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Detailed Analysis</CardTitle>
+          <CardDescription>Comprehensive metrics breakdown</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="overview">
+            <TabsList>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="details">Details</TabsTrigger>
+            </TabsList>
+            <TabsContent value="overview">
+              <div className="space-y-4">
+                {stats.map((stat, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium">{stat.title}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {stat.value}
+                      </span>
+                    </div>
+                    <Progress value={parseFloat(stat.change)} className="h-2" />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="details">
+              <div className="space-y-4">
+                {marketShare.map((item, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium">{item.name}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {item.value}
+                      </span>
+                    </div>
+                    <Progress value={item.value / 10} className="h-2" />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+     
     </div>
   );
 };
 
-export default DocumentationPage;
+export default Preview;
