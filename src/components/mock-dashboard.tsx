@@ -1,10 +1,10 @@
 "use client";
 
-import { ClientSatisfactionChart } from "./client-satisfaction";
-import { ProjectsCompletedChart } from "./projects-completed";
-import { ProjectTypesChart } from "./project-types";
-import { RecentProjectsTable } from "./recent-projects";
-import PerformanceMetrics from "./perfomance-chart";
+import { ClientSatisfactionChart } from "./charts/client-satisfaction";
+import { ProjectsCompletedChart } from "./charts/projects-completed";
+import { ProjectTypesChart } from "./charts/project-types";
+import { RecentProjectsTable } from "./charts/recent-projects";
+import PerformanceMetrics from "./charts/perfomance-chart";
 
 export default function MockDashboard() {
   return (
