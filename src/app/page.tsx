@@ -1,8 +1,10 @@
 import Faqs from "@/components/faqs";
 import FeaturesSection from "@/components/features";
 import Hero from "@/components/hero";
+import MockDashboard from "@/components/mock-dashboard";
+
 import ThemeGenerator from "@/components/theme-generator";
-import TonemifyDashboard from "../components/mock-dashboard";
+
 
 export default function Home() {
   return (
@@ -11,8 +13,8 @@ export default function Home() {
       <ThemeGenerator />
       <Faqs />
       <FeaturesSection />
-
-      <TonemifyDashboard />
+      <MockDashboard />
+     
     </main>
   );
 }
