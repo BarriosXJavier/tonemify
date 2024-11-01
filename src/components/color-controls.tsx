@@ -21,6 +21,7 @@ export function ColorControls({
   onChange,
   onHexChange,
 }: ColorControlsProps) {
+  // ... (keeping the conversion functions the same)
   const hslToHex = (h: number, s: number, l: number, a: number): string => {
     h = ((h % 360) + 360) % 360;
     s = Math.min(Math.max(s, 0), 100);
@@ -100,125 +101,170 @@ export function ColorControls({
   }%, ${color.alpha / 100})`;
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <div
-          className="h-8 rounded-lg transition-colors duration-200"
-          style={{ backgroundColor: currentColor }}
-        />
-
-        <div className="space-y-2">
-          <Label>Color Picker</Label>
-          <ColorPicker
-            color={currentColorHex}
-            onChange={(hex) => {
-              const hsl = hexToHSL(hex);
-              onChange("hue", hsl.hue);
-              onChange("saturation", hsl.saturation);
-              onChange("lightness", hsl.lightness);
-              onChange("alpha", hsl.alpha);
-              onHexChange(hex);
-            }}
+    <div className="flex h-full w-full items-center justify-center p-4  max-md:w-3/4">
+      <div className="w-full max-w-md space-y-6 rounded-lg">
+        <div className="space-y-4">
+          <div
+            className="h-8 w-full rounded-lg transition-colors duration-200"
+            style={{ backgroundColor: currentColor }}
           />
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Color Picker</Label>
+            <ColorPicker
+              color={currentColorHex}
+              onChange={(hex) => {
+                const hsl = hexToHSL(hex);
+                onChange("hue", hsl.hue);
+                onChange("saturation", hsl.saturation);
+                onChange("lightness", hsl.lightness);
+                onChange("alpha", hsl.alpha);
+                onHexChange(hex);
+              }}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label>Hue ({color.hue}°)</Label>
-        <Slider
-          value={[color.hue]}
-          min={0}
-          max={360}
-          step={1}
-          onValueChange={([value]) => {
-            onChange("hue", value);
-            onHexChange(
-              hslToHex(
-                value,
-                color.saturation,
-                color.lightness,
-                color.alpha / 100
-              )
-            );
-          }}
-          className="h-2 rounded-full"
-          style={{
-            background: `linear-gradient(to right, 
-              hsla(${color.hue}, 0%, ${color.lightness}%, ${color.alpha / 100}),
-              hsla(${color.hue}, 100%, ${color.lightness}%, ${
-              color.alpha / 100
-            }))`,
-          }}
-        />
-      </div>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Hue</Label>
+              <span className="text-xs text-muted-foreground">
+                {color.hue}°
+              </span>
+            </div>
+            <Slider
+              value={[color.hue]}
+              min={0}
+              max={360}
+              step={1}
+              onValueChange={([value]) => {
+                onChange("hue", value);
+                onHexChange(
+                  hslToHex(
+                    value,
+                    color.saturation,
+                    color.lightness,
+                    color.alpha / 100
+                  )
+                );
+              }}
+              className="h-2 w-full rounded-full"
+              style={{
+                background: `linear-gradient(to right, 
+                  hsl(0, ${color.saturation}%, ${color.lightness}%),
+                  hsl(60, ${color.saturation}%, ${color.lightness}%),
+                  hsl(120, ${color.saturation}%, ${color.lightness}%),
+                  hsl(180, ${color.saturation}%, ${color.lightness}%),
+                  hsl(240, ${color.saturation}%, ${color.lightness}%),
+                  hsl(300, ${color.saturation}%, ${color.lightness}%),
+                  hsl(360, ${color.saturation}%, ${color.lightness}%))`,
+              }}
+            />
+          </div>
 
-      <div className="space-y-2">
-        <Label>Saturation ({color.saturation}%)</Label>
-        <Slider
-          value={[color.saturation]}
-          min={0}
-          max={100}
-          step={1}
-          onValueChange={([value]) => {
-            onChange("saturation", value);
-            onHexChange(
-              hslToHex(color.hue, value, color.lightness, color.alpha / 100)
-            );
-          }}
-          className="h-2 rounded-full"
-          style={{
-            background: `linear-gradient(to right, 
-              hsla(${color.hue}, 0%, ${color.lightness}%, ${color.alpha / 100}),
-              hsla(${color.hue}, 100%, ${color.lightness}%, ${
-              color.alpha / 100
-            }))`,
-          }}
-        />
-      </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Saturation</Label>
+              <span className="text-xs text-muted-foreground">
+                {color.saturation}%
+              </span>
+            </div>
+            <Slider
+              value={[color.saturation]}
+              min={0}
+              max={100}
+              step={1}
+              onValueChange={([value]) => {
+                onChange("saturation", value);
+                onHexChange(
+                  hslToHex(color.hue, value, color.lightness, color.alpha / 100)
+                );
+              }}
+              className="h-2 w-full rounded-full"
+              style={{
+                background: `linear-gradient(to right, 
+                  hsla(${color.hue}, 0%, ${color.lightness}%, ${
+                  color.alpha / 100
+                }),
+                  hsla(${color.hue}, 100%, ${color.lightness}%, ${
+                  color.alpha / 100
+                }))`,
+              }}
+            />
+          </div>
 
-      <div className="space-y-2">
-        <Label>Lightness ({color.lightness}%)</Label>
-        <Slider
-          value={[color.lightness]}
-          min={0}
-          max={100}
-          step={1}
-          onValueChange={([value]) => {
-            onChange("lightness", value);
-            onHexChange(
-              hslToHex(color.hue, color.saturation, value, color.alpha / 100)
-            );
-          }}
-          className="h-2 rounded-full"
-          style={{
-            background: `linear-gradient(to right, 
-              hsla(${color.hue}, 0%, ${color.lightness}%, ${color.alpha / 100}),
-              hsla(${color.hue}, 100%, ${color.lightness}%, ${
-              color.alpha / 100
-            }))`,
-          }}
-        />
-      </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Lightness</Label>
+              <span className="text-xs text-muted-foreground">
+                {color.lightness}%
+              </span>
+            </div>
+            <Slider
+              value={[color.lightness]}
+              min={0}
+              max={100}
+              step={1}
+              onValueChange={([value]) => {
+                onChange("lightness", value);
+                onHexChange(
+                  hslToHex(
+                    color.hue,
+                    color.saturation,
+                    value,
+                    color.alpha / 100
+                  )
+                );
+              }}
+              className="h-2 w-full rounded-full"
+              style={{
+                background: `linear-gradient(to right, 
+                  hsla(${color.hue}, ${color.saturation}%, 0%, ${
+                  color.alpha / 100
+                }),
+                  hsla(${color.hue}, ${color.saturation}%, 50%, ${
+                  color.alpha / 100
+                }),
+                  hsla(${color.hue}, ${color.saturation}%, 100%, ${
+                  color.alpha / 100
+                }))`,
+              }}
+            />
+          </div>
 
-      <div className="space-y-2">
-        <Label>Alpha ({color.alpha}%)</Label>
-        <Slider
-          value={[color.alpha]}
-          min={0}
-          max={100}
-          step={1}
-          onValueChange={([value]) => {
-            onChange("alpha", value);
-          }}
-          className="h-2 rounded-full"
-          style={{
-            background: `linear-gradient(to right, 
-              hsla(${color.hue}, 0%, ${color.lightness}%, ${color.alpha / 100}),
-              hsla(${color.hue}, 100%, ${color.lightness}%, ${
-              color.alpha / 100
-            }))`,
-          }}
-        />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Alpha</Label>
+              <span className="text-xs text-muted-foreground">
+                {color.alpha}%
+              </span>
+            </div>
+            <Slider
+              value={[color.alpha]}
+              min={0}
+              max={100}
+              step={1}
+              onValueChange={([value]) => {
+                onChange("alpha", value);
+                onHexChange(
+                  hslToHex(
+                    color.hue,
+                    color.saturation,
+                    color.lightness,
+                    value / 100
+                  )
+                );
+              }}
+              className="h-2 w-full rounded-full"
+              style={{
+                background: `linear-gradient(to right, 
+                  hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0),
+                  hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 1))`,
+              }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

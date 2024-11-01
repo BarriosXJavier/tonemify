@@ -351,7 +351,7 @@ export default function ThemeGenerator() {
           </div>
 
           {/* Color Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {Object.entries(currentColors).map(([name, config]) => {
               const validColor = isValidColor(config);
               const backgroundColor = validColor
@@ -400,7 +400,7 @@ export default function ThemeGenerator() {
                 >
                   <div className="text-center">
                     <p className="text-sm font-medium">{name}</p>
-                    <p className="text-xs">{hexValue}</p>
+                    <p className="text-xs font-bold">{hexValue}</p>
                   </div>
                 </Card>
               );
@@ -424,7 +424,7 @@ export default function ThemeGenerator() {
           <textarea
             value={pasteInput}
             onChange={(e) => setPasteInput(e.target.value)}
-            className="w-full h-60 border rounded p-2"
+            className="w-full h-60 border rounded p-2 text-black  dark:text-white "
             placeholder={`Paste your CSS theme...
 
 Expected format:
