@@ -37,26 +37,22 @@ export function ClientSatisfactionChart() {
           Average monthly satisfaction score (out of 5)
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer
-          config={chartConfigs}
-         
-        >
-          <LineChart
-            data={clientSatisfaction}
-            width={600}
-            height={200}
-          >
-            <ChartTooltip content={<ChartTooltipContent />} />
-            <Line
-              type="monotone"
-              dataKey="satisfaction"
-              stroke={chartConfigs.satisfaction.color}
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ChartContainer>
-      </CardContent>
+      <div className="relative h-[300px] w-full overflow-x-auto">
+        <CardContent>
+          <ChartContainer config={chartConfigs}>
+            <LineChart data={clientSatisfaction} width={600} height={200}>
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Line
+                type="monotone"
+                dataKey="satisfaction"
+                stroke={chartConfigs.satisfaction.color}
+                strokeWidth={4}
+              />
+            </LineChart>
+          </ChartContainer>
+        </CardContent>
+      </div>
+     
     </Card>
   );
 }

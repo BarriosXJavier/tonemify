@@ -108,7 +108,7 @@ const Faqs = () => {
               >
                 <Image
                   src="/github.png"
-                  alt="Buy Me a Beer"
+                  alt="Contribute on GitHub"
                   className="h-6 w-6"
                   height={24}
                   width={24}
@@ -116,6 +116,20 @@ const Faqs = () => {
                 <span className="text-sm">Contribute on GitHub</span>
               </Link>
             </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem
+          value="open-to-work"
+          className="border-primary/20 dark:border-primary/10 rounded-lg bg-background/90 dark:bg-dark-background/90"
+        >
+          <AccordionTrigger className="text-foreground dark:text-dark-foreground hover:text-primary dark:hover:text-dark-primary transition-colors px-4 py-2 text-lg font-medium">
+            Are you open to work?
+          </AccordionTrigger>
+          <AccordionContent className="text-muted-foreground dark:text-dark-muted-foreground px-4 leading-relaxed">
+            Yes, I am open to new opportunities and collaborations. If you have
+            an exciting project or job offer, feel free to reach out to me
+            through my contact page. I look forward to hearing from you!
           </AccordionContent>
         </AccordionItem>
       </Accordion>

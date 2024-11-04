@@ -42,11 +42,7 @@ export function ProjectsCompletedChart() {
           config={chartConfigs}
           className="h-[300px] md:h-[300px]"
         >
-          <BarChart
-            data={projectsPerMonth}
-            width={350}
-            height={300}
-          >
+          <BarChart data={projectsPerMonth} width={350} height={300}>
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar
               dataKey="projects"

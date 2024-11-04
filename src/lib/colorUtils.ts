@@ -119,3 +119,5 @@ export const defaultsDark: Record<string, ColorConfig> = {
   "chart-4": { hue: 38, saturation: 95, lightness: 44, alpha: 1 }, // Warm gold variation
   "chart-5": { hue: 14, saturation: 95, lightness: 44, alpha: 1 }, // Warm terracotta variation
 };
+
+

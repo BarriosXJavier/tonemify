@@ -1,11 +1,4 @@
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { AreaChart, Area, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -13,6 +6,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 const PerformanceMetrics = () => {
   const data = [
@@ -22,11 +20,20 @@ const PerformanceMetrics = () => {
     { name: "Q4", projects: 28, bugs: 9, target: 26 },
   ];
 
-  // Get CSS variables for colors
-  const rootStyle = getComputedStyle(document.documentElement);
-  const colorProjects = rootStyle.getPropertyValue("--primary").trim();
-  const colorBugs = rootStyle.getPropertyValue("--secondary").trim();
-  const colorTarget = rootStyle.getPropertyValue("--accent").trim();
+  const chartConfigs = {
+    projects: {
+      label: "Projects",
+      color: "hsl(var(--chart-5))",
+    },
+    bugs: {
+      label: "Bugs",
+      color: "hsl(var(--chart-2))",
+    },
+    target: {
+      label: "Target",
+      color: "hsl(var(--chart-3))",
+    },
+  };
 
   return (
     <Card>
@@ -37,63 +44,36 @@ const PerformanceMetrics = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div style={{ width: "100%", height: "300px" }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={data}
-              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-              height={300}
-              width={350}
-            >
-              <defs>
-                <linearGradient id="colorProjects" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor={colorProjects}
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor={colorProjects}
-                    stopOpacity={0}
-                  />
-                </linearGradient>
-                <linearGradient id="colorBugs" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={colorBugs} stopOpacity={0.8} />
-                  <stop offset="95%" stopColor={colorBugs} stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="colorTarget" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={colorTarget} stopOpacity={0.8} />
-                  <stop offset="95%" stopColor={colorTarget} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Area
-                type="monotone"
-                dataKey="projects"
-                stroke={colorProjects}
-                fillOpacity={1}
-                fill="url(#colorProjects)"
-              />
-              <Area
-                type="monotone"
-                dataKey="bugs"
-                stroke={colorBugs}
-                fillOpacity={1}
-                fill="url(#colorBugs)"
-              />
-              <Area
-                type="monotone"
-                dataKey="target"
-                stroke={colorTarget}
-                fillOpacity={1}
-                fill="url(#colorTarget)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        <ChartContainer config={chartConfigs} className="h-[300px]">
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            height={300}
+            width={350}
+          >
+            <XAxis dataKey="name" />
+            <YAxis />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Area
+              type="monotone"
+              dataKey="projects"
+              stroke={chartConfigs.projects.color}
+              fill={chartConfigs.projects.color}
+            />
+            <Area
+              type="monotone"
+              dataKey="bugs"
+              stroke={chartConfigs.bugs.color}
+              fill={chartConfigs.bugs.color}
+            />
+            <Area
+              type="monotone"
+              dataKey="target"
+              stroke={chartConfigs.target.color}
+              fill={chartConfigs.target.color}
+            />
+          </AreaChart>
+        </ChartContainer>
       </CardContent>
     </Card>
   );

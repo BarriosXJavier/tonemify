@@ -417,14 +417,14 @@ export default function ThemeGenerator() {
           setDialogState((prev) => ({ ...prev, paste: open }))
         }
       >
-        <DialogContent className="bg-background/60">
+        <DialogContent className="bg-background/60 p-4 sm:p-6 md:p-8 max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto">
           <DialogHeader>
             <DialogTitle>Paste Theme</DialogTitle>
           </DialogHeader>
           <textarea
             value={pasteInput}
             onChange={(e) => setPasteInput(e.target.value)}
-            className="w-full h-60 border rounded p-2 text-black  dark:text-white "
+            className="w-full h-40 sm:h-48 md:h-60 border rounded p-2 text-black dark:text-white"
             placeholder={`Paste your CSS theme...
 
 Expected format:
@@ -548,7 +548,7 @@ Expected format:
                         </Button>
                       </div>
                     </div>
-                    <pre className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
+                    <pre className="bg-background text-primary dark:text-foreground p-2 rounded text-xs overflow-x-auto">
                       {css}
                     </pre>
                   </li>
@@ -576,13 +576,16 @@ Expected format:
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="capitalize">{activeColor}</DialogTitle>
+            <DialogTitle className="capitalize">{activeColor!}</DialogTitle>
           </DialogHeader>
           {activeColor && (
             <ColorControls
-              color={currentColors[activeColor]}
+              color={{
+                ...currentColors[activeColor!],
+                alpha: currentColors[activeColor!].alpha ?? 1,
+              }}
               onChange={(property, value) =>
-                updateColor(activeColor, property, value)
+                updateColor(activeColor!, property, value)
               }
               onHexChange={() => {}}
             />
