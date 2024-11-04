@@ -38,7 +38,7 @@ const PerformanceMetrics = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Performance Metrics</CardTitle>
+        <CardTitle className="text-primary">Performance Metrics</CardTitle>
         <CardDescription>
           Quarterly performance metrics including projects, bugs, and targets
         </CardDescription>

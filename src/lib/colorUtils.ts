@@ -121,3 +121,128 @@ export const defaultsDark: Record<string, ColorConfig> = {
 };
 
 
+export const generateThemeColorsFromPrimary = (
+  baseHue: number,
+  isDarkMode: boolean
+): Record<string, ColorConfig> => {
+  const offsetHue = (baseHue - 38 + 360) % 360;
+
+  return {
+    background: {
+      hue: baseHue,
+      saturation: isDarkMode ? 50 : 92,
+      lightness: isDarkMode ? 10 : 95,
+      alpha: 1,
+    },
+    foreground: {
+      hue: baseHue,
+      saturation: 5,
+      lightness: isDarkMode ? 90 : 10,
+      alpha: 1,
+    },
+    card: {
+      hue: baseHue,
+      saturation: 50,
+      lightness: isDarkMode ? 10 : 90,
+      alpha: 1,
+    },
+    "card-foreground": {
+      hue: baseHue,
+      saturation: 5,
+      lightness: isDarkMode ? 90 : 15,
+      alpha: 1,
+    },
+    popover: {
+      hue: baseHue,
+      saturation: isDarkMode ? 50 : 92,
+      lightness: isDarkMode ? 5 : 95,
+      alpha: 1,
+    },
+    "popover-foreground": {
+      hue: baseHue,
+      saturation: 5,
+      lightness: isDarkMode ? 90 : 10,
+      alpha: 1,
+    },
+    primary: {
+      hue: baseHue,
+      saturation: 86,
+      lightness: 27,
+      alpha: 1,
+    },
+    "primary-foreground": {
+      hue: 0,
+      saturation: 0,
+      lightness: 100,
+      alpha: 1,
+    },
+    secondary: {
+      hue: baseHue,
+      saturation: 30,
+      lightness: isDarkMode ? 20 : 70,
+      alpha: 1,
+    },
+    "secondary-foreground": {
+      hue: 0,
+      saturation: 0,
+      lightness: isDarkMode ? 100 : 0,
+      alpha: 1,
+    },
+    muted: {
+      hue: offsetHue,
+      saturation: 30,
+      lightness: isDarkMode ? 25 : 85,
+      alpha: 1,
+    },
+    "muted-foreground": {
+      hue: baseHue,
+      saturation: 5,
+      lightness: isDarkMode ? 60 : 36,
+      alpha: 1,
+    },
+    accent: {
+      hue: offsetHue,
+      saturation: 30,
+      lightness: isDarkMode ? 25 : 80,
+      alpha: 1,
+    },
+    "accent-foreground": {
+      hue: baseHue,
+      saturation: 5,
+      lightness: isDarkMode ? 90 : 15,
+      alpha: 1,
+    },
+    destructive: {
+      hue: 0,
+      saturation: 92,
+      lightness: 36,
+      alpha: 1,
+    },
+    "destructive-foreground": {
+      hue: baseHue,
+      saturation: 5,
+      lightness: 90,
+      alpha: 1,
+    },
+    border: {
+      hue: baseHue,
+      saturation: 30,
+      lightness: isDarkMode ? 36 : 50,
+      alpha: 1,
+    },
+    input: {
+      hue: baseHue,
+      saturation: 30,
+      lightness: 36,
+      alpha: 1,
+    },
+    ring: {
+      hue: baseHue,
+      saturation: 86,
+      lightness: 27,
+      alpha: 1,
+    },
+  };
+};
+
+

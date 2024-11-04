@@ -20,10 +20,10 @@ const Faqs = () => {
             What is Tonemify?
           </AccordionTrigger>
           <AccordionContent className="text-muted-foreground dark:text-dark-muted-foreground px-4 leading-relaxed">
-            Tonemify is a web application designed to help users generate,
-            prototype, and manage ShadCN themes effortlessly. With a
-            user-friendly interface and powerful features, Tonemify allows you
-            to fine-tune your themes with ease.
+            Tonemify is a tool designed to help users generate, prototype, and
+            manage ShadCN themes effortlessly. With a user-friendly interface
+            and powerful features, Tonemify allows you to fine-tune your themes
+            with ease.
           </AccordionContent>
         </AccordionItem>
 
@@ -32,12 +32,13 @@ const Faqs = () => {
           className="border-primary/20 dark:border-primary/10 rounded-lg bg-background/90 dark:bg-dark-background/90"
         >
           <AccordionTrigger className="text-foreground dark:text-dark-foreground hover:text-primary dark:hover:text-dark-primary transition-colors px-4 py-2 text-lg font-medium">
-            How do I create a theme?
+            How does it work?
           </AccordionTrigger>
           <AccordionContent className="text-muted-foreground dark:text-dark-muted-foreground px-4 leading-relaxed">
-            Use the theme generator to create a new theme. Adjust the colors and
-            settings as desired. Once you&apos;re satisfied with your theme,
-            save it for future use.
+            Paste your current ShadCN theme. It will immediately update the
+            color cards. Click on the cards to adjust the colors as desired and
+            preview the changes you made in the components. Once you&apos;re
+            satisfied with your new cool theme, save it for future use.
           </AccordionContent>
         </AccordionItem>
 

@@ -43,7 +43,7 @@ export function ColorControls({
   };
 
   return (
-    <div className="flex h-full w-full items-center justify-center p-4 max-md:w-3/4">
+    <div className="flex h-full w-full items-center justify-center p-4 max-md:w-3/4 overflow-auto">
       <div className="w-full max-w-md space-y-6 rounded-lg">
         <div className="space-y-4">
           <div

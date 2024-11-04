@@ -32,7 +32,7 @@ export function ClientSatisfactionChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Client Satisfaction</CardTitle>
+        <CardTitle className="text-primary">Client Satisfaction</CardTitle>
         <CardDescription>
           Average monthly satisfaction score (out of 5)
         </CardDescription>

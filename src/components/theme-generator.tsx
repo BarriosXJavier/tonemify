@@ -18,6 +18,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { hslToHex } from "@/lib/colorUtils";
 import { defaults, defaultsDark } from "@/lib/colorUtils";
 import { ColorConfig } from "@/lib/types";
+import { generateThemeColorsFromPrimary } from "@/lib/colorUtils";
+import { hexToHSL } from "@/lib/colorUtils";
 
 export default function ThemeGenerator() {
   const [colorsLight, setColorsLight] =
@@ -56,108 +58,155 @@ export default function ThemeGenerator() {
     );
   };
 
-  const handlePasteTheme = (input?: string) => {
-    try {
-      const parsedColorsLight: Record<string, ColorConfig> = {};
-      const parsedColorsDark: Record<string, ColorConfig> = {};
-      const failedVariables: string[] = [];
-      const inputString = input || pasteInput;
 
-      const variableRegex =
-        /--([a-zA-Z0-9-]+):\s*((?:hsl|hsla)\([^)]+\)|[\d.-]+\s+[\d.]+%\s+[\d.]+%(?:\s*\/\s*[\d.]+%?)?);/g;
+ const handlePasteTheme = (input?: string) => {
+   try {
+     const parsedColorsLight: Record<string, ColorConfig> = {};
+     const parsedColorsDark: Record<string, ColorConfig> = {};
+     const failedVariables: string[] = [];
+     const inputString = input || pasteInput;
 
-      const lightSectionRegex = /:root\s*{([^}]*)}/s;
-      const darkSectionRegex = /\.dark\s*{([^}]*)}/s;
+     const variableRegex = /--([a-zA-Z0-9-]+):\s*([^;]+);/g;
 
-      const lightSectionMatch = inputString.match(lightSectionRegex);
-      const darkSectionMatch = inputString.match(darkSectionRegex);
+     const lightSectionRegex = /:root\s*{([^}]*)}/s;
+     const darkSectionRegex = /\.dark\s*{([^}]*)}/s;
 
-      const parseColorValue = (value: string): ColorConfig | null => {
-        const hslRegex =
-          /^(?:hsl|hsla)\(\s*([\d.-]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/;
-        const spaceRegex =
-          /^([\d.-]+)\s+([\d.]+)%\s+([\d.]+)%(?:\s*\/\s*([\d.]+%?))?$/;
+     const lightSectionMatch = inputString.match(lightSectionRegex);
+     const darkSectionMatch = inputString.match(darkSectionRegex);
 
-        const match = value.match(hslRegex) || value.match(spaceRegex);
-        if (!match) return null;
+     const parseColorValue = (value: string): ColorConfig | null => {
+       const hslRegex =
+         /^(?:hsl|hsla)\(\s*([\d.-]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/;
+       const spaceRegex =
+         /^([\d.-]+)\s+([\d.]+)%\s+([\d.]+)%(?:\s*\/\s*([\d.]+%?))?$/;
+       const hexRegex = /^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/;
 
-        return {
-          hue: parseFloat(match[1]),
-          saturation: parseFloat(match[2]),
-          lightness: parseFloat(match[3]),
-          alpha: match[4]
-            ? match[4].endsWith("%")
-              ? parseFloat(match[4]) / 100
-              : parseFloat(match[4])
-            : 1,
-        };
-      };
+       let match;
+       if ((match = value.match(hslRegex) || value.match(spaceRegex))) {
+         return {
+           hue: parseFloat(match[1]),
+           saturation: parseFloat(match[2]),
+           lightness: parseFloat(match[3]),
+           alpha: match[4]
+             ? match[4].endsWith("%")
+               ? parseFloat(match[4]) / 100
+               : parseFloat(match[4])
+             : 1,
+         };
+       } else if ((match = value.match(hexRegex))) {
+         // Convert hex to HSL here
+         const hsl = hexToHSL(value);
+         return hsl;
+       } else {
+         return null;
+       }
+     };
 
-      const parseSection = (
-        section: string,
-        target: Record<string, ColorConfig>
-      ) => {
-        let match;
-        while ((match = variableRegex.exec(section)) !== null) {
-          const [, name, value] = match;
-          if (!defaults[name]) continue;
-          const colorConfig = parseColorValue(value.trim());
-          if (colorConfig) {
-            target[name] = colorConfig;
-          } else {
-            failedVariables.push(name);
-          }
-        }
-      };
+     const parseSection = (
+       section: string,
+       target: Record<string, ColorConfig>
+     ) => {
+       let match;
+       while ((match = variableRegex.exec(section)) !== null) {
+         const [, name, value] = match;
+         if (!defaults[name]) continue;
+         const colorConfig = parseColorValue(value.trim());
+         if (colorConfig) {
+           target[name] = colorConfig;
+         } else {
+           failedVariables.push(name);
+         }
+       }
+     };
 
-      if (lightSectionMatch) {
-        parseSection(lightSectionMatch[1], parsedColorsLight);
-      }
+     if (lightSectionMatch) {
+       parseSection(lightSectionMatch[1], parsedColorsLight);
+     } else {
+       // If no light section, parse entire input for light mode
+       parseSection(inputString, parsedColorsLight);
+     }
 
-      if (darkSectionMatch) {
-        parseSection(darkSectionMatch[1], parsedColorsDark);
-      }
+     if (darkSectionMatch) {
+       parseSection(darkSectionMatch[1], parsedColorsDark);
+     }
 
-      if (
-        Object.keys(parsedColorsLight).length === 0 &&
-        Object.keys(parsedColorsDark).length === 0
-      ) {
-        toast.error("No valid colors found in the pasted theme.");
-      } else {
-        if (Object.keys(parsedColorsLight).length > 0) {
-          const finalColorsLight = { ...colorsLight, ...parsedColorsLight };
-          setColorsLight(finalColorsLight);
-          if (activeMode === "light") {
-            updateCSSVariables(finalColorsLight);
-          }
-        }
+     const applyGeneratedColors = (
+       parsedColors: Record<string, ColorConfig>,
+       mode: "light" | "dark"
+     ) => {
+       if (parsedColors["primary"]) {
+         const baseHue = parsedColors["primary"].hue;
+         const isDarkMode = mode === "dark";
+         const generatedColors = generateThemeColorsFromPrimary(baseHue, isDarkMode);
 
-        if (Object.keys(parsedColorsDark).length > 0) {
-          const finalColorsDark = { ...colorsDark, ...parsedColorsDark };
-          setColorsDark(finalColorsDark);
-          if (activeMode === "dark") {
-            updateCSSVariables(finalColorsDark);
-          }
-        }
+         Object.keys(generatedColors).forEach((key) => {
+           if (!parsedColors[key]) {
+             parsedColors[key] = generatedColors[key];
+           }
+         });
+       }
+     };
 
-        if (failedVariables.length > 0) {
-          toast.error(
-            `Failed to parse the following variables: ${failedVariables.join(
-              ", "
-            )}. Others were updated successfully.`
-          );
-        } else {
-          toast.success("Theme updated successfully!");
-        }
-      }
-    } catch (error) {
-      console.error("Theme parsing error:", error);
-      toast.error("Failed to parse theme. Please check the format.");
-    } finally {
-      setDialogState((prev) => ({ ...prev, paste: false }));
-      setPasteInput("");
-    }
-  };
+     applyGeneratedColors(parsedColorsLight, "light");
+     applyGeneratedColors(parsedColorsDark, "dark");
+
+     // Generate dark mode colors if only light mode colors are provided
+     if (
+       Object.keys(parsedColorsDark).length === 0 &&
+       Object.keys(parsedColorsLight).length > 0
+     ) {
+       const baseHue = parsedColorsLight["primary"]?.hue;
+       if (baseHue !== undefined) {
+         const generatedColorsDark = generateThemeColorsFromPrimary(baseHue, true);
+         Object.keys(generatedColorsDark).forEach((key) => {
+           if (!parsedColorsDark[key]) {
+             parsedColorsDark[key] = generatedColorsDark[key];
+           }
+         });
+       }
+     }
+
+     if (
+       Object.keys(parsedColorsLight).length === 0 &&
+       Object.keys(parsedColorsDark).length === 0
+     ) {
+       toast.error("No valid colors found in the pasted theme.");
+     } else {
+       if (Object.keys(parsedColorsLight).length > 0) {
+         const finalColorsLight = { ...colorsLight, ...parsedColorsLight };
+         setColorsLight(finalColorsLight);
+         if (activeMode === "light") {
+           updateCSSVariables(finalColorsLight);
+         }
+       }
+
+       if (Object.keys(parsedColorsDark).length > 0) {
+         const finalColorsDark = { ...colorsDark, ...parsedColorsDark };
+         setColorsDark(finalColorsDark);
+         if (activeMode === "dark") {
+           updateCSSVariables(finalColorsDark);
+         }
+       }
+
+       if (failedVariables.length > 0) {
+         toast.error(
+           `Failed to parse the following variables: ${failedVariables.join(
+             ", "
+           )}. Others were updated successfully.`
+         );
+       } else {
+         toast.success("Theme updated successfully!");
+       }
+     }
+   } catch (error) {
+     console.error("Theme parsing error:", error);
+     toast.error("Failed to parse theme. Please check the format.");
+   } finally {
+     setDialogState((prev) => ({ ...prev, paste: false }));
+     setPasteInput("");
+   }
+ };
+
 
   const updateCSSVariables = (
     themeColors: Record<string, ColorConfig>
@@ -274,7 +323,7 @@ export default function ThemeGenerator() {
               onClick={() =>
                 setDialogState((prev) => ({ ...prev, paste: true }))
               }
-              className="flex items-center"
+              className="flex items-center text-primary"
               title="Paste Theme"
             >
               <Clipboard className="w-4 h-4 mr-2" />
@@ -282,7 +331,7 @@ export default function ThemeGenerator() {
             <Button
               variant="outline"
               onClick={actions.resetToDefault}
-              className="flex items-center"
+              className="flex items-center text-primary"
               title="Reset Theme"
             >
               <RefreshCcw className="w-4 h-4 mr-2" />
@@ -293,7 +342,7 @@ export default function ThemeGenerator() {
               onClick={() =>
                 setDialogState((prev) => ({ ...prev, save: true }))
               }
-              className="flex items-center"
+              className="flex items-center text-primary"
               title="Save Theme"
             >
               <Save className="w-4 h-4 mr-2" />
@@ -301,7 +350,7 @@ export default function ThemeGenerator() {
             <Button
               variant="outline"
               onClick={actions.copyTheme}
-              className="flex items-center bg-secondary text-secondary-foreground"
+              className="flex items-center text-primary"
               title="Copy Theme"
             >
               <Copy className="w-4 h-4 mr-2" />
@@ -311,42 +360,46 @@ export default function ThemeGenerator() {
               onClick={() =>
                 setDialogState((prev) => ({ ...prev, viewSaved: true }))
               }
-              className="flex items-center"
+              className="flex items-center text-primary"
               title="View Saved Themes"
             >
               View Saved
             </Button>
             <div className="flex gap-2">
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => actions.switchTheme("light")}
-                  className="relative flex items-center min-w-[100px] justify-start"
-                  variant={activeMode === "light" ? "default" : "secondary"}
-                  title="Light Mode"
-                >
-                  <Sun className="w-4 h-4 mr-2" />
-
-                  {activeMode === "light" && (
-                    <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
-                      active
-                    </span>
-                  )}
-                </Button>
-                <Button
-                  onClick={() => actions.switchTheme("dark")}
-                  className="relative flex items-center min-w-[100px] justify-start"
-                  variant={activeMode === "dark" ? "default" : "secondary"}
-                  title="Dark Mode"
-                >
-                  <Moon className="w-4 h-4 mr-2" />
-
-                  {activeMode === "dark" && (
-                    <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
-                      active
-                    </span>
-                  )}
-                </Button>
-              </div>
+              <Button
+                onClick={() => actions.switchTheme("light")}
+                className={`relative flex items-center min-w-[100px] justify-start ${
+                  activeMode === "light"
+                    ? "bg-primary text-white"
+                    : "text-primary"
+                }`}
+                variant="outline"
+                title="Light Mode"
+              >
+                <Sun className="w-4 h-4 mr-2" />
+                {activeMode === "light" && (
+                  <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
+                    active
+                  </span>
+                )}
+              </Button>
+              <Button
+                onClick={() => actions.switchTheme("dark")}
+                className={`relative flex items-center min-w-[100px] justify-start ${
+                  activeMode === "dark"
+                    ? "bg-primary text-white"
+                    : "text-primary"
+                }`}
+                variant="outline"
+                title="Dark Mode"
+              >
+                <Moon className="w-4 h-4 mr-2" />
+                {activeMode === "dark" && (
+                  <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
+                    active
+                  </span>
+                )}
+              </Button>
             </div>
           </div>
 

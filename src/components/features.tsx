@@ -3,9 +3,9 @@ import {
   Paintbrush,
   Sliders,
   Moon,
-  Clipboard,
-  Palette,
-  Share2,
+  // Clipboard,
+  // Palette,
+  // Share2,
   Layers,
 } from "lucide-react";
 
@@ -18,7 +18,12 @@ interface FeatureItemProps {
   color: string;
 }
 
-const FeatureItem: FC<FeatureItemProps> = ({ icon: Icon, title, description, color }) => (
+const FeatureItem: FC<FeatureItemProps> = ({
+  icon: Icon,
+  title,
+  description,
+  color,
+}) => (
   <li className="group p-4 rounded-lg bg-background/50 dark:bg-background/20 border border-primary/10 dark:border-primary/5 hover:border-primary/20 dark:hover:border-primary/10 transition-all">
     <div className="flex items-start space-x-4">
       <div
@@ -44,14 +49,14 @@ const FeaturesSection = () => {
       icon: Paintbrush,
       title: "Intuitive Theme Generation",
       description:
-        "Create stunning custom themes with our user-friendly interface. Perfect for both beginners and experienced developers.",
+        "Create stunning custom themes with a user-friendly interface. Perfect for both beginners and experienced developers.",
       color: "primary",
     },
     {
       icon: Sliders,
       title: "Advanced Customization",
       description:
-        "Fine-tune every aspect of your theme with precise controls. Adjust colors, spacing, and more with real-time preview.",
+        "Fine-tune every aspect of your theme with precise controls. Adjust colors with real-time preview.",
       color: "primary",
     },
 
@@ -62,28 +67,21 @@ const FeaturesSection = () => {
         "Built-in dark mode support ensures your themes look great in both light and dark environments.",
       color: "primary",
     },
-    {
-      icon: Clipboard,
-      title: "Quick Export",
-      description:
-        "Copy your theme directly to clipboard in various formats. Seamlessly integrate with your existing projects.",
-      color: "primary",
-    },
-    {
-      icon: Palette,
-      title: "Color Harmonies",
-      description:
-        "Generate beautiful color palettes with our color harmony system. Create cohesive and balanced designs.",
-      color: "primary",
-    },
+    // {
+    //   icon: Clipboard,
+    //   title: "Quick Export",
+    //   description:
+    //     "Copy your theme directly to clipboard in various formats. Seamlessly integrate with your existing projects.",
+    //   color: "primary",
+    // },
+      // {
+      //   icon: Palette,
+      //   title: "Color Harmonies",
+      //   description:
+      //     "Generate beautiful color palettes with our color harmony system. Create cohesive and balanced designs.",
+      //   color: "primary",
+      // },
 
-    {
-      icon: Share2,
-      title: "Easy Sharing",
-      description:
-        "Share your themes with team members or the community. Collaborate on design systems effortlessly.",
-      color: "primary",
-    },
     {
       icon: Layers,
       title: "Component Preview",
