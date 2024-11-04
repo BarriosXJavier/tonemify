@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Coffee, Github } from "lucide-react";
+import { Coffee, Github, X } from "lucide-react";
 import { ModeToggle } from "./theme-switch";
 import {
   NavigationMenu,
@@ -17,6 +17,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Gem } from "lucide-react";
@@ -25,7 +26,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between bg-background dark:bg-dark-background border-b border-border dark:border-dark-border font-mono">
+    <header className="sticky top-0 z-50 px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between bg-background dark:bg-dark-background border-b border-border dark:border-dark-border font-mono">
       {/* Logo and Brand Name */}
       <Link className="flex items-center justify-center" href="/">
         <Gem className="h-6 w-6 text-foreground dark:text-dark-foreground" />
@@ -79,28 +80,40 @@ export default function Header() {
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="h-12 w-12">
-              <svg
-                className="h-8 w-8 text-foreground dark:text-dark-foreground"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+              {isOpen ? (
+                <X className="h-8 w-8 text-foreground dark:text-dark-foreground" />
+              ) : (
+                <svg
+                  className="h-8 w-8 text-foreground dark:text-dark-foreground"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              )}
             </Button>
           </SheetTrigger>
-          <SheetContent className="w-[300px] bg-background dark:bg-dark-background">
-            <SheetHeader>
-              <SheetTitle className="sr-only">Navigation</SheetTitle>
+          <SheetContent
+            side="right"
+            className="w-[80%] sm:w-[300px] bg-background dark:bg-dark-background"
+          >
+            <SheetHeader className="flex justify-between items-center">
+              <SheetTitle className="text-lg font-bold">Menu</SheetTitle>
+              <SheetClose asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <X className="h-6 w-6" />
+                </Button>
+              </SheetClose>
             </SheetHeader>
-            <div className="flex flex-col space-y-6 mt-8 font-mono">
+            <nav className="flex flex-col space-y-6 mt-8 font-mono">
               <Link
-                href="#contact"
+                href="/contact"
                 className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary dark:hover:text-dark-primary"
                 onClick={() => setIsOpen(false)}
               >
@@ -125,7 +138,7 @@ export default function Header() {
               <div className="pt-4">
                 <ModeToggle />
               </div>
-            </div>
+            </nav>
           </SheetContent>
         </Sheet>
       </div>

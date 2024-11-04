@@ -361,10 +361,10 @@ const handlePasteTheme = (input?: string) => {
             <Button
               variant="outline"
               onClick={() => setConvertDialogOpen(true)}
-              className="flex items-center text-primary"
+              className="flex items-center text-primary text-xs"
               title="Convert to Tonemify Format"
             >
-              Convert Color
+              Convert to --color
             </Button>
 
             <Dialog
