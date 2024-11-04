@@ -24,6 +24,9 @@ const Faqs = () => {
             manage ShadCN themes effortlessly. With a user-friendly interface
             and powerful features, Tonemify allows you to fine-tune your themes
             with ease.
+            <br />
+            <br />
+            Does what it says on the tin.
           </AccordionContent>
         </AccordionItem>
 
@@ -39,6 +42,12 @@ const Faqs = () => {
             color cards. Click on the cards to adjust the colors as desired and
             preview the changes you made in the components. Once you&apos;re
             satisfied with your new cool theme, save it for future use.
+            <br />
+            <br />
+            Note that to paste a single color, you will use the &apos;Convert to
+            --color&apos; button and select the &apos;--primary: h s% l%;&apos;
+            option and paste it using the paste icon. This will generate a color
+            cool theme based on what you pasted (primary color).
           </AccordionContent>
         </AccordionItem>
 
@@ -130,7 +139,8 @@ const Faqs = () => {
           <AccordionContent className="text-muted-foreground dark:text-dark-muted-foreground px-4 leading-relaxed">
             Yes, I am open to new opportunities and collaborations. If you have
             an exciting project or job offer, feel free to reach out to me
-            through my contact page. I look forward to hearing from you!
+            through my <Link href="/contact" className="text-primary hover:text-secondary">contact page</Link>. I look forward
+            to hearing from you!
           </AccordionContent>
         </AccordionItem>
       </Accordion>
