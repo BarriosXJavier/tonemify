@@ -1,13 +1,6 @@
 "use client";
 
-import { hexToHSL } from "@/lib/colorUtils";
-
-interface ColorConfig {
-  hue: number;
-  saturation: number;
-  lightness: number;
-  alpha: number;
-}
+import { hexToHSL, rgbToHSL } from "@/lib/colorUtils";
 
 export const convertColorToHSLFormat = (color: string): string | null => {
   const hslFunctionRegex =
@@ -35,37 +28,8 @@ export const convertColorToHSLFormat = (color: string): string | null => {
   }
 };
 
-const rgbToHSL = (r: number, g: number, b: number): ColorConfig => {
-  r /= 255;
-  g /= 255;
-  b /= 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  let h = 0,
-    s = 0;
 
-  if (max !== min) {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r:
-        h = (g - b) / d + (g < b ? 6 : 0);
-        break;
-      case g:
-        h = (b - r) / d + 2;
-        break;
-      case b:
-        h = (r - g) / d + 4;
-        break;
-    }
-    h /= 6;
-  }
 
-  return {
-    hue: Math.round(h * 360),
-    saturation: Math.round(s * 100),
-    lightness: Math.round(l * 100),
-    alpha: 1,
-  };
-};
+
+
+

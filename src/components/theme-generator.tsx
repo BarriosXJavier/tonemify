@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Copy, RefreshCcw, Save, Clipboard, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import  {convertColorToHSLFormat}  from "@/components/tonemifyformat";
+import { convertColor } from "@/lib/colorUtils";
 import {
   Dialog,
   DialogContent,
@@ -43,17 +43,29 @@ export default function ThemeGenerator() {
   const [activeMode, setActiveMode] = useState<"light" | "dark">("light");
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
   const [colorInput, setColorInput] = useState("");
+  const [selectedFormat, setSelectedFormat] = useState<
+    "hex" | "rgb" | "rgba" | "hsl" | "hsla"
+  >("hex");
+  const [convertedColor, setConvertedColor] = useState<string | null>(null);
 
-  const handleConvertAndCopy = () => {
-    const formattedColor = convertColorToHSLFormat(colorInput.trim());
-    if (formattedColor) {
-      navigator.clipboard.writeText(String(formattedColor));
-      toast.success("Color format copied to clipboard!");
-      setConvertDialogOpen(false);
-    } else {
-      toast.error("Invalid color format. Please try again.");
-    }
-  };
+const handleConvert = () => {
+  const result = convertColor(colorInput.trim(), selectedFormat);
+  if (result) {
+    setConvertedColor(result);
+  } else {
+    toast.error("Invalid color format. Please try again.");
+    setConvertedColor(null);
+  }
+};
+
+const handleCopy = () => {
+  if (convertedColor) {
+    navigator.clipboard.writeText(convertedColor);
+    toast.success("Converted color copied to clipboard!");
+  } else {
+    toast.error("No converted color to copy.");
+  }
+};
 
   useEffect(() => {
     const themes = Object.keys(localStorage).reduce((acc, key) => {
@@ -375,23 +387,44 @@ const handlePasteTheme = (input?: string) => {
                 <DialogHeader>
                   <DialogTitle>Convert Color</DialogTitle>
                 </DialogHeader>
-                <input
-                  type="text"
-                  value={colorInput}
-                  onChange={(e) => setColorInput(e.target.value)}
-                  placeholder="Enter color value (e.g., hsl(255, 81%, 95%), #ff5733)"
-                  className="w-full p-2 border rounded"
-                />
-                <div className="flex justify-end space-x-2 mt-4">
-                  <Button variant="outline" onClick={handleConvertAndCopy}>
-                    Convert and Copy
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setConvertDialogOpen(false)}
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    value={colorInput}
+                    onChange={(e) => setColorInput(e.target.value)}
+                    placeholder="Enter color value (e.g., hsl(255, 81%, 95%), #ff5733)"
+                    className="w-full p-2 border rounded"
+                  />
+                  <select
+                    value={selectedFormat}
+                    onChange={(e) => setSelectedFormat(e.target.value as "hex" | "rgb" | "rgba" | "hsl" | "hsla")}
+                    className="w-full p-2 border rounded"
                   >
-                    Cancel
-                  </Button>
+                    <option value="hex">HEX</option>
+                    <option value="rgb">RGB</option>
+                    <option value="rgba">RGBA</option>
+                    <option value="hsl">HSL</option>
+                    <option value="hsla">HSLA</option>
+                  </select>
+                  {convertedColor && (
+                    <div className="p-2 border rounded bg-gray-50">
+                      Converted Color: <strong>{convertedColor}</strong>
+                    </div>
+                  )}
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={handleConvert}>
+                      Convert
+                    </Button>
+                    <Button variant="outline" onClick={handleCopy}>
+                      Copy
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setConvertDialogOpen(false)}
+                    >
+                      Close
+                    </Button>
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>

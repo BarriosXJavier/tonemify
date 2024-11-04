@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Coffee, Github, Menu } from "lucide-react";
+import { Coffee, Github, MenuIcon, X } from "lucide-react";
 import { ModeToggle } from "./theme-switch";
 import {
   NavigationMenu,
@@ -17,6 +17,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Gem } from "lucide-react";
@@ -78,19 +79,28 @@ export default function Header() {
       <div className="lg:hidden">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-12 w-12">
-              <Menu className="h-12 w-12 text-foreground dark:text-dark-foreground" />
+            <Button variant="ghost" size="lg" className="h-12 w-12">
+              <MenuIcon
+                className="text-primary dark:text-dark-foreground"
+                size="lg"
+              />
             </Button>
           </SheetTrigger>
           <SheetContent
             side="right"
             className="w-[80%] sm:w-[300px] bg-background dark:bg-dark-background"
           >
-            <SheetHeader>
-              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            <SheetHeader className="flex justify-between items-center">
+              <SheetTitle className="text-lg font-bold sr-only">
+                Menu
+              </SheetTitle>
+              <SheetClose asChild>
+                <Button variant="ghost" size="lg" className="p-4 bg-secondary rounded-full">
+                  <X size="lg" />
+                </Button>
+              </SheetClose>
             </SheetHeader>
-
-            <nav className="flex flex-col space-y-6 mt-16 font-mono">
+            <nav className="flex flex-col space-y-6 mt-8 font-mono">
               <Link
                 href="/contact"
                 className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary dark:hover:text-dark-primary"
