@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Copy, RefreshCcw, Save, Clipboard, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import  {convertColorToHSLFormat}  from "@/components/tonemifyformat";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +16,8 @@ import { ColorControls } from "@/components/color-controls";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
 import { Checkbox } from "@/components/ui/checkbox";
-import { generateChartColorsFromPrimary, hslToHex } from "@/lib/colorUtils";
+// import { generateChartColorsFromPrimary, hslToHex } from "@/lib/colorUtils";
+import { hslToHex } from "@/lib/colorUtils";
 import { defaults, defaultsDark } from "@/lib/colorUtils";
 import { ColorConfig } from "@/lib/types";
 import { generateThemeColorsFromPrimary } from "@/lib/colorUtils";
@@ -39,6 +41,19 @@ export default function ThemeGenerator() {
   const [includeAlpha, setIncludeAlpha] = useState(false);
   const { setTheme } = useTheme();
   const [activeMode, setActiveMode] = useState<"light" | "dark">("light");
+  const [convertDialogOpen, setConvertDialogOpen] = useState(false);
+  const [colorInput, setColorInput] = useState("");
+
+  const handleConvertAndCopy = () => {
+    const formattedColor = convertColorToHSLFormat(colorInput.trim());
+    if (formattedColor) {
+      navigator.clipboard.writeText(String(formattedColor));
+      toast.success("Color format copied to clipboard!");
+      setConvertDialogOpen(false);
+    } else {
+      toast.error("Invalid color format. Please try again.");
+    }
+  };
 
   useEffect(() => {
     const themes = Object.keys(localStorage).reduce((acc, key) => {
@@ -74,60 +89,60 @@ const handlePasteTheme = (input?: string) => {
     const lightSectionMatch = inputString.match(lightSectionRegex);
     const darkSectionMatch = inputString.match(darkSectionRegex);
 
- const parseColorValue = (value: string): ColorConfig | null => {
-   const hslFunctionRegex =
-     /^(?:hsl|hsla)\(\s*([\d.-]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
-   const hslSpaceRegex =
-     /^([\d.-]+)(?:deg)?\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
-   const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
+   const parseColorValue = (value: string): ColorConfig | null => {
+     const hslFunctionRegex =
+       /^(?:hsl|hsla)\(\s*([\d.-]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
+     const hslSpaceRegex =
+       /^([\d.-]+)(?:deg)?\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
+     const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
 
-   let match;
-   if ((match = value.match(hslFunctionRegex))) {
-     return {
-       hue: parseFloat(match[1]),
-       saturation: parseFloat(match[2]),
-       lightness: parseFloat(match[3]),
-       alpha: match[4]
-         ? match[4].endsWith("%")
-           ? parseFloat(match[4]) / 100
-           : parseFloat(match[4])
-         : 1,
-     };
-   } else if ((match = value.match(hslSpaceRegex))) {
-     return {
-       hue: parseFloat(match[1]),
-       saturation: parseFloat(match[2]),
-       lightness: parseFloat(match[3]),
-       alpha: match[4]
-         ? match[4].endsWith("%")
-           ? parseFloat(match[4]) / 100
-           : parseFloat(match[4])
-         : 1,
-     };
-   } else if ((match = value.match(hexRegex))) {
-     const hsl = hexToHSL(value);
-     return hsl;
-   } else {
-     return null;
-   }
- };
-
- const parseSection = (
-   section: string,
-   target: Record<string, ColorConfig>
- ) => {
-   let match;
-   while ((match = variableRegex.exec(section)) !== null) {
-     const [, name, value] = match;
-     if (!defaults[name]) continue;
-     const colorConfig = parseColorValue(value.trim());
-     if (colorConfig) {
-       target[name] = colorConfig;
+     let match;
+     if ((match = value.match(hslFunctionRegex))) {
+       return {
+         hue: parseFloat(match[1]),
+         saturation: parseFloat(match[2]),
+         lightness: parseFloat(match[3]),
+         alpha: match[4]
+           ? match[4].endsWith("%")
+             ? parseFloat(match[4]) / 100
+             : parseFloat(match[4])
+           : 1,
+       };
+     } else if ((match = value.match(hslSpaceRegex))) {
+       return {
+         hue: parseFloat(match[1]),
+         saturation: parseFloat(match[2]),
+         lightness: parseFloat(match[3]),
+         alpha: match[4]
+           ? match[4].endsWith("%")
+             ? parseFloat(match[4]) / 100
+             : parseFloat(match[4])
+           : 1,
+       };
+     } else if ((match = value.match(hexRegex))) {
+       const hsl = hexToHSL(value);
+       return hsl;
      } else {
-       failedVariables.push(name);
+       return null;
      }
-   }
- };
+   };
+
+    const parseSection = (
+      section: string,
+      target: Record<string, ColorConfig>
+    ) => {
+      let match;
+      while ((match = variableRegex.exec(section)) !== null) {
+        const [, name, value] = match;
+        if (!defaults[name]) continue;
+        const colorConfig = parseColorValue(value.trim());
+        if (colorConfig) {
+          target[name] = colorConfig;
+        } else {
+          failedVariables.push(name);
+        }
+      }
+    };
 
     if (lightSectionMatch) {
       parseSection(lightSectionMatch[1], parsedColorsLight);
@@ -140,36 +155,36 @@ const handlePasteTheme = (input?: string) => {
       parseSection(darkSectionMatch[1], parsedColorsDark);
     }
 
- const applyGeneratedColors = (
-   parsedColors: Record<string, ColorConfig>,
-   mode: "light" | "dark"
- ) => {
-   if (parsedColors["primary"]) {
-     const baseHue = parsedColors["primary"].hue;
-     const isDarkMode = mode === "dark";
-     const generatedColors = generateThemeColorsFromPrimary(
-       baseHue,
-       isDarkMode
-     );
+  //  const applyGeneratedColors = (
+  //    parsedColors: Record<string, ColorConfig>,
+  //    mode: "light" | "dark"
+  //  ) => {
+  //    if (parsedColors["primary"]) {
+  //      const baseHue = parsedColors["primary"].hue;
+  //      const isDarkMode = mode === "dark";
+  //      const generatedColors = generateThemeColorsFromPrimary(
+  //        baseHue,
+  //        isDarkMode
+  //      );
 
-     Object.keys(generatedColors).forEach((key) => {
-       if (!parsedColors[key]) {
-         parsedColors[key] = generatedColors[key];
-       }
-     });
+  //      Object.keys(generatedColors).forEach((key) => {
+  //        if (!parsedColors[key]) {
+  //          parsedColors[key] = generatedColors[key];
+  //        }
+  //      });
 
-     // Generate chart colors
-     const chartColors = generateChartColorsFromPrimary(baseHue, isDarkMode);
-     Object.keys(chartColors).forEach((key) => {
-       if (!parsedColors[key]) {
-         parsedColors[key] = chartColors[key];
-       }
-     });
-   }
- };
+  //      // Generate chart colors only if they don't already exist
+  //      const chartColors = generateChartColorsFromPrimary(baseHue, isDarkMode);
+  //      Object.keys(chartColors).forEach((key) => {
+  //        if (!parsedColors[key]) {
+  //          parsedColors[key] = chartColors[key];
+  //        }
+  //      });
+  //    }
+  //  };
 
-    applyGeneratedColors(parsedColorsLight, "light");
-    applyGeneratedColors(parsedColorsDark, "dark");
+    // applyGeneratedColors(parsedColorsLight, "light");
+    
 
     // Generate dark mode colors if only light mode colors are provided
     if (
@@ -343,6 +358,43 @@ const handlePasteTheme = (input?: string) => {
         <div className="space-y-4">
           {/* Control Buttons */}
           <div className="flex flex-wrap gap-2 justify-center">
+            <Button
+              variant="outline"
+              onClick={() => setConvertDialogOpen(true)}
+              className="flex items-center text-primary"
+              title="Convert to Tonemify Format"
+            >
+              Convert Color
+            </Button>
+
+            <Dialog
+              open={convertDialogOpen}
+              onOpenChange={setConvertDialogOpen}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Convert Color</DialogTitle>
+                </DialogHeader>
+                <input
+                  type="text"
+                  value={colorInput}
+                  onChange={(e) => setColorInput(e.target.value)}
+                  placeholder="Enter color value (e.g., hsl(255, 81%, 95%), #ff5733)"
+                  className="w-full p-2 border rounded"
+                />
+                <div className="flex justify-end space-x-2 mt-4">
+                  <Button variant="outline" onClick={handleConvertAndCopy}>
+                    Convert and Copy
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setConvertDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
             <Button
               variant="outline"
               onClick={() =>
