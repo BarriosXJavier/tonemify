@@ -8,7 +8,7 @@ const Hero = () => {
         Stop tweaking, <span className="text-primary">Start shipping!</span>
       </p>
       <p className="text-sm">
-        Just kidding, with Tonemify you can do it in no time 🚀. 
+        Just kidding, Tonemify helps you do it, but faster.🚀
       </p>
     </section>
   );
