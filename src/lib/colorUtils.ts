@@ -80,7 +80,6 @@ export const rgbToHSL = (r: number, g: number, b: number): ColorConfig => {
   };
 };
 
-
 export function hslToHex(h: number, s: number, l: number, a: number): string {
   h = ((h % 360) + 360) % 360; // Ensure hue is between 0-359
   s = Math.min(Math.max(s, 0), 100);
@@ -101,7 +100,6 @@ export function hslToHex(h: number, s: number, l: number, a: number): string {
   };
   return `#${f(0)}${f(8)}${f(4)}`;
 }
-
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const hslToRGB = ({ hue, saturation, lightness, alpha }: ColorConfig) => {
@@ -178,9 +176,6 @@ export const convertColor = (
       return null;
   }
 };
-
-
-
 
 export const defaults: Record<string, ColorConfig> = {
   background: { hue: 26, saturation: 88, lightness: 95, alpha: 1 },
@@ -359,7 +354,6 @@ export const generateThemeColorsFromPrimary = (
     },
   };
 };
-
 
 export const tailwindColorPalette = {
   slate: {
