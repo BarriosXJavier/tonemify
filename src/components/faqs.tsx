@@ -16,10 +16,10 @@ const Faqs = () => {
           value="what-is-tonemify"
           className="border-primary/20 dark:border-primary/10 rounded-lg bg-background/90 dark:bg-dark-background/90"
         >
-          <AccordionTrigger className="text-foreground dark:text-dark-foreground hover:text-primary dark:hover:text-dark-primary transition-colors px-4 py-2 text-lg font-medium">
+          <AccordionTrigger className="text-foreground hover:text-primary transition-colors px-4 py-2 text-lg font-medium">
             What is Tonemify?
           </AccordionTrigger>
-          <AccordionContent className="text-muted-foreground dark:text-dark-muted-foreground px-4 leading-relaxed">
+          <AccordionContent className="text-muted-foreground px-4 leading-relaxed">
             Tonemify is a tool designed to help users generate, prototype, and
             manage ShadCN themes effortlessly. With a user-friendly interface
             and powerful features, Tonemify allows you to fine-tune your themes
@@ -34,10 +34,10 @@ const Faqs = () => {
           value="create-theme"
           className="border-primary/20 dark:border-primary/10 rounded-lg bg-background/90 dark:bg-dark-background/90"
         >
-          <AccordionTrigger className="text-foreground dark:text-dark-foreground hover:text-primary dark:hover:text-dark-primary transition-colors px-4 py-2 text-lg font-medium">
+          <AccordionTrigger className="text-foreground hover:text-primary transition-colors px-4 py-2 text-lg font-medium">
             How does it work?
           </AccordionTrigger>
-          <AccordionContent className="text-muted-foreground dark:text-dark-muted-foreground px-4 leading-relaxed">
+          <AccordionContent className="text-muted-foreground px-4 leading-relaxed">
             Paste your current ShadCN theme. It will immediately update the
             color cards. Click on the cards to adjust the colors as desired and
             preview the changes you made in the components. Once you&apos;re
@@ -55,10 +55,10 @@ const Faqs = () => {
           value="manage-themes"
           className="border-primary/20 dark:border-primary/10 rounded-lg bg-background/90 dark:bg-dark-background/90"
         >
-          <AccordionTrigger className="text-foreground dark:text-dark-foreground hover:text-primary dark:hover:text-dark-primary transition-colors px-4 py-2 text-lg font-medium">
+          <AccordionTrigger className="text-foreground hover:text-primary transition-colors px-4 py-2 text-lg font-medium">
             How can I manage my themes?
           </AccordionTrigger>
-          <AccordionContent className="text-muted-foreground dark:text-dark-muted-foreground px-4 leading-relaxed">
+          <AccordionContent className="text-muted-foreground px-4 leading-relaxed">
             Access your saved themes to edit or delete them as needed. You can
             also export your themes directly to the clipboard in various
             formats.
@@ -69,10 +69,10 @@ const Faqs = () => {
           value="dark-mode-support"
           className="border-primary/20 dark:border-primary/10 rounded-lg bg-background/90 dark:bg-dark-background/90"
         >
-          <AccordionTrigger className="text-foreground dark:text-dark-foreground hover:text-primary dark:hover:text-dark-primary transition-colors px-4 py-2 text-lg font-medium">
+          <AccordionTrigger className="text-foreground hover:text-primary transition-colors px-4 py-2 text-lg font-medium">
             Does Tonemify support dark mode?
           </AccordionTrigger>
-          <AccordionContent className="text-muted-foreground dark:text-dark-muted-foreground px-4 leading-relaxed">
+          <AccordionContent className="text-muted-foreground px-4 leading-relaxed">
             Yes, Tonemify has built-in dark mode support to ensure your themes
             look great in both light and dark environments.
           </AccordionContent>
@@ -82,17 +82,17 @@ const Faqs = () => {
           value="support-project"
           className="border-primary/20 dark:border-primary/10 rounded-lg bg-background/90 dark:bg-dark-background/90"
         >
-          <AccordionTrigger className="text-foreground dark:text-dark-foreground hover:text-primary dark:hover:text-dark-primary transition-colors px-4 py-2 text-lg font-medium">
+          <AccordionTrigger className="text-foreground hover:text-primary transition-colors px-4 py-2 text-lg font-medium">
             How can I support the project?
           </AccordionTrigger>
-          <AccordionContent className="text-muted-foreground dark:text-dark-muted-foreground px-4 leading-relaxed">
+          <AccordionContent className="text-muted-foreground px-4 leading-relaxed">
             Tonemify is free and opensource but if you enjoy using it and want
             to support the project, you can buy me a beer (or coffee)! Click the
             link below to show your support 😊
             <div className="mt-4">
               <Link
                 href="https://www.buymeacoffee.com/barrios"
-                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary dark:hover:text-dark-primary"
+                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -112,7 +112,7 @@ const Faqs = () => {
               pull request. Your contributions are greatly appreciated!
               <Link
                 href="https://github.com/BarriosXJavier/tonemify"
-                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary dark:hover:text-dark-primary"
+                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -133,14 +133,17 @@ const Faqs = () => {
           value="open-to-work"
           className="border-primary/20 dark:border-primary/10 rounded-lg bg-background/90 dark:bg-dark-background/90"
         >
-          <AccordionTrigger className="text-foreground dark:text-dark-foreground hover:text-primary dark:hover:text-dark-primary transition-colors px-4 py-2 text-lg font-medium">
+          <AccordionTrigger className="text-foreground hover:text-primary transition-colors px-4 py-2 text-lg font-medium">
             Are you open to work?
           </AccordionTrigger>
-          <AccordionContent className="text-muted-foreground dark:text-dark-muted-foreground px-4 leading-relaxed">
+          <AccordionContent className="text-muted-foreground px-4 leading-relaxed">
             Yes, I am open to new opportunities and collaborations. If you have
             an exciting project or job offer, feel free to reach out to me
-            through my <Link href="/contact" className="text-primary hover:text-secondary">contact page</Link>. I look forward
-            to hearing from you!
+            through my{" "}
+            <Link href="/contact" className="text-primary hover:text-secondary">
+              contact page
+            </Link>
+            . I look forward to hearing from you!
           </AccordionContent>
         </AccordionItem>
       </Accordion>

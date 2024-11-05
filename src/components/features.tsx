@@ -94,10 +94,10 @@ const FeaturesSection = () => {
   return (
     <Card className="border border-primary/20 dark:border-primary/10 bg-background/95 dark:bg-background/50 backdrop-blur-sm shadow-lg hover:shadow-primary/5 dark:hover:shadow-primary/10 transition-all">
       <CardHeader className="space-y-4">
-        <CardTitle className="text-4xl font-bold text-center text-primary/80 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text">
+        <CardTitle className="text-4xl font-bold text-center text-primary dark:text-foreground bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text">
           Features
         </CardTitle>
-        <p className="text-lg text-center text-muted-foreground dark:text-muted-foreground/90">
+        <p className="text-lg text-center text-foreground dark:text-foreground">
           Everything you need to create and manage beautiful themes for your
           next project
         </p>

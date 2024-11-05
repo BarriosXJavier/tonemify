@@ -26,11 +26,11 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between bg-background dark:bg-dark-background border-b border-border dark:border-dark-border font-mono">
+    <header className="sticky top-0 z-50 px-4 mx-2 sm:px-6 lg:px-10 h-16 flex items-center justify-between bg-background dark:bg-dark-background border-b border-border dark:border-dark-border font-mono">
       {/* Logo and Brand Name */}
       <Link className="flex items-center justify-center" href="/">
-        <Gem className="h-6 w-6 text-foreground dark:text-dark-foreground" />
-        <span className="ml-1 text-xl sm:text-2xl font-bold text-foreground dark:text-dark-foreground">
+        <Gem className="h-6 w-6 text-primary dark:text-primary-foreground" />
+        <span className="ml-1 text-xl sm:text-2xl font-bold text-primary dark:text-primary-foreground">
           TonemifyLabs
         </span>
       </Link>
@@ -41,7 +41,9 @@ export default function Header() {
           <NavigationMenuList>
             <NavigationMenuItem>
               <Link href="/contact" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink
+                  className={`${navigationMenuTriggerStyle()} transition-colors duration-200 ease-in-out text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground`}
+                >
                   Contact
                 </NavigationMenuLink>
               </Link>
@@ -52,8 +54,10 @@ export default function Header() {
                 legacyBehavior
                 passHref
               >
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  <Coffee className="h-5 w-5 mr-2 text-foreground dark:text-dark-foreground" />
+                <NavigationMenuLink
+                  className={`${navigationMenuTriggerStyle()} transition-colors duration-200 ease-in-out text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground`}
+                >
+                  <Coffee className="h-5 w-5 mr-2 text-primary dark:text-primary-foreground" />
                   <span className="hidden xl:inline">Buy Me a Coffee</span>
                 </NavigationMenuLink>
               </Link>
@@ -64,8 +68,10 @@ export default function Header() {
                 legacyBehavior
                 passHref
               >
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  <Github className="h-5 w-5 mr-2 text-foreground dark:text-dark-foreground" />
+                <NavigationMenuLink
+                  className={`${navigationMenuTriggerStyle()} transition-colors duration-200 ease-in-out text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground`}
+                >
+                  <Github className="h-5 w-5 mr-2 text-primary dark:text-primary-foreground" />
                   <span className="hidden xl:inline">GitHub</span>
                 </NavigationMenuLink>
               </Link>
@@ -81,7 +87,7 @@ export default function Header() {
           <SheetTrigger asChild>
             <Button variant="ghost" size="lg" className="h-12 w-12">
               <MenuIcon
-                className="text-primary dark:text-dark-foreground"
+                className="text-primary dark:text-primary-foreground"
                 size="lg"
               />
             </Button>
@@ -91,37 +97,44 @@ export default function Header() {
             className="w-[80%] sm:w-[300px] bg-background dark:bg-dark-background"
           >
             <SheetHeader className="flex justify-between items-center">
-              <SheetTitle className="text-lg font-bold sr-only">
+              <SheetTitle className="text-lg font-bold text-primary dark:text-primary-foreground sr-only">
                 Menu
               </SheetTitle>
               <SheetClose asChild>
-                <Button variant="ghost" size="lg" className="p-4 bg-secondary rounded-full">
-                  <X size="lg" />
+                <Button
+                  variant="ghost"
+                  size="lg"
+                  className="p-4 bg-secondary rounded-full"
+                >
+                  <X
+                    className="text-primary dark:text-primary-foreground"
+                    size="lg"
+                  />
                 </Button>
               </SheetClose>
             </SheetHeader>
             <nav className="flex flex-col space-y-6 mt-8 font-mono">
               <Link
                 href="/contact"
-                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary dark:hover:text-dark-primary"
+                className="flex items-center space-x-3 text-lg font-medium transition-colors duration-200 ease-in-out text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground"
                 onClick={() => setIsOpen(false)}
               >
-                Contact
+                <span>Contact</span>
               </Link>
               <Link
                 href="https://www.buymeacoffee.com/barrios"
-                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary dark:hover:text-dark-primary"
+                className="flex items-center space-x-3 text-lg font-medium transition-colors duration-200 ease-in-out text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground"
                 onClick={() => setIsOpen(false)}
               >
-                <Coffee className="h-6 w-6 text-foreground dark:text-dark-foreground" />
+                <Coffee className="h-6 w-6 text-primary dark:text-primary-foreground" />
                 <span>Buy Me a Coffee</span>
               </Link>
               <Link
                 href="https://github.com/BarriosXJavier/tonemify"
-                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary dark:hover:text-dark-primary"
+                className="flex items-center space-x-3 text-lg font-medium transition-colors duration-200 ease-in-out text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground"
                 onClick={() => setIsOpen(false)}
               >
-                <Github className="h-6 w-6 text-foreground dark:text-dark-foreground" />
+                <Github className="h-6 w-6 text-primary dark:text-primary-foreground" />
                 <span>GitHub</span>
               </Link>
               <div className="pt-4">

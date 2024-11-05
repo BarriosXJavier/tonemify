@@ -32,7 +32,7 @@ export function ProjectsCompletedChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-primary">Projects Completed</CardTitle>
+        <CardTitle className="text-primary dark:text-foreground">Projects Completed</CardTitle>
         <CardDescription>
           Monthly breakdown of completed projects
         </CardDescription>

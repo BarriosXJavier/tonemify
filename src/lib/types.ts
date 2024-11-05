@@ -8,3 +8,14 @@ export interface ColorConfig {
 export interface ThemeColors {
   [key: string]: ColorConfig;
 }
+
+// export type ColorConfigOrChartColors =
+//   | ColorConfig
+//   | {
+//       line: ColorConfig;
+//       area: ColorConfig;
+//       bar: ColorConfig;
+//       pie: ColorConfig[];
+//       scatter: ColorConfig;
+//     };
+

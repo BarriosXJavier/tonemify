@@ -31,7 +31,7 @@ export function ProjectTypesChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-primary">Project Types</CardTitle>
+        <CardTitle className="text-primary dark:text-foreground">Project Types</CardTitle>
         <CardDescription>
           Distribution of web development projects
         </CardDescription>

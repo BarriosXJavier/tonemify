@@ -221,7 +221,7 @@ export default function ThemeGenerator() {
           );
           Object.keys(generatedColorsDark).forEach((key) => {
             if (!parsedColorsDark[key]) {
-              parsedColorsDark[key] = generatedColorsDark[key];
+              parsedColorsDark[key] = generatedColorsDark[key as keyof typeof generatedColorsDark];
             }
           });
         }
@@ -383,7 +383,7 @@ export default function ThemeGenerator() {
             <Button
               variant="outline"
               onClick={() => setConvertDialogOpen(true)}
-              className="flex items-center text-primary"
+              className="flex items-center text-primary dark:text-primary-foreground"
               title="Convert Color Format"
             >
               Convert Color
@@ -397,7 +397,7 @@ export default function ThemeGenerator() {
                   <DialogTitle>Convert Color</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
-                  <input
+                  <Input
                     type="text"
                     value={colorInput}
                     onChange={(e) => setColorInput(e.target.value)}
@@ -456,7 +456,7 @@ export default function ThemeGenerator() {
                   <DialogTitle>Convert Color</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
-                  <input
+                  <Input
                     type="text"
                     value={colorInput}
                     onChange={(e) => setColorInput(e.target.value)}
@@ -515,7 +515,7 @@ export default function ThemeGenerator() {
               onClick={() =>
                 setDialogState((prev) => ({ ...prev, paste: true }))
               }
-              className="flex items-center text-primary"
+              className="flex items-center text-primary dark:text-primary-foreground"
               title="Paste Theme"
             >
               <Clipboard className="w-4 h-4 mr-2" />
@@ -523,7 +523,7 @@ export default function ThemeGenerator() {
             <Button
               variant="outline"
               onClick={actions.resetToDefault}
-              className="flex items-center text-primary"
+              className="flex items-center text-primary dark:text-foreground"
               title="Reset Theme"
             >
               <RefreshCcw className="w-4 h-4 mr-2" />
@@ -534,7 +534,7 @@ export default function ThemeGenerator() {
               onClick={() =>
                 setDialogState((prev) => ({ ...prev, save: true }))
               }
-              className="flex items-center text-primary"
+              className="flex items-center text-primary dark:text-foreground"
               title="Save Theme"
             >
               <Save className="w-4 h-4 mr-2" />
@@ -542,7 +542,7 @@ export default function ThemeGenerator() {
             <Button
               variant="outline"
               onClick={actions.copyTheme}
-              className="flex items-center text-primary"
+              className="flex items-center text-primary dark:text-foreground"
               title="Copy Theme"
             >
               <Copy className="w-4 h-4 mr-2" />
@@ -552,7 +552,7 @@ export default function ThemeGenerator() {
               onClick={() =>
                 setDialogState((prev) => ({ ...prev, viewSaved: true }))
               }
-              className="flex items-center text-primary"
+              className="flex items-center text-primary dark:text-foreground"
               title="View Saved Themes"
             >
               View Saved

@@ -2,28 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 :root {
   /* Base Theme Colors */
-  --background: 26 88% 95%;
-  --foreground: 26 5% 10%;
-  --card: 26 50% 90%;
-  --card-foreground: 26 5% 15%;
-  --popover: 26 88% 95%;
-  --popover-foreground: 26 95% 10%;
-  --primary: 26 95% 44%;
+  --background: 303 92% 95%;
+  --foreground: 303 5% 10%;
+  --card: 303 50% 90%;
+  --card-foreground: 303 5% 15%;
+  --popover: 303 92% 95%;
+  --popover-foreground: 303 95% 10%;
+  --primary: 303 88% 40%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 26 30% 70%;
+  --secondary: 303 30% 70%;
   --secondary-foreground: 0 0% 0%;
-  --muted: -12 30% 85%;
-  --muted-foreground: 26 5% 35%;
-  --accent: -12 30% 80%;
-  --accent-foreground: 26 5% 15%;
-  --destructive: 0 88% 30%;
-  --destructive-foreground: 26 5% 90%;
-  --border: 26 30% 50%;
-  --input: 26 30% 29%;
-  --ring: 26 95% 44%;
-  --radius: 0rem;
+  --muted: 265 30% 85%;
+  --muted-foreground: 303 5% 40%;
+  --accent: 265 30% 80%;
+  --accent-foreground: 303 5% 15%;
+  --destructive: 0 92% 50%;
+  --destructive-foreground: 303 5% 90%;
+  --border: 303 30% 60%;
+  --input: 303 30% 50%;
+  --ring: 303 88% 40%;
+  --radius: 1rem;
 
 
   --chart-1: 26 85% 50%;
@@ -40,28 +49,28 @@
 
 .dark {
   /* Base Theme Colors */
-  --background: 26 50% 10%;
-  --foreground: 26 5% 90%;
-  --card: 26 50% 10%;
-  --card-foreground: 26 5% 90%;
-  --popover: 26 50% 5%;
-  --popover-foreground: 26 5% 90%;
-  --primary: 26 95% 44%;
+  --background: 303 50% 10%;
+  --foreground: 303 5% 90%;
+  --card: 303 50% 10%;
+  --card-foreground: 303 5% 90%;
+  --popover: 303 50% 5%;
+  --popover-foreground: 303 5% 90%;
+  --primary: 303 88% 40%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 26 30% 20%;
+  --secondary: 303 30% 20%;
   --secondary-foreground: 0 0% 100%;
-  --muted: -12 30% 25%;
-  --muted-foreground: 26 5% 60%;
-  --accent: -12 30% 25%;
-  --accent-foreground: 26 5% 90%;
-  --destructive: 0 88% 30%;
-  --destructive-foreground: 26 5% 90%;
-  --border: 26 30% 29%;
-  --input: 26 30% 29%;
-  --ring: 26 95% 44%;
-  --radius: 0rem;
+  --muted: 265 30% 25%;
+  --muted-foreground: 303 5% 60%;
+  --accent: 265 30% 25%;
+  --accent-foreground: 303 5% 90%;
+  --destructive: 0 92% 50%;
+  --destructive-foreground: 303 5% 90%;
+  --border: 303 30% 50%;
+  --input: 303 30% 50%;
+  --ring: 303 88% 40%;
+  --radius: 1rem;
 
- 
+
   --chart-1: 26 75% 45%;
   /* Darker Orange */
   --chart-2: 46 75% 45%;

@@ -81,7 +81,7 @@ export const rgbToHSL = (r: number, g: number, b: number): ColorConfig => {
 };
 
 export function hslToHex(h: number, s: number, l: number, a: number): string {
-  h = ((h % 360) + 360) % 360; // Ensure hue is between 0-359
+  h = ((h % 360) + 360) % 360;
   s = Math.min(Math.max(s, 0), 100);
   l = Math.min(Math.max(l, 0), 100);
   a = Math.min(Math.max(a, 0), 1);
@@ -178,180 +178,144 @@ export const convertColor = (
 };
 
 export const defaults: Record<string, ColorConfig> = {
-  background: { hue: 26, saturation: 88, lightness: 95, alpha: 1 },
-  foreground: { hue: 26, saturation: 5, lightness: 10, alpha: 1 },
-  primary: { hue: 26, saturation: 95, lightness: 44, alpha: 1 },
+  background: { hue: 303, saturation: 92, lightness: 95, alpha: 1 },
+  foreground: { hue: 303, saturation: 5, lightness: 10, alpha: 1 },
+  primary: { hue: 303, saturation: 88, lightness: 40, alpha: 1 },
   "primary-foreground": { hue: 0, saturation: 0, lightness: 100, alpha: 1 },
-  secondary: { hue: 26, saturation: 30, lightness: 70, alpha: 1 },
+  secondary: { hue: 303, saturation: 30, lightness: 70, alpha: 1 },
   "secondary-foreground": { hue: 0, saturation: 0, lightness: 0, alpha: 1 },
-  accent: { hue: -12, saturation: 30, lightness: 80, alpha: 1 },
-  "accent-foreground": { hue: 26, saturation: 5, lightness: 15, alpha: 1 },
-  card: { hue: 26, saturation: 50, lightness: 90, alpha: 1 },
-  "card-foreground": { hue: 26, saturation: 5, lightness: 15, alpha: 1 },
-  popover: { hue: 26, saturation: 88, lightness: 95, alpha: 1 },
-  "popover-foreground": { hue: 26, saturation: 95, lightness: 10, alpha: 1 },
-  muted: { hue: -12, saturation: 30, lightness: 85, alpha: 1 },
-  "muted-foreground": { hue: 26, saturation: 5, lightness: 35, alpha: 1 },
-  destructive: { hue: 0, saturation: 88, lightness: 30, alpha: 1 },
-  "destructive-foreground": { hue: 26, saturation: 5, lightness: 90, alpha: 1 },
-  border: { hue: 26, saturation: 30, lightness: 50, alpha: 1 },
-  input: { hue: 26, saturation: 30, lightness: 29, alpha: 1 },
-  ring: { hue: 26, saturation: 95, lightness: 44, alpha: 1 },
-  "chart-1": { hue: 26, saturation: 95, lightness: 44, alpha: 1 }, // Primary
-  "chart-2": { hue: -12, saturation: 70, lightness: 45, alpha: 1 }, // Darker accent for visibility
-  "chart-3": { hue: 26, saturation: 70, lightness: 35, alpha: 1 }, // Darker warm tone
-  "chart-4": { hue: 38, saturation: 95, lightness: 40, alpha: 1 }, // Darker gold
-  "chart-5": { hue: 14, saturation: 95, lightness: 40, alpha: 1 }, // Darker terracotta
+  accent: { hue: 265, saturation: 30, lightness: 80, alpha: 1 },
+  "accent-foreground": { hue: 303, saturation: 5, lightness: 15, alpha: 1 },
+  card: { hue: 303, saturation: 50, lightness: 90, alpha: 1 },
+  "card-foreground": { hue: 303, saturation: 5, lightness: 15, alpha: 1 },
+  popover: { hue: 303, saturation: 92, lightness: 95, alpha: 1 },
+  "popover-foreground": { hue: 303, saturation: 95, lightness: 10, alpha: 1 },
+  muted: { hue: 265, saturation: 30, lightness: 85, alpha: 1 },
+  "muted-foreground": { hue: 303, saturation: 5, lightness: 40, alpha: 1 },
+  destructive: { hue: 0, saturation: 92, lightness: 50, alpha: 1 },
+  "destructive-foreground": {
+    hue: 303,
+    saturation: 5,
+    lightness: 90,
+    alpha: 1,
+  },
+  border: { hue: 303, saturation: 30, lightness: 60, alpha: 1 },
+  input: { hue: 303, saturation: 30, lightness: 50, alpha: 1 },
+  ring: { hue: 303, saturation: 88, lightness: 40, alpha: 1 },
+  // Chart colors using the same color scheme patterns
+  "chart-1": { hue: 303, saturation: 88, lightness: 40, alpha: 1 }, // Primary
+  "chart-2": { hue: 265, saturation: 30, lightness: 80, alpha: 1 }, // Accent-based
+  "chart-3": { hue: 303, saturation: 88, lightness: 40, alpha: 1 }, // Primary variant
+  "chart-4": { hue: 64, saturation: 86, lightness: 35, alpha: 1 }, // Complementary (+38°)
+  "chart-5": { hue: -38, saturation: 86, lightness: 32, alpha: 1 }, // Offset (-38°)
 };
 
 export const defaultsDark: Record<string, ColorConfig> = {
-  background: { hue: 26, saturation: 50, lightness: 10, alpha: 1 },
-  foreground: { hue: 26, saturation: 5, lightness: 90, alpha: 1 },
-  primary: { hue: 26, saturation: 95, lightness: 44, alpha: 1 },
+  background: { hue: 303, saturation: 50, lightness: 10, alpha: 1 },
+  foreground: { hue: 303, saturation: 5, lightness: 90, alpha: 1 },
+  primary: { hue: 303, saturation: 88, lightness: 40, alpha: 1 },
   "primary-foreground": { hue: 0, saturation: 0, lightness: 100, alpha: 1 },
-  secondary: { hue: 26, saturation: 30, lightness: 20, alpha: 1 },
+  secondary: { hue: 303, saturation: 30, lightness: 20, alpha: 1 },
   "secondary-foreground": { hue: 0, saturation: 0, lightness: 100, alpha: 1 },
-  accent: { hue: -12, saturation: 30, lightness: 25, alpha: 1 },
-  "accent-foreground": { hue: 26, saturation: 5, lightness: 90, alpha: 1 },
-  card: { hue: 26, saturation: 50, lightness: 10, alpha: 1 },
-  "card-foreground": { hue: 26, saturation: 5, lightness: 90, alpha: 1 },
-  popover: { hue: 26, saturation: 50, lightness: 5, alpha: 1 },
-  "popover-foreground": { hue: 26, saturation: 5, lightness: 90, alpha: 1 },
-  muted: { hue: -12, saturation: 30, lightness: 25, alpha: 1 },
-  "muted-foreground": { hue: 26, saturation: 5, lightness: 60, alpha: 1 },
-  destructive: { hue: 0, saturation: 88, lightness: 30, alpha: 1 },
-  "destructive-foreground": { hue: 26, saturation: 5, lightness: 90, alpha: 1 },
-  border: { hue: 26, saturation: 30, lightness: 29, alpha: 1 },
-  input: { hue: 26, saturation: 30, lightness: 29, alpha: 1 },
-  ring: { hue: 26, saturation: 95, lightness: 44, alpha: 1 },
-  "chart-1": { hue: 26, saturation: 95, lightness: 44, alpha: 1 }, // Primary
-  "chart-2": { hue: -12, saturation: 30, lightness: 25, alpha: 1 }, // Accent
-  "chart-3": { hue: 26, saturation: 30, lightness: 20, alpha: 1 }, // Secondary
-  "chart-4": { hue: 38, saturation: 95, lightness: 44, alpha: 1 }, // Warm gold variation
-  "chart-5": { hue: 14, saturation: 95, lightness: 44, alpha: 1 }, // Warm terracotta variation
+  accent: { hue: 265, saturation: 30, lightness: 25, alpha: 1 },
+  "accent-foreground": { hue: 303, saturation: 5, lightness: 90, alpha: 1 },
+  card: { hue: 303, saturation: 50, lightness: 10, alpha: 1 },
+  "card-foreground": { hue: 303, saturation: 5, lightness: 90, alpha: 1 },
+  popover: { hue: 303, saturation: 50, lightness: 5, alpha: 1 },
+  "popover-foreground": { hue: 303, saturation: 5, lightness: 90, alpha: 1 },
+  muted: { hue: 265, saturation: 30, lightness: 25, alpha: 1 },
+  "muted-foreground": { hue: 303, saturation: 5, lightness: 60, alpha: 1 },
+  destructive: { hue: 0, saturation: 92, lightness: 50, alpha: 1 },
+  "destructive-foreground": {
+    hue: 303,
+    saturation: 5,
+    lightness: 90,
+    alpha: 1,
+  },
+  border: { hue: 303, saturation: 30, lightness: 50, alpha: 1 },
+  input: { hue: 303, saturation: 30, lightness: 50, alpha: 1 },
+  ring: { hue: 303, saturation: 88, lightness: 40, alpha: 1 },
+  // Chart colors remain constant in dark mode for consistency
+  "chart-1": { hue: 303, saturation: 88, lightness: 40, alpha: 1 }, // Primary
+  "chart-2": { hue: 265, saturation: 30, lightness: 80, alpha: 1 }, // Accent-based
+  "chart-3": { hue: 303, saturation: 88, lightness: 40, alpha: 1 }, // Primary variant
+  "chart-4": { hue: 64, saturation: 86, lightness: 35, alpha: 1 }, // Complementary (+38°)
+  "chart-5": { hue: -38, saturation: 86, lightness: 32, alpha: 1 }, // Offset (-38°)
 };
+
+export const createColor = (
+  baseHue: number,
+  saturation: number,
+  lightness: number,
+  alpha: number = 1
+): ColorConfig => ({
+  hue: baseHue,
+  saturation,
+  lightness,
+  alpha,
+});
 
 export const generateThemeColorsFromPrimary = (
   baseHue: number,
   isDarkMode: boolean
-): Record<string, ColorConfig> => {
-  const offsetHue = (baseHue - 38 + 360) % 360;
+) => {
+  const normalizedHue = ((baseHue % 360) + 360) % 360;
+  const offsetHue = (normalizedHue - 38 + 360) % 360;
 
   return {
-    background: {
-      hue: baseHue,
-      saturation: isDarkMode ? 50 : 92,
-      lightness: isDarkMode ? 10 : 95,
-      alpha: 1,
-    },
-    foreground: {
-      hue: baseHue,
-      saturation: 5,
-      lightness: isDarkMode ? 90 : 10,
-      alpha: 1,
-    },
-    card: {
-      hue: baseHue,
-      saturation: 50,
-      lightness: isDarkMode ? 10 : 90,
-      alpha: 1,
-    },
-    "card-foreground": {
-      hue: baseHue,
-      saturation: 5,
-      lightness: isDarkMode ? 90 : 15,
-      alpha: 1,
-    },
-    popover: {
-      hue: baseHue,
-      saturation: isDarkMode ? 50 : 92,
-      lightness: isDarkMode ? 5 : 95,
-      alpha: 1,
-    },
-    "popover-foreground": {
-      hue: baseHue,
-      saturation: 5,
-      lightness: isDarkMode ? 90 : 10,
-      alpha: 1,
-    },
-    primary: {
-      hue: baseHue,
-      saturation: 86,
-      lightness: 27,
-      alpha: 1,
-    },
-    "primary-foreground": {
-      hue: 0,
-      saturation: 0,
-      lightness: 100,
-      alpha: 1,
-    },
-    secondary: {
-      hue: baseHue,
-      saturation: 30,
-      lightness: isDarkMode ? 20 : 70,
-      alpha: 1,
-    },
-    "secondary-foreground": {
-      hue: 0,
-      saturation: 0,
-      lightness: isDarkMode ? 100 : 0,
-      alpha: 1,
-    },
-    muted: {
-      hue: offsetHue,
-      saturation: 30,
-      lightness: isDarkMode ? 25 : 85,
-      alpha: 1,
-    },
-    "muted-foreground": {
-      hue: baseHue,
-      saturation: 5,
-      lightness: isDarkMode ? 60 : 36,
-      alpha: 1,
-    },
-    accent: {
-      hue: offsetHue,
-      saturation: 30,
-      lightness: isDarkMode ? 25 : 80,
-      alpha: 1,
-    },
-    "accent-foreground": {
-      hue: baseHue,
-      saturation: 5,
-      lightness: isDarkMode ? 90 : 15,
-      alpha: 1,
-    },
-    destructive: {
-      hue: 0,
-      saturation: 92,
-      lightness: 36,
-      alpha: 1,
-    },
-    "destructive-foreground": {
-      hue: baseHue,
-      saturation: 5,
-      lightness: 90,
-      alpha: 1,
-    },
-    border: {
-      hue: baseHue,
-      saturation: 30,
-      lightness: isDarkMode ? 36 : 50,
-      alpha: 1,
-    },
-    input: {
-      hue: baseHue,
-      saturation: 30,
-      lightness: 36,
-      alpha: 1,
-    },
-    ring: {
-      hue: baseHue,
-      saturation: 86,
-      lightness: 27,
-      alpha: 1,
-    },
+    // Base Colors
+    background: createColor(
+      normalizedHue,
+      isDarkMode ? 50 : 92,
+      isDarkMode ? 10 : 95
+    ),
+    foreground: createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
+    border: createColor(normalizedHue, 30, isDarkMode ? 36 : 50),
+    ring: createColor(normalizedHue, 86, 27),
+    input: createColor(normalizedHue, 30, 36),
+
+    // Card & Popover
+    card: createColor(
+      normalizedHue,
+      isDarkMode ? 50 : 92,
+      isDarkMode ? 10 : 95
+    ),
+    "card-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 15),
+    popover: createColor(
+      normalizedHue,
+      isDarkMode ? 50 : 92,
+      isDarkMode ? 5 : 95
+    ),
+    "popover-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
+
+    // Primary & Secondary
+    primary: createColor(normalizedHue, 86, 27),
+    "primary-foreground": createColor(0, 0, 100),
+    secondary: createColor(normalizedHue, 30, isDarkMode ? 20 : 70),
+    "secondary-foreground": createColor(0, 0, isDarkMode ? 100 : 0),
+
+    // Accent & Muted
+    accent: createColor(offsetHue, 30, isDarkMode ? 25 : 80),
+    "accent-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 15),
+    muted: createColor(offsetHue, 30, isDarkMode ? 25 : 85),
+    "muted-foreground": createColor(normalizedHue, 5, isDarkMode ? 60 : 36),
+
+    // Destructive
+    destructive: createColor(0, 92, 36),
+    "destructive-foreground": createColor(0, 0, 100),
+
+    // Chart Colors
+    // charts: {
+    //   line: createColor(normalizedHue, 80, 50), // Main line color
+    //   area: createColor(normalizedHue, 80, 80), // Area fill color
+    //   bar: createColor(normalizedHue, 70, 60), // Bar color
+    //   pie: [
+    //     createColor(normalizedHue, 80, 40), // First slice color
+    //     createColor((normalizedHue + 30) % 360, 80, 40), // Second slice color
+    //     createColor((normalizedHue + 60) % 360, 80, 40), // Third slice color
+    //   ],
+    //   scatter: createColor(normalizedHue, 90, 40), // Scatter points color
+    // },
   };
 };
 

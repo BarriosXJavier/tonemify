@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
       <div className="grid gap-8 md:grid-cols-2 lg:gap-16 justify-center max-w-3xl mx-auto ">
         <div className="">
           <header>
-            <h1 className="text-primary text-2xl font-semibold mb-4">
+            <h1 className="text-primary dark:text-foreground text-2xl font-semibold mb-4">
               Quick Links
             </h1>
           </header>
@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
         {/* Tools Used Section */}
         <div>
           <header>
-            <h1 className="text-primary text-2xl font-semibold mb-4">
+            <h1 className="text-primary dark:text-foreground text-2xl font-semibold mb-4">
               Tools Used
             </h1>
           </header>

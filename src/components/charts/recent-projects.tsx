@@ -37,7 +37,7 @@ export function RecentProjectsTable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-primary">Recent Projects</CardTitle>
+        <CardTitle className="text-primary dark:text-foreground ">Recent Projects</CardTitle>
         <CardDescription>
           Overview of the latest project activities
         </CardDescription>
