@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Coffee, Github, MenuIcon, X } from "lucide-react";
+import { Coffee, Github, MenuIcon } from "lucide-react";
 import { ModeToggle } from "./theme-switch";
 import {
   NavigationMenu,
@@ -26,7 +26,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 px-4 mx-2 sm:px-6 lg:px-10 h-16 flex items-center justify-between bg-background dark:bg-dark-background border-b border-border dark:border-dark-border font-mono">
+    <header className="sticky top-0 z-50 px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between bg-background dark:bg-dark-background border-b border-border dark:border-dark-border font-mono">
       {/* Logo and Brand Name */}
       <Link className="flex items-center justify-center" href="/">
         <Gem className="h-6 w-6 text-primary dark:text-primary-foreground" />
@@ -101,16 +101,6 @@ export default function Header() {
                 Menu
               </SheetTitle>
               <SheetClose asChild>
-                <Button
-                  variant="ghost"
-                  size="lg"
-                  className="p-4 bg-secondary rounded-full"
-                >
-                  <X
-                    className="text-primary dark:text-primary-foreground"
-                    size="lg"
-                  />
-                </Button>
               </SheetClose>
             </SheetHeader>
             <nav className="flex flex-col space-y-6 mt-8 font-mono">
