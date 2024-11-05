@@ -170,8 +170,8 @@ export const convertColor = (
       return `hsla(${hsl.hue}, ${hsl.saturation}%, ${hsl.lightness}%, ${hsl.alpha})`;
     case "custom":
       return (hsl.alpha ?? 1) < 1
-        ? `--primary: ${hsl.hue}, ${hsl.saturation}%, ${hsl.lightness}%, ${hsl.alpha};`
-        : `--primary: ${hsl.hue}, ${hsl.saturation}%, ${hsl.lightness}%;`;
+        ? `--primary: ${hsl.hue} ${hsl.saturation}% ${hsl.lightness}% ${hsl.alpha};`
+        : `--primary: ${hsl.hue} ${hsl.saturation}% ${hsl.lightness}%;`;
     default:
       return null;
   }
@@ -202,12 +202,13 @@ export const defaults: Record<string, ColorConfig> = {
   border: { hue: 303, saturation: 30, lightness: 60, alpha: 1 },
   input: { hue: 303, saturation: 30, lightness: 50, alpha: 1 },
   ring: { hue: 303, saturation: 88, lightness: 40, alpha: 1 },
-  // Chart colors using the same color scheme patterns
-  "chart-1": { hue: 303, saturation: 88, lightness: 40, alpha: 1 }, // Primary
-  "chart-2": { hue: 265, saturation: 30, lightness: 80, alpha: 1 }, // Accent-based
-  "chart-3": { hue: 303, saturation: 88, lightness: 40, alpha: 1 }, // Primary variant
-  "chart-4": { hue: 64, saturation: 86, lightness: 35, alpha: 1 }, // Complementary (+38°)
-  "chart-5": { hue: -38, saturation: 86, lightness: 32, alpha: 1 }, // Offset (-38°)
+
+  // Slight variations for chart colors
+  "chart-1": { hue: 303, saturation: 85, lightness: 45, alpha: 1 }, // Slightly less saturated primary
+  "chart-2": { hue: 265, saturation: 40, lightness: 75, alpha: 1 }, // Slightly more saturated accent
+  "chart-3": { hue: 310, saturation: 88, lightness: 35, alpha: 1 }, // Variant of primary with hue shift
+  "chart-4": { hue: 64, saturation: 80, lightness: 40, alpha: 1 }, // Slightly lighter complementary
+  "chart-5": { hue: 305, saturation: 85, lightness: 40, alpha: 1 }, // Adjusted offset with hue change
 };
 
 export const defaultsDark: Record<string, ColorConfig> = {
@@ -235,12 +236,13 @@ export const defaultsDark: Record<string, ColorConfig> = {
   border: { hue: 303, saturation: 30, lightness: 50, alpha: 1 },
   input: { hue: 303, saturation: 30, lightness: 50, alpha: 1 },
   ring: { hue: 303, saturation: 88, lightness: 40, alpha: 1 },
-  // Chart colors remain constant in dark mode for consistency
-  "chart-1": { hue: 303, saturation: 88, lightness: 40, alpha: 1 }, // Primary
-  "chart-2": { hue: 265, saturation: 30, lightness: 80, alpha: 1 }, // Accent-based
-  "chart-3": { hue: 303, saturation: 88, lightness: 40, alpha: 1 }, // Primary variant
-  "chart-4": { hue: 64, saturation: 86, lightness: 35, alpha: 1 }, // Complementary (+38°)
-  "chart-5": { hue: -38, saturation: 86, lightness: 32, alpha: 1 }, // Offset (-38°)
+
+  // Slight variations for chart colors in dark mode
+  "chart-1": { hue: 303, saturation: 85, lightness: 45, alpha: 1 }, // Slightly less saturated primary
+  "chart-2": { hue: 265, saturation: 40, lightness: 75, alpha: 1 }, // Slightly more saturated accent
+  "chart-3": { hue: 310, saturation: 88, lightness: 35, alpha: 1 }, // Variant of primary with hue shift
+  "chart-4": { hue: 64, saturation: 80, lightness: 40, alpha: 1 }, // Slightly lighter complementary
+  "chart-5": { hue: 305, saturation: 85, lightness: 40, alpha: 1 }, // Adjusted offset with hue change
 };
 
 export const createColor = (
@@ -305,19 +307,19 @@ export const generateThemeColorsFromPrimary = (
     "destructive-foreground": createColor(0, 0, 100),
 
     // Chart Colors
-    // charts: {
-    //   line: createColor(normalizedHue, 80, 50), // Main line color
-    //   area: createColor(normalizedHue, 80, 80), // Area fill color
-    //   bar: createColor(normalizedHue, 70, 60), // Bar color
-    //   pie: [
-    //     createColor(normalizedHue, 80, 40), // First slice color
-    //     createColor((normalizedHue + 30) % 360, 80, 40), // Second slice color
-    //     createColor((normalizedHue + 60) % 360, 80, 40), // Third slice color
-    //   ],
-    //   scatter: createColor(normalizedHue, 90, 40), // Scatter points color
-    // },
+    "chart-1": createColor(normalizedHue, 85, isDarkMode ? 45 : 45), // Slightly less saturated primary
+    "chart-2": createColor(265, 40, isDarkMode ? 75 : 75), // Slightly more saturated accent
+    "chart-3": createColor((normalizedHue + 7) % 360, 88, isDarkMode ? 35 : 35), // Variant of primary with slight hue shift
+    "chart-4": createColor(64, 80, isDarkMode ? 40 : 40), // Slightly lighter complementary
+    "chart-5": createColor(
+      (normalizedHue - 33) % 360,
+      85,
+      isDarkMode ? 40 : 40
+    ), // Adjusted offset with hue change
   };
 };
+
+
 
 export const tailwindColorPalette = {
   slate: {
