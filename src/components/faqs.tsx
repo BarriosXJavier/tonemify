@@ -45,7 +45,7 @@ const Faqs = () => {
             <br />
             <br />
             Note that to paste a single color, you will use the &apos;Convert to
-            --color&apos; button and select the &apos;--primary: h s% l%;&apos;
+            custom&apos; button and select the &apos;--primary: h s% l%;&apos;
             option and paste it using the paste icon. This will generate a color
             cool theme based on what you pasted (primary color).
           </AccordionContent>
