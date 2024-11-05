@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Coffee, Github, MenuIcon } from "lucide-react";
-import { ModeToggle } from "./theme-switch";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -78,7 +77,7 @@ export default function Header() {
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
-        <ModeToggle />
+       
       </div>
 
       {/* Mobile Navigation */}
@@ -128,7 +127,7 @@ export default function Header() {
                 <span>GitHub</span>
               </Link>
               <div className="pt-4">
-                <ModeToggle />
+             
               </div>
             </nav>
           </SheetContent>
