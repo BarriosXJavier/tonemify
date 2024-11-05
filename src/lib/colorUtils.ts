@@ -152,7 +152,7 @@ export const parseToHSL = (color: string): ColorConfig | null => {
 
 export const convertColor = (
   color: string,
-  outputFormat: "hex" | "rgb" | "rgba" | "hsl" | "hsla"
+  outputFormat: "hex" | "rgb" | "rgba" | "hsl" | "hsla" | "custom"
 ): string | null => {
   const hsl = parseToHSL(color);
   if (!hsl) return null;
@@ -170,6 +170,10 @@ export const convertColor = (
       return `hsl(${hsl.hue}, ${hsl.saturation}%, ${hsl.lightness}%)`;
     case "hsla":
       return `hsla(${hsl.hue}, ${hsl.saturation}%, ${hsl.lightness}%, ${hsl.alpha})`;
+    case "custom":
+      return (hsl.alpha ?? 1) < 1
+        ? `--primary: ${hsl.hue}, ${hsl.saturation}%, ${hsl.lightness}%, ${hsl.alpha};`
+        : `--primary: ${hsl.hue}, ${hsl.saturation}%, ${hsl.lightness}%;`;
     default:
       return null;
   }

@@ -373,12 +373,11 @@ const handlePasteTheme = (input?: string) => {
             <Button
               variant="outline"
               onClick={() => setConvertDialogOpen(true)}
-              className="flex items-center text-primary text-xs"
-              title="Convert to Tonemify Format"
+              className="flex items-center text-primary"
+              title="Convert Color Format"
             >
-              Convert to --color
+              Convert Color
             </Button>
-
             <Dialog
               open={convertDialogOpen}
               onOpenChange={setConvertDialogOpen}
@@ -405,9 +404,12 @@ const handlePasteTheme = (input?: string) => {
                     <option value="rgba">RGBA</option>
                     <option value="hsl">HSL</option>
                     <option value="hsla">HSLA</option>
+                    <option value="custom">
+                      Custom (--primary: h s% l%;)
+                    </option>
                   </select>
                   {convertedColor && (
-                    <div className="p-2 border rounded bg-gray-50">
+                    <div className="p-2 border rounded bg-background text-primary">
                       Converted Color: <strong>{convertedColor}</strong>
                     </div>
                   )}
@@ -428,6 +430,59 @@ const handlePasteTheme = (input?: string) => {
                 </div>
               </DialogContent>
             </Dialog>
+            <Dialog
+              open={convertDialogOpen}
+              onOpenChange={setConvertDialogOpen}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Convert Color</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    value={colorInput}
+                    onChange={(e) => setColorInput(e.target.value)}
+                    placeholder="Enter color value (e.g., hsl(255, 81%, 95%), #ff5733)"
+                    className="w-full p-2 border rounded"
+                  />
+                  <select
+                    value={selectedFormat}
+                    onChange={(e) => setSelectedFormat(e.target.value as "hex" | "rgb" | "rgba" | "hsl" | "hsla")}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="hex">HEX</option>
+                    <option value="rgb">RGB</option>
+                    <option value="rgba">RGBA</option>
+                    <option value="hsl">HSL</option>
+                    <option value="hsla">HSLA</option>
+                    <option value="custom">
+                      Custom (--primary: 292 88% 11%;) put this into the paste button for a primary color
+                    </option>
+                  </select>
+                  {convertedColor && (
+                    <div className="p-2 border rounded bg-background text-primary">
+                      Converted Color: <strong>{convertedColor}</strong>
+                    </div>
+                  )}
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={handleConvert}>
+                      Convert
+                    </Button>
+                    <Button variant="outline" onClick={handleCopy}>
+                      Copy
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setConvertDialogOpen(false)}
+                    >
+                      Close
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
             <Button
               variant="outline"
               onClick={() =>
