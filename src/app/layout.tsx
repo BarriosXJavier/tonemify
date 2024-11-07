@@ -5,7 +5,7 @@ import Header from "@/components/navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { Montserrat } from "next/font/google";
 import Footer from "@/components/footer";
-
+import { Analytics } from "@vercel/analytics/react";
 const montserrat = Montserrat({
   weight: ["300", "400", "500", "700"],
   subsets: ["latin"],
@@ -36,6 +36,7 @@ export default function RootLayout({
           {children}
           <Footer />
           <Toaster position="bottom-right" />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
