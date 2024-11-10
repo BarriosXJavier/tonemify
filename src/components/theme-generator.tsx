@@ -307,29 +307,27 @@ export default function ThemeGenerator() {
     }
   };
 
-  const generateThemeCSS = (): string => {
-    const formatColor = ({
-      hue,
-      saturation,
-      lightness,
-      alpha,
-    }: ColorConfig): string => {
-      const alphaValue = alpha ?? 1;
-      return includeAlpha && alphaValue < 1
-        ? `hsla(${hue}, ${saturation}%, ${lightness}%, ${alphaValue})`
-        : `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-    };
+ const generateThemeCSS = (): string => {
+   const formatColor = ({
+     hue,
+     saturation,
+     lightness,
+     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     alpha,
+   }: ColorConfig): string => {
+     return `${hue} ${saturation}% ${lightness}%`;
+   };
 
-    const lightVariables = Object.entries(colorsLight)
-      .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
-      .join("\n");
+   const lightVariables = Object.entries(colorsLight)
+     .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
+     .join("\n");
 
-    const darkVariables = Object.entries(colorsDark)
-      .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
-      .join("\n");
+   const darkVariables = Object.entries(colorsDark)
+     .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
+     .join("\n");
 
-    return `:root {\n${lightVariables}\n}\n\n.dark {\n${darkVariables}\n}`;
-  };
+   return `:root {\n${lightVariables}\n}\n\n.dark {\n${darkVariables}\n}`;
+ };
 
   const actions = {
     copyTheme: () => {
