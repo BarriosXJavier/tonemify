@@ -669,17 +669,17 @@ export default function ThemeGenerator() {
             className="w-full h-40 sm:h-48 md:h-60 border rounded p-2 text-black dark:text-white"
             placeholder={`Paste your CSS theme...
 
-Expected format:
+Expected format(css variable format):
 :root {
-  --color-name: hsl(255, 81%, 95%);
+  --color-name: 255 81% 95%;
   /* other classes */
 }
 .dark {
-  --color-name: hsla(255, 50%, 10%, 0.9);
+  --color-name: 255 50% 10% 0.9;
   /* other classes */
 }
   
-or a primary color such as --primary: hsl(255, 81%, 95%);`}
+or the primary color e.g --primary: 255 81% 95%;`}
           />
           <div className="flex justify-end space-x-2 mt-4">
             <Button variant="outline" onClick={() => handlePasteTheme()}>
