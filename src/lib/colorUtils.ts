@@ -257,69 +257,66 @@ export const createColor = (
   alpha,
 });
 
-export const generateThemeColorsFromPrimary = (
-  baseHue: number,
-  isDarkMode: boolean
-) => {
-  const normalizedHue = ((baseHue % 360) + 360) % 360;
-  const offsetHue = (normalizedHue - 38 + 360) % 360;
+  export const generateThemeColorsFromPrimary = (
+    baseHue: number,
+    isDarkMode: boolean
+  ) => {
+    const normalizedHue = ((baseHue % 360) + 360) % 360;
+    const offsetHue = (normalizedHue - 38 + 360) % 360;
+    return {
+      // Base Colors
+      background: createColor(
+        normalizedHue,
+        isDarkMode ? 50 : 92,
+        isDarkMode ? 10 : 95
+      ),
+      foreground: createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
+      border: createColor(normalizedHue, 30, isDarkMode ? 36 : 50),
+      ring: createColor(normalizedHue, 86, 27),
+      input: createColor(normalizedHue, 30, 36),
 
-  return {
-    // Base Colors
-    background: createColor(
-      normalizedHue,
-      isDarkMode ? 50 : 92,
-      isDarkMode ? 10 : 95
-    ),
-    foreground: createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
-    border: createColor(normalizedHue, 30, isDarkMode ? 36 : 50),
-    ring: createColor(normalizedHue, 86, 27),
-    input: createColor(normalizedHue, 30, 36),
+      // Card & Popover
+      card: createColor(
+        normalizedHue,
+        isDarkMode ? 50 : 92,
+        isDarkMode ? 10 : 95
+      ),
+      "card-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 15),
+      popover: createColor(
+        normalizedHue,
+        isDarkMode ? 50 : 92,
+        isDarkMode ? 5 : 95
+      ),
+      "popover-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
 
-    // Card & Popover
-    card: createColor(
-      normalizedHue,
-      isDarkMode ? 50 : 92,
-      isDarkMode ? 10 : 95
-    ),
-    "card-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 15),
-    popover: createColor(
-      normalizedHue,
-      isDarkMode ? 50 : 92,
-      isDarkMode ? 5 : 95
-    ),
-    "popover-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
+      // Primary & Secondary
+      primary: createColor(normalizedHue, 86, 27),
+      "primary-foreground": createColor(0, 0, 100),
+      secondary: createColor(normalizedHue, 30, isDarkMode ? 20 : 70),
+      "secondary-foreground": createColor(0, 0, isDarkMode ? 100 : 0),
 
-    // Primary & Secondary
-    primary: createColor(normalizedHue, 86, 27),
-    "primary-foreground": createColor(0, 0, 100),
-    secondary: createColor(normalizedHue, 30, isDarkMode ? 20 : 70),
-    "secondary-foreground": createColor(0, 0, isDarkMode ? 100 : 0),
+      // Accent & Muted
+      accent: createColor(offsetHue, 30, isDarkMode ? 25 : 80),
+      "accent-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 15),
+      muted: createColor(offsetHue, 30, isDarkMode ? 25 : 85),
+      "muted-foreground": createColor(normalizedHue, 5, isDarkMode ? 60 : 36),
 
-    // Accent & Muted
-    accent: createColor(offsetHue, 30, isDarkMode ? 25 : 80),
-    "accent-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 15),
-    muted: createColor(offsetHue, 30, isDarkMode ? 25 : 85),
-    "muted-foreground": createColor(normalizedHue, 5, isDarkMode ? 60 : 36),
+      // Destructive
+      destructive: createColor(0, 92, 36),
+      "destructive-foreground": createColor(0, 0, 100),
 
-    // Destructive
-    destructive: createColor(0, 92, 36),
-    "destructive-foreground": createColor(0, 0, 100),
-
-    // Chart Colors
-    "chart-1": createColor(normalizedHue, 85, isDarkMode ? 45 : 45), // Slightly less saturated primary
-    "chart-2": createColor(265, 40, isDarkMode ? 75 : 75), // Slightly more saturated accent
-    "chart-3": createColor((normalizedHue + 7) % 360, 88, isDarkMode ? 35 : 35), // Variant of primary with slight hue shift
-    "chart-4": createColor(64, 80, isDarkMode ? 40 : 40), // Slightly lighter complementary
-    "chart-5": createColor(
-      (normalizedHue - 33) % 360,
-      85,
-      isDarkMode ? 40 : 40
-    ), // Adjusted offset with hue change
+      // Chart Colors
+      "chart-1": createColor(normalizedHue, 85, isDarkMode ? 45 : 45), // Slightly less saturated primary
+      "chart-2": createColor(265, 40, isDarkMode ? 75 : 75), // Slightly more saturated accent
+      "chart-3": createColor((normalizedHue + 7) % 360, 88, isDarkMode ? 35 : 35), // Variant of primary with slight hue shift
+      "chart-4": createColor(64, 80, isDarkMode ? 40 : 40), // Slightly lighter complementary
+      "chart-5": createColor(
+        (normalizedHue - 33) % 360,
+        85,
+        isDarkMode ? 40 : 40
+      ), // Adjusted offset with hue change
+    };
   };
-};
-
-
 
 export const tailwindColorPalette = {
   slate: {
@@ -610,22 +607,22 @@ export const tailwindColorPalette = {
   },
 };
 
-export const generateChartColorsFromPrimary = (
-  baseHue: number,
-  isDarkMode: boolean
-): Record<string, ColorConfig> => {
-  const chartColors: Record<string, ColorConfig> = {};
-  const lightness = isDarkMode ? 30 : 70;
-  const saturation = 80;
+// export const generateChartColorsFromPrimary = (
+//   baseHue: number,
+//   isDarkMode: boolean
+// ): Record<string, ColorConfig> => {
+//   const chartColors: Record<string, ColorConfig> = {};
+//   const lightness = isDarkMode ? 30 : 70;
+//   const saturation = 80;
 
-  for (let i = 0; i < 5; i++) {
-    chartColors[`chartColor${i + 1}`] = {
-      hue: (baseHue + i * 30) % 360,
-      saturation: saturation,
-      lightness: lightness,
-      alpha: 1,
-    };
-  }
+//   for (let i = 0; i < 5; i++) {
+//     chartColors[`chartColor${i + 1}`] = {
+//       hue: (baseHue + i * 30) % 360,
+//       saturation: saturation,
+//       lightness: lightness,
+//       alpha: 1,
+//     };
+//   }
 
-  return chartColors;
-};
+//   return chartColors;
+// };

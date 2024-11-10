@@ -86,187 +86,160 @@ export default function ThemeGenerator() {
     );
   };
 
-  const handlePasteTheme = (input?: string) => {
-    try {
-      const parsedColorsLight: Record<string, ColorConfig> = {};
-      const parsedColorsDark: Record<string, ColorConfig> = {};
-      const failedVariables: string[] = [];
-      const inputString = input || pasteInput;
+const handlePasteTheme = (input?: string) => {
+  try {
+    const parsedColorsLight: Record<string, ColorConfig> = {};
+    let parsedColorsDark: Record<string, ColorConfig> = {};
+    const failedVariables: string[] = [];
+    const inputString = input || pasteInput;
 
-      const variableRegex = /--([a-zA-Z0-9-]+):\s*([^;]+);/g;
+    const variableRegex = /--([a-zA-Z0-9-]+):\s*([^;]+);/g;
 
-      const lightSectionRegex = /:root\s*{([^}]*)}/s;
-      const darkSectionRegex = /\.dark\s*{([^}]*)}/s;
+    const lightSectionRegex = /:root\s*{([^}]*)}/s;
+    const darkSectionRegex = /\.dark\s*{([^}]*)}/s;
 
-      const lightSectionMatch = inputString.match(lightSectionRegex);
-      const darkSectionMatch = inputString.match(darkSectionRegex);
-      const parseColorValue = (value: string): ColorConfig | null => {
-        const hslFunctionRegex =
-          /^(?:hsl|hsla)\(\s*([\d.-]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
-        const hslSpaceRegex =
-          /^([\d.-]+)(?:deg)?\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
-        const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
-        const customFormatRegex =
-          /^--primary:\s*([\d.-]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*;$/i;
+    const lightSectionMatch = inputString.match(lightSectionRegex);
+    const darkSectionMatch = inputString.match(darkSectionRegex);
 
-        let match;
-        if ((match = value.match(hslFunctionRegex))) {
-          return {
-            hue: parseFloat(match[1]),
-            saturation: parseFloat(match[2]),
-            lightness: parseFloat(match[3]),
-            alpha: match[4]
-              ? match[4].endsWith("%")
-                ? parseFloat(match[4]) / 100
-                : parseFloat(match[4])
-              : 1,
-          };
-        } else if ((match = value.match(hslSpaceRegex))) {
-          return {
-            hue: parseFloat(match[1]),
-            saturation: parseFloat(match[2]),
-            lightness: parseFloat(match[3]),
-            alpha: match[4]
-              ? match[4].endsWith("%")
-                ? parseFloat(match[4]) / 100
-                : parseFloat(match[4])
-              : 1,
-          };
-        } else if ((match = value.match(hexRegex))) {
-          return hexToHSL(value);
-        } else if ((match = value.match(customFormatRegex))) {
-          return {
-            hue: parseFloat(match[1]),
-            saturation: parseFloat(match[2]),
-            lightness: parseFloat(match[3]),
-            alpha: match[4]
-              ? match[4].endsWith("%")
-                ? parseFloat(match[4]) / 100
-                : parseFloat(match[4])
-              : 1,
-          };
-        } else {
-          return null;
-        }
-      };
+    const parseColorValue = (value: string): ColorConfig | null => {
+      const hslFunctionRegex =
+        /^(?:hsl|hsla)\(\s*([\d.-]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
+      const hslSpaceRegex =
+        /^([\d.-]+)(?:deg)?\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
+      const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
+      const customFormatRegex =
+        /^([\d.-]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?$/i;
 
-      const parseSection = (
-        section: string,
-        target: Record<string, ColorConfig>
-      ) => {
-        let match;
-        while ((match = variableRegex.exec(section)) !== null) {
-          const [, name, value] = match;
-          if (!defaults[name]) continue;
-          const colorConfig = parseColorValue(value.trim());
-          if (colorConfig) {
-            target[name] = colorConfig;
-          } else {
-            failedVariables.push(name);
-          }
-        }
-      };
-
-      if (lightSectionMatch) {
-        parseSection(lightSectionMatch[1], parsedColorsLight);
+      let match;
+      if ((match = value.match(hslFunctionRegex))) {
+        return {
+          hue: parseFloat(match[1]),
+          saturation: parseFloat(match[2]),
+          lightness: parseFloat(match[3]),
+          alpha: match[4]
+            ? match[4].endsWith("%")
+              ? parseFloat(match[4]) / 100
+              : parseFloat(match[4])
+            : 1,
+        };
+      } else if ((match = value.match(hslSpaceRegex))) {
+        return {
+          hue: parseFloat(match[1]),
+          saturation: parseFloat(match[2]),
+          lightness: parseFloat(match[3]),
+          alpha: match[4]
+            ? match[4].endsWith("%")
+              ? parseFloat(match[4]) / 100
+              : parseFloat(match[4])
+            : 1,
+        };
+      } else if ((match = value.match(hexRegex))) {
+        return hexToHSL(value);
+      } else if ((match = value.match(customFormatRegex))) {
+        return {
+          hue: parseFloat(match[1]),
+          saturation: parseFloat(match[2]),
+          lightness: parseFloat(match[3]),
+          alpha: match[4]
+            ? match[4].endsWith("%")
+              ? parseFloat(match[4]) / 100
+              : parseFloat(match[4])
+            : 1,
+        };
       } else {
-        // If no light section, parse entire input for light mode
-        parseSection(inputString, parsedColorsLight);
+        return null;
       }
+    };
 
-      if (darkSectionMatch) {
-        parseSection(darkSectionMatch[1], parsedColorsDark);
-      }
-
-      //  const applyGeneratedColors = (
-      //    parsedColors: Record<string, ColorConfig>,
-      //    mode: "light" | "dark"
-      //  ) => {
-      //    if (parsedColors["primary"]) {
-      //      const baseHue = parsedColors["primary"].hue;
-      //      const isDarkMode = mode === "dark";
-      //      const generatedColors = generateThemeColorsFromPrimary(
-      //        baseHue,
-      //        isDarkMode
-      //      );
-
-      //      Object.keys(generatedColors).forEach((key) => {
-      //        if (!parsedColors[key]) {
-      //          parsedColors[key] = generatedColors[key];
-      //        }
-      //      });
-
-      //      // Generate chart colors only if they don't already exist
-      //      const chartColors = generateChartColorsFromPrimary(baseHue, isDarkMode);
-      //      Object.keys(chartColors).forEach((key) => {
-      //        if (!parsedColors[key]) {
-      //          parsedColors[key] = chartColors[key];
-      //        }
-      //      });
-      //    }
-      //  };
-
-      // applyGeneratedColors(parsedColorsLight, "light");
-
-      // Generate dark mode colors if only light mode colors are provided
-      if (
-        Object.keys(parsedColorsDark).length === 0 &&
-        Object.keys(parsedColorsLight).length > 0
-      ) {
-        const baseHue = parsedColorsLight["primary"]?.hue;
-        if (baseHue !== undefined) {
-          const generatedColorsDark = generateThemeColorsFromPrimary(
-            baseHue,
-            true
-          );
-          Object.keys(generatedColorsDark).forEach((key) => {
-            if (!parsedColorsDark[key]) {
-              parsedColorsDark[key] = generatedColorsDark[key as keyof typeof generatedColorsDark];
-            }
-          });
-        }
-      }
-
-      if (
-        Object.keys(parsedColorsLight).length === 0 &&
-        Object.keys(parsedColorsDark).length === 0
-      ) {
-        toast.error("No valid colors found in the pasted theme.");
-      } else {
-        if (Object.keys(parsedColorsLight).length > 0) {
-          const finalColorsLight = { ...colorsLight, ...parsedColorsLight };
-          setColorsLight(finalColorsLight);
-          if (activeMode === "light") {
-            updateCSSVariables(finalColorsLight);
-          }
-        }
-
-        if (Object.keys(parsedColorsDark).length > 0) {
-          const finalColorsDark = { ...colorsDark, ...parsedColorsDark };
-          setColorsDark(finalColorsDark);
-          if (activeMode === "dark") {
-            updateCSSVariables(finalColorsDark);
-          }
-        }
-
-        if (failedVariables.length > 0) {
-          toast.error(
-            `Failed to parse the following variables: ${failedVariables.join(
-              ", "
-            )}. Others were updated successfully.`
-          );
+    const parseSection = (
+      section: string,
+      target: Record<string, ColorConfig>
+    ) => {
+      let match;
+      while ((match = variableRegex.exec(section)) !== null) {
+        const [, name, value] = match;
+        const colorConfig = parseColorValue(value.trim());
+        if (colorConfig) {
+          target[name] = colorConfig;
         } else {
-          toast.success("Theme updated successfully!");
+          failedVariables.push(name);
         }
       }
-    } catch (error) {
-      console.error("Theme parsing error:", error);
-      toast.error("Failed to parse theme. Please check the format.");
-    } finally {
-      setDialogState((prev) => ({ ...prev, paste: false }));
-      setPasteInput("");
+    };
+
+    if (lightSectionMatch) {
+      parseSection(lightSectionMatch[1], parsedColorsLight);
+    } else {
+      parseSection(inputString, parsedColorsLight);
     }
-  };
+
+    if (darkSectionMatch) {
+      parseSection(darkSectionMatch[1], parsedColorsDark);
+    }
+
+    if (Object.keys(parsedColorsLight).length > 0) {
+      const baseHue = parsedColorsLight["primary"]?.hue;
+      if (baseHue !== undefined) {
+        const generatedColorsLight = generateThemeColorsFromPrimary(
+          baseHue,
+          false
+        );
+        Object.keys(generatedColorsLight).forEach((key) => {
+          if (!parsedColorsLight[key]) {
+            parsedColorsLight[key] =
+              generatedColorsLight[key as keyof typeof generatedColorsLight];
+          }
+        });
+      }
+    }
+
+    if (Object.keys(parsedColorsDark).length === 0) {
+      const baseHue = parsedColorsLight["primary"]?.hue;
+      if (baseHue !== undefined) {
+        parsedColorsDark = generateThemeColorsFromPrimary(baseHue, true);
+      }
+    }
+
+    if (
+      Object.keys(parsedColorsLight).length === 0 &&
+      Object.keys(parsedColorsDark).length === 0
+    ) {
+      toast.error("No valid colors found in the pasted theme.");
+    } else {
+      if (Object.keys(parsedColorsLight).length > 0) {
+        const finalColorsLight = { ...colorsLight, ...parsedColorsLight };
+        setColorsLight(finalColorsLight);
+        if (activeMode === "light") {
+          updateCSSVariables(finalColorsLight);
+        }
+      }
+
+      if (Object.keys(parsedColorsDark).length > 0) {
+        const finalColorsDark = { ...colorsDark, ...parsedColorsDark };
+        setColorsDark(finalColorsDark);
+        if (activeMode === "dark") {
+          updateCSSVariables(finalColorsDark);
+        }
+      }
+
+      if (failedVariables.length > 0) {
+        toast.error(
+          `Failed to parse the following variables: ${failedVariables.join(
+            ", "
+          )}. Others were updated successfully.`
+        );
+      } else {
+        toast.success("Theme updated successfully!");
+      }
+    }
+  } catch (error) {
+    console.error("Theme parsing error:", error);
+    toast.error("Failed to parse theme. Please check the format.");
+  } finally {
+    setDialogState((prev) => ({ ...prev, paste: false }));
+    setPasteInput("");
+  }
+};
 
   const updateCSSVariables = (
     themeColors: Record<string, ColorConfig>
@@ -307,27 +280,27 @@ export default function ThemeGenerator() {
     }
   };
 
- const generateThemeCSS = (): string => {
-   const formatColor = ({
-     hue,
-     saturation,
-     lightness,
-     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-     alpha,
-   }: ColorConfig): string => {
-     return `${hue} ${saturation}% ${lightness}%`;
-   };
+  const generateThemeCSS = (): string => {
+    const formatColor = ({
+      hue,
+      saturation,
+      lightness,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      alpha,
+    }: ColorConfig): string => {
+      return `${hue} ${saturation}% ${lightness}%`;
+    };
 
-   const lightVariables = Object.entries(colorsLight)
-     .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
-     .join("\n");
+    const lightVariables = Object.entries(colorsLight)
+      .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
+      .join("\n");
 
-   const darkVariables = Object.entries(colorsDark)
-     .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
-     .join("\n");
+    const darkVariables = Object.entries(colorsDark)
+      .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
+      .join("\n");
 
-   return `:root {\n${lightVariables}\n}\n\n.dark {\n${darkVariables}\n}`;
- };
+    return `:root {\n${lightVariables}\n}\n\n.dark {\n${darkVariables}\n}`;
+  };
 
   const actions = {
     copyTheme: () => {
