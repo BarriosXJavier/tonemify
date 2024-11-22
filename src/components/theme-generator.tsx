@@ -200,13 +200,39 @@ export default function ThemeGenerator() {
         }
       }
 
-      // Ensure chart colors remain constant between light and dark modes
+      // Generate chart colors based on the primary color's hue
+      const baseHue = parsedColorsLight["primary"]?.hue || 0;
       const chartColors = {
-        "chart-1": { hue: 339, saturation: 85, lightness: 45, alpha: 1 },
-        "chart-2": { hue: 265, saturation: 40, lightness: 75, alpha: 1 },
-        "chart-3": { hue: 346, saturation: 88, lightness: 35, alpha: 1 },
-        "chart-4": { hue: 64, saturation: 80, lightness: 40, alpha: 1 },
-        "chart-5": { hue: 306, saturation: 85, lightness: 40, alpha: 1 },
+        "chart-1": {
+          hue: (baseHue + 15) % 360,
+          saturation: 70,
+          lightness: 50,
+          alpha: 1,
+        },
+        "chart-2": {
+          hue: (baseHue + 45) % 360,
+          saturation: 60,
+          lightness: 60,
+          alpha: 1,
+        },
+        "chart-3": {
+          hue: (baseHue + 75) % 360,
+          saturation: 80,
+          lightness: 40,
+          alpha: 1,
+        },
+        "chart-4": {
+          hue: (baseHue + 105) % 360,
+          saturation: 70,
+          lightness: 50,
+          alpha: 1,
+        },
+        "chart-5": {
+          hue: (baseHue + 135) % 360,
+          saturation: 60,
+          lightness: 60,
+          alpha: 1,
+        },
       };
 
       Object.assign(parsedColorsLight, chartColors);
