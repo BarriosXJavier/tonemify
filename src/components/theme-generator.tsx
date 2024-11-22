@@ -211,24 +211,24 @@ export default function ThemeGenerator() {
         },
         "chart-2": {
           hue: (baseHue + 45) % 360,
+          saturation: 65,
+          lightness: 55,
+          alpha: 1,
+        },
+        "chart-3": {
+          hue: (baseHue + 90) % 360,
+          saturation: 65,
+          lightness: 55,
+          alpha: 1,
+        },
+        "chart-4": {
+          hue: (baseHue + 135) % 360,
           saturation: 60,
           lightness: 60,
           alpha: 1,
         },
-        "chart-3": {
-          hue: (baseHue + 75) % 360,
-          saturation: 80,
-          lightness: 40,
-          alpha: 1,
-        },
-        "chart-4": {
-          hue: (baseHue + 105) % 360,
-          saturation: 70,
-          lightness: 50,
-          alpha: 1,
-        },
         "chart-5": {
-          hue: (baseHue + 135) % 360,
+          hue: (baseHue + 180) % 360,
           saturation: 60,
           lightness: 60,
           alpha: 1,
