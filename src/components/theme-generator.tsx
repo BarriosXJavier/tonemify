@@ -387,6 +387,18 @@ export default function ThemeGenerator() {
       setActiveMode(mode);
       updateCSSVariables(mode === "light" ? colorsLight : colorsDark);
     },
+
+    generateRandomTheme: () => {
+      const randomHue = Math.floor(Math.random() * 360);
+      const newColorsLight = generateThemeColorsFromPrimary(randomHue, false);
+      const newColorsDark = generateThemeColorsFromPrimary(randomHue, true);
+      setColorsLight(newColorsLight);
+      setColorsDark(newColorsDark);
+      updateCSSVariables(
+        activeMode === "light" ? newColorsLight : newColorsDark
+      );
+      toast.success("Random theme generated!");
+    },
   };
 
   const currentColors = activeMode === "light" ? colorsLight : colorsDark;
@@ -536,6 +548,14 @@ export default function ThemeGenerator() {
               title="Paste Theme"
             >
               <Clipboard className="w-4 h-4 mr-2" />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={actions.generateRandomTheme}
+              className="flex items-center text-primary dark:text-primary-foreground"
+              title="Generate Random Theme"
+            >
+              Random Theme
             </Button>
             <Button
               variant="outline"
