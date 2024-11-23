@@ -660,19 +660,19 @@ export default function ThemeGenerator() {
                 <Card
                   key={name}
                   className={`
-          p-4 
+          p-2 
           flex 
           flex-col 
           items-center 
           justify-center 
           ${textColor}
           transition-all 
-          duration-300 
+          duration-400 
           ease-in-out
-          hover:scale-105 
+          hover:scale-110 
           hover:shadow-xl 
           cursor-pointer
-          active:scale-95
+          active:scale-100
         `}
                   style={{ backgroundColor }}
                   onClick={() => setActiveColor(name)}
