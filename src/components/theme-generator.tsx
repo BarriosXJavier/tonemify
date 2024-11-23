@@ -494,10 +494,6 @@ export default function ThemeGenerator() {
                     <option value="rgba">RGBA</option>
                     <option value="hsl">HSL</option>
                     <option value="hsla">HSLA</option>
-                    <option value="custom">
-                      Custom (--primary: 292 88% 11%;) put this into the paste
-                      button for a primary color
-                    </option>
                   </select>
                   {convertedColor && (
                     <div className="p-2 border rounded bg-background text-primary">

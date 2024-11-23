@@ -44,10 +44,8 @@ const Faqs = () => {
             satisfied with your new cool theme, save it for future use.
             <br />
             <br />
-            Note that to paste a single color, you will use the &apos;Convert to
-            custom&apos; button and select the &apos;--primary: h s% l%;&apos;
-            option and paste it using the paste icon. This will generate a color
-            cool theme based on what you pasted (primary color).
+            You can also paste a single color to generate a theme based on that.
+            It will act as the primary color.
           </AccordionContent>
         </AccordionItem>
 
