@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Accordion,
   AccordionItem,
@@ -7,6 +9,7 @@ import {
 import { CardContent } from "./ui/card";
 import Image from "next/image";
 import Link from "next/link";
+import SupportDropdown from "./support";
 
 const Faqs = () => {
   return (
@@ -88,21 +91,7 @@ const Faqs = () => {
             to support the project, you can buy me a beer (or coffee)! Click the
             link below to show your support 😊
             <div className="mt-4">
-              <Link
-                href="https://www.buymeacoffee.com/barrios"
-                className="flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Image
-                  src="/beer.png"
-                  alt="Buy Me a Beer"
-                  className="h-6 w-6"
-                  height={24}
-                  width={24}
-                />
-                <span className="text-sm">Buy Me a Beer </span>
-              </Link>
+              <SupportDropdown />
             </div>
             <div className="mt-4">
               If you are a developer and would like to contribute to the

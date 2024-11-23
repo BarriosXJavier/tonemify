@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Coffee, Github, MenuIcon } from "lucide-react";
+import { Github, MenuIcon } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Gem } from "lucide-react";
+import SupportDropdown from "./support";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,18 +49,7 @@ export default function Header() {
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link
-                href="https://buymeacoffee.com/barrios"
-                legacyBehavior
-                passHref
-              >
-                <NavigationMenuLink
-                  className={`${navigationMenuTriggerStyle()} transition-colors duration-200 ease-in-out text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground`}
-                >
-                  <Coffee className="h-5 w-5 mr-2 text-primary dark:text-primary-foreground" />
-                  <span className="hidden xl:inline">Buy Me a Coffee</span>
-                </NavigationMenuLink>
-              </Link>
+              <SupportDropdown />
             </NavigationMenuItem>
             <NavigationMenuItem>
               <Link
@@ -77,7 +67,6 @@ export default function Header() {
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
-       
       </div>
 
       {/* Mobile Navigation */}
@@ -99,8 +88,7 @@ export default function Header() {
               <SheetTitle className="text-lg font-bold text-primary dark:text-primary-foreground sr-only">
                 Menu
               </SheetTitle>
-              <SheetClose asChild>
-              </SheetClose>
+              <SheetClose asChild></SheetClose>
             </SheetHeader>
             <nav className="flex flex-col space-y-6 mt-8 font-mono">
               <Link
@@ -110,14 +98,7 @@ export default function Header() {
               >
                 <span>Contact</span>
               </Link>
-              <Link
-                href="https://www.buymeacoffee.com/barrios"
-                className="flex items-center space-x-3 text-lg font-medium transition-colors duration-200 ease-in-out text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground"
-                onClick={() => setIsOpen(false)}
-              >
-                <Coffee className="h-6 w-6 text-primary dark:text-primary-foreground" />
-                <span>Buy Me a Coffee</span>
-              </Link>
+              <SupportDropdown />
               <Link
                 href="https://github.com/BarriosXJavier/tonemify"
                 className="flex items-center space-x-3 text-lg font-medium transition-colors duration-200 ease-in-out text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground"
@@ -126,9 +107,7 @@ export default function Header() {
                 <Github className="h-6 w-6 text-primary dark:text-primary-foreground" />
                 <span>GitHub</span>
               </Link>
-              <div className="pt-4">
-             
-              </div>
+              <div className="pt-4"></div>
             </nav>
           </SheetContent>
         </Sheet>
