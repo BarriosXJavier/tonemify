@@ -264,7 +264,7 @@ export const generateThemeColorsFromPrimary = (
   const normalizedHue = ((baseHue % 360) + 360) % 360;
 
   return {
-    background: createColor(normalizedHue, 69, isDarkMode ? 2 : 95),
+    background: createColor(normalizedHue, 69, isDarkMode ? 3 : 95),
     foreground: createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
     border: createColor(normalizedHue, 30, isDarkMode ? 18 : 50),
     ring: createColor(normalizedHue, 97, 48),
