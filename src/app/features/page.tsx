@@ -1,11 +1,8 @@
-import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card";
 import {
   Paintbrush,
   Sliders,
   Moon,
-  // Clipboard,
-  // Palette,
-  // Share2,
   Layers,
 } from "lucide-react";
 
@@ -67,21 +64,7 @@ const FeaturesSection = () => {
         "Built-in dark mode support ensures your themes look great in both light and dark environments.",
       color: "primary",
     },
-    // {
-    //   icon: Clipboard,
-    //   title: "Quick Export",
-    //   description:
-    //     "Copy your theme directly to clipboard in various formats. Seamlessly integrate with your existing projects.",
-    //   color: "primary",
-    // },
-      // {
-      //   icon: Palette,
-      //   title: "Color Harmonies",
-      //   description:
-      //     "Generate beautiful color palettes with our color harmony system. Create cohesive and balanced designs.",
-      //   color: "primary",
-      // },
-
+   
     {
       icon: Layers,
       title: "Component Preview",

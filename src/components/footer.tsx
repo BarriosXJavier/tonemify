@@ -65,6 +65,7 @@ const Footer: React.FC = () => {
           <Link
             href="https://x.com/barrios__x"
             className="flex items-center gap-1"
+            target="_blank noopener"
           >
             <Image src="/x.png" alt="x logo" width={20} height={20} />
             barriös__x
