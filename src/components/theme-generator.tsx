@@ -176,75 +176,46 @@ export default function ThemeGenerator() {
         parseSection(darkSectionMatch[1], parsedColorsDark);
       }
 
+      let baseHue: number | undefined;
+
       if (Object.keys(parsedColorsLight).length > 0) {
         const primaryColor = parsedColorsLight["primary"];
         if (primaryColor) {
           parsedColorsDark["primary"] = primaryColor;
-        }
-
-        const baseHue = primaryColor?.hue;
-        if (baseHue !== undefined) {
-          const generatedColorsLight = generateThemeColorsFromPrimary(
-            baseHue,
-            false
-          );
-          Object.keys(generatedColorsLight).forEach((key) => {
-            if (!parsedColorsLight[key]) {
-              parsedColorsLight[key] =
-                generatedColorsLight[key as keyof typeof generatedColorsLight];
-            }
-          });
-
-          const generatedColorsDark = generateThemeColorsFromPrimary(
-            baseHue,
-            true
-          );
-          Object.keys(generatedColorsDark).forEach((key) => {
-            if (!parsedColorsDark[key]) {
-              parsedColorsDark[key] =
-                generatedColorsDark[key as keyof typeof generatedColorsDark];
-            }
-          });
+          baseHue = primaryColor.hue;
         }
       }
 
-      // Generate chart colors based on the primary color's hue
-      const baseHue = parsedColorsLight["primary"]?.hue || 0;
-      const chartColors = {
-        "chart-1": {
-          hue: (baseHue + 15) % 360,
-          saturation: 70,
-          lightness: 50,
-          alpha: 1,
-        },
-        "chart-2": {
-          hue: (baseHue + 45) % 360,
-          saturation: 60,
-          lightness: 60,
-          alpha: 1,
-        },
-        "chart-3": {
-          hue: (baseHue + 75) % 360,
-          saturation: 80,
-          lightness: 40,
-          alpha: 1,
-        },
-        "chart-4": {
-          hue: (baseHue + 105) % 360,
-          saturation: 70,
-          lightness: 50,
-          alpha: 1,
-        },
-        "chart-5": {
-          hue: (baseHue + 135) % 360,
-          saturation: 60,
-          lightness: 60,
-          alpha: 1,
-        },
-      };
+      if (!baseHue) {
+        const parsedColor = parseColorValue(inputString);
+        if (parsedColor) {
+          baseHue = parsedColor.hue;
+        }
+      }
 
-      Object.assign(parsedColorsLight, chartColors);
-      Object.assign(parsedColorsDark, chartColors);
+      if (baseHue !== undefined) {
+        const generatedColorsLight = generateThemeColorsFromPrimary(
+          baseHue,
+          false
+        );
+        Object.keys(generatedColorsLight).forEach((key) => {
+          if (!parsedColorsLight[key]) {
+            parsedColorsLight[key] =
+              generatedColorsLight[key as keyof typeof generatedColorsLight];
+          }
+        });
+
+        const generatedColorsDark = generateThemeColorsFromPrimary(
+          baseHue,
+          true
+        );
+        Object.keys(generatedColorsDark).forEach((key) => {
+          if (!parsedColorsDark[key]) {
+            parsedColorsDark[key] =
+              generatedColorsDark[key as keyof typeof generatedColorsDark];
+          }
+        });
+      }
 
       if (
         Object.keys(parsedColorsLight).length === 0 &&
