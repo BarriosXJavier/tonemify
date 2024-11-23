@@ -16,7 +16,6 @@ import { ColorControls } from "@/components/color-controls";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
 import { Checkbox } from "@/components/ui/checkbox";
-// import { generateChartColorsFromPrimary, hslToHex } from "@/lib/colorUtils";
 import { hslToHex } from "@/lib/colorUtils";
 import { defaults, defaultsDark } from "@/lib/colorUtils";
 import { ColorConfig } from "@/lib/types";
@@ -89,7 +88,7 @@ export default function ThemeGenerator() {
   const handlePasteTheme = (input?: string) => {
     try {
       const parsedColorsLight: Record<string, ColorConfig> = {};
-      let parsedColorsDark: Record<string, ColorConfig> = {};
+      const parsedColorsDark: Record<string, ColorConfig> = {};
       const failedVariables: string[] = [];
       const inputString = input || pasteInput;
 
@@ -178,7 +177,12 @@ export default function ThemeGenerator() {
       }
 
       if (Object.keys(parsedColorsLight).length > 0) {
-        const baseHue = parsedColorsLight["primary"]?.hue;
+        const primaryColor = parsedColorsLight["primary"];
+        if (primaryColor) {
+          parsedColorsDark["primary"] = primaryColor;
+        }
+
+        const baseHue = primaryColor?.hue;
         if (baseHue !== undefined) {
           const generatedColorsLight = generateThemeColorsFromPrimary(
             baseHue,
@@ -190,13 +194,17 @@ export default function ThemeGenerator() {
                 generatedColorsLight[key as keyof typeof generatedColorsLight];
             }
           });
-        }
-      }
 
-      if (Object.keys(parsedColorsDark).length === 0) {
-        const baseHue = parsedColorsLight["primary"]?.hue;
-        if (baseHue !== undefined) {
-          parsedColorsDark = generateThemeColorsFromPrimary(baseHue, true);
+          const generatedColorsDark = generateThemeColorsFromPrimary(
+            baseHue,
+            true
+          );
+          Object.keys(generatedColorsDark).forEach((key) => {
+            if (!parsedColorsDark[key]) {
+              parsedColorsDark[key] =
+                generatedColorsDark[key as keyof typeof generatedColorsDark];
+            }
+          });
         }
       }
 
@@ -211,24 +219,24 @@ export default function ThemeGenerator() {
         },
         "chart-2": {
           hue: (baseHue + 45) % 360,
-          saturation: 65,
-          lightness: 55,
-          alpha: 1,
-        },
-        "chart-3": {
-          hue: (baseHue + 90) % 360,
-          saturation: 65,
-          lightness: 55,
-          alpha: 1,
-        },
-        "chart-4": {
-          hue: (baseHue + 135) % 360,
           saturation: 60,
           lightness: 60,
           alpha: 1,
         },
+        "chart-3": {
+          hue: (baseHue + 75) % 360,
+          saturation: 80,
+          lightness: 40,
+          alpha: 1,
+        },
+        "chart-4": {
+          hue: (baseHue + 105) % 360,
+          saturation: 70,
+          lightness: 50,
+          alpha: 1,
+        },
         "chart-5": {
-          hue: (baseHue + 180) % 360,
+          hue: (baseHue + 135) % 360,
           saturation: 60,
           lightness: 60,
           alpha: 1,

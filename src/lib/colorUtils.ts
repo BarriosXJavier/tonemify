@@ -257,66 +257,45 @@ export const createColor = (
   alpha,
 });
 
-  export const generateThemeColorsFromPrimary = (
-    baseHue: number,
-    isDarkMode: boolean
-  ) => {
-    const normalizedHue = ((baseHue % 360) + 360) % 360;
-    const offsetHue = (normalizedHue - 38 + 360) % 360;
-    return {
-      // Base Colors
-      background: createColor(
-        normalizedHue,
-        isDarkMode ? 50 : 92,
-        isDarkMode ? 10 : 95
-      ),
-      foreground: createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
-      border: createColor(normalizedHue, 30, isDarkMode ? 36 : 50),
-      ring: createColor(normalizedHue, 86, 27),
-      input: createColor(normalizedHue, 30, 36),
+export const generateThemeColorsFromPrimary = (
+  baseHue: number,
+  isDarkMode: boolean
+) => {
+  const normalizedHue = ((baseHue % 360) + 360) % 360;
 
-      // Card & Popover
-      card: createColor(
-        normalizedHue,
-        isDarkMode ? 50 : 92,
-        isDarkMode ? 10 : 95
-      ),
-      "card-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 15),
-      popover: createColor(
-        normalizedHue,
-        isDarkMode ? 50 : 92,
-        isDarkMode ? 5 : 95
-      ),
-      "popover-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
+  return {
+    background: createColor(normalizedHue, 69, isDarkMode ? 2 : 95),
+    foreground: createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
+    border: createColor(normalizedHue, 30, isDarkMode ? 18 : 50),
+    ring: createColor(normalizedHue, 97, 48),
+    input: createColor(normalizedHue, 30, 18),
 
-      // Primary & Secondary
-      primary: createColor(normalizedHue, 86, 27),
-      "primary-foreground": createColor(0, 0, 100),
-      secondary: createColor(normalizedHue, 30, isDarkMode ? 20 : 70),
-      "secondary-foreground": createColor(0, 0, isDarkMode ? 100 : 0),
+    card: createColor(normalizedHue, 50, isDarkMode ? 10 : 90),
+    "card-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 13),
+    popover: createColor(normalizedHue, 69, isDarkMode ? 5 : 95),
+    "popover-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
 
-      // Accent & Muted
-      accent: createColor(offsetHue, 30, isDarkMode ? 25 : 80),
-      "accent-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 15),
-      muted: createColor(offsetHue, 30, isDarkMode ? 25 : 85),
-      "muted-foreground": createColor(normalizedHue, 5, isDarkMode ? 60 : 36),
+    primary: createColor(normalizedHue, 97, 48),
+    "primary-foreground": createColor(normalizedHue, 0, 100),
 
-      // Destructive
-      destructive: createColor(0, 92, 36),
-      "destructive-foreground": createColor(0, 0, 100),
+    secondary: createColor(normalizedHue, 30, isDarkMode ? 13 : 70),
+    "secondary-foreground": createColor(normalizedHue, 0, isDarkMode ? 100 : 0),
 
-      // Chart Colors
-      "chart-1": createColor(normalizedHue, 85, isDarkMode ? 45 : 45), // Slightly less saturated primary
-      "chart-2": createColor(265, 40, isDarkMode ? 75 : 75), // Slightly more saturated accent
-      "chart-3": createColor((normalizedHue + 7) % 360, 88, isDarkMode ? 35 : 35), // Variant of primary with slight hue shift
-      "chart-4": createColor(64, 80, isDarkMode ? 40 : 40), // Slightly lighter complementary
-      "chart-5": createColor(
-        (normalizedHue - 33) % 360,
-        85,
-        isDarkMode ? 40 : 40
-      ), // Adjusted offset with hue change
-    };
+    accent: createColor(-38, 30, isDarkMode ? 15 : 80),
+    "accent-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 13),
+    muted: createColor(-38, 30, isDarkMode ? 15 : 85),
+    "muted-foreground": createColor(normalizedHue, 5, isDarkMode ? 60 : 35),
+
+    destructive: createColor(0, 69, 30),
+    "destructive-foreground": createColor(0, 5, 90),
+
+    "chart-1": createColor(normalizedHue, 85, 55),
+    "chart-2": createColor(normalizedHue + 15, 80, 50),
+    "chart-3": createColor(normalizedHue + 3, 83, 52),
+    "chart-4": createColor(normalizedHue + 7, 82, 51),
+    "chart-5": createColor(normalizedHue + 12, 81, 49),
   };
+};
 
 export const tailwindColorPalette = {
   slate: {
