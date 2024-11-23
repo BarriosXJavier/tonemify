@@ -32,7 +32,9 @@ export function ClientSatisfactionChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-primary dark:text-foreground">Client Satisfaction</CardTitle>
+        <CardTitle className="text-primary dark:text-foreground">
+          Client Satisfaction
+        </CardTitle>
         <CardDescription>
           Average monthly satisfaction score (out of 5)
         </CardDescription>
@@ -52,7 +54,6 @@ export function ClientSatisfactionChart() {
           </ChartContainer>
         </CardContent>
       </div>
-     
     </Card>
   );
 }

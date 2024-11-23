@@ -177,6 +177,11 @@ export const convertColor = (
   }
 };
 
+export function getCSSVariable(varName: string): string {
+  const computedStyle = getComputedStyle(document.documentElement);
+  return computedStyle.getPropertyValue(varName).trim();
+}
+
 export const defaults: Record<string, ColorConfig> = {
   background: { hue: 303, saturation: 92, lightness: 95, alpha: 1 },
   foreground: { hue: 303, saturation: 5, lightness: 10, alpha: 1 },
