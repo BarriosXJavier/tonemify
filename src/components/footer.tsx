@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const Footer: React.FC = () => {
   return (
@@ -59,8 +60,15 @@ const Footer: React.FC = () => {
 
       {/* Footer Bottom Text */}
       <div className="border-t border-muted pt-8 mt-8 text-center">
-        <p className="text-muted-foreground text-xs sm:text-sm md:text-base">
-          © TonemifyLabs {new Date().getFullYear()}. All rights reserved.
+        <p className="text-muted-foreground text-xs sm:text-sm md:text-base flex items-center gap-2 justify-center">
+          &copy; TonemifyLabs {new Date().getFullYear()}. All rights reserved.{" "}
+          <Link
+            href="https://x.com/barrios__x"
+            className="flex items-center gap-1"
+          >
+            <Image src="/x.png" alt="x logo" width={20} height={20} />
+            barriös__x
+          </Link>
         </p>
       </div>
     </footer>
