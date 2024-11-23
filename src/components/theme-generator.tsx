@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Copy, RefreshCcw, Save, Clipboard, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { convertColor } from "@/lib/colorUtils";
+import { convertColor, rgbToHSL } from "@/lib/colorUtils";
 import {
   Dialog,
   DialogContent,
@@ -106,6 +106,8 @@ export default function ThemeGenerator() {
         const hslSpaceRegex =
           /^([\d.-]+)(?:deg)?\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
         const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
+        const rgbFunctionRegex =
+          /^(?:rgb|rgba)\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
         const customFormatRegex =
           /^([\d.-]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?$/i;
 
@@ -134,6 +136,16 @@ export default function ThemeGenerator() {
           };
         } else if ((match = value.match(hexRegex))) {
           return hexToHSL(value);
+        } else if ((match = value.match(rgbFunctionRegex))) {
+          const r = parseFloat(match[1]);
+          const g = parseFloat(match[2]);
+          const b = parseFloat(match[3]);
+          const alpha = match[4]
+            ? match[4].endsWith("%")
+              ? parseFloat(match[4]) / 100
+              : parseFloat(match[4])
+            : 1;
+          return { ...rgbToHSL(r, g, b), alpha };
         } else if ((match = value.match(customFormatRegex))) {
           return {
             hue: parseFloat(match[1]),
