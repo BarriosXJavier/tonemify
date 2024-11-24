@@ -25,7 +25,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { BarChart, CreditCard, Apple } from "lucide-react";
 import Image from "next/image";
-import AnalyticsDashboard from "./tremor-charts";
+
+import dynamic from "next/dynamic";
+
+const AnalyticsDashboard = dynamic(import("./tremor-charts"), { ssr: false });
 
 export default function PreviewContainer() {
   const [date, setDate] = useState<Date | undefined>(new Date());
