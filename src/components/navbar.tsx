@@ -41,7 +41,7 @@ export default function Header() {
     },
     {
       href: "#",
-      label: "Support",
+      label: "Support project",
       isComponent: true,
       component: <SupportDropdown />,
     },

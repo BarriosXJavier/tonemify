@@ -32,9 +32,9 @@ export default function SupportDropdown() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="flex items-center space-x-2 text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground"
+          className="flex items-center space-x-2 text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground max-md:bg-secondary"
         >
-          <span className="hidden xl:inline">Support the project</span>
+          <span className="max-md:text-base">Support project</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48">
