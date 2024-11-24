@@ -28,7 +28,9 @@ import Image from "next/image";
 
 import dynamic from "next/dynamic";
 
-const AnalyticsDashboard = dynamic(import("./tremor-charts"), { ssr: false });
+const AnalyticsDashboard = dynamic(() => import("./tremor-charts"), {
+  ssr: false,
+});
 
 export default function PreviewContainer() {
   const [date, setDate] = useState<Date | undefined>(new Date());
