@@ -26,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
-      <body className={`${montserrat.className} antialiased bg-background`}>
+    <html lang="en" suppressHydrationWarning={true} className="antialiased">
+      <body className={`${montserrat.className} bg-background`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

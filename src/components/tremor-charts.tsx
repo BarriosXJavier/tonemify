@@ -101,10 +101,9 @@ const ChartCard = ({
   children: React.ReactNode;
 }) => (
   <Card className="overflow-hidden transition-all hover:shadow-lg">
-    <CardHeader className="pb-2" style={{ background: colorScheme.chart1 }}>
+    <CardHeader className="pb-2 bg-card">
       <CardTitle
-        className="text-lg font-semibold"
-        style={{ color: colorScheme.chart5 }}
+        className="text-lg font-semibold text-primary"
       >
         {title}
       </CardTitle>
