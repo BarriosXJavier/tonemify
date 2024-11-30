@@ -188,6 +188,7 @@ export default function ThemeGenerator() {
         parseSection(darkSectionMatch[1], parsedColorsDark);
       }
 
+<<<<<<< Updated upstream
       let baseHue: number | undefined;
 
       if (Object.keys(parsedColorsLight).length > 0) {
@@ -195,6 +196,24 @@ export default function ThemeGenerator() {
         if (primaryColor) {
           parsedColorsDark["primary"] = primaryColor;
           baseHue = primaryColor.hue;
+=======
+      
+      if (
+        Object.keys(parsedColorsDark).length === 0 &&
+        Object.keys(parsedColorsLight).length > 0
+      ) {
+        const baseHue = parsedColorsLight["primary"]?.hue;
+        if (baseHue !== undefined) {
+          const generatedColorsDark = generateThemeColorsFromPrimary(
+            baseHue,
+            true
+          );
+          Object.keys(generatedColorsDark).forEach((key) => {
+            if (!parsedColorsDark[key]) {
+              parsedColorsDark[key] = generatedColorsDark[key as keyof typeof generatedColorsDark];
+            }
+          });
+>>>>>>> Stashed changes
         }
       }
 
