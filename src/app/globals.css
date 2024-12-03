@@ -12,7 +12,6 @@ body {
 }
 
 :root {
-  /* Base Theme Colors */
   --background: 303 92% 95%;
   --foreground: 303 5% 10%;
   --card: 303 50% 90%;
@@ -34,7 +33,6 @@ body {
   --ring: 303 88% 40%;
   --radius: 1rem;
 
-
   --chart-1: 26 85% 50%;
   /* Primary Orange */
   --chart-2: 46 85% 50%;
@@ -45,10 +43,16 @@ body {
   /* Warm Green */
   --chart-5: 206 85% 50%;
   /* Complementary Blue */
+
+  --success: 120 60% 50%;
+  --success-foreground: 120 20% 90%;
+  --warning: 45 100% 50%;
+  --warning-foreground: 45 100% 20%;
+  --info: 200 100% 50%;
+  --info-foreground: 200 100% 90%;
 }
 
 .dark {
-  /* Base Theme Colors */
   --background: 303 50% 10%;
   --foreground: 303 5% 90%;
   --card: 303 50% 10%;
@@ -70,7 +74,6 @@ body {
   --ring: 303 88% 40%;
   --radius: 1rem;
 
-
   --chart-1: 26 75% 45%;
   /* Darker Orange */
   --chart-2: 46 75% 45%;
@@ -81,6 +84,13 @@ body {
   /* Darker Green */
   --chart-5: 206 75% 45%;
   /* Darker Blue */
+
+  --success: 120 60% 40%;
+  --success-foreground: 120 20% 80%;
+  --warning: 45 100% 40%;
+  --warning-foreground: 45 100% 30%;
+  --info: 200 100% 40%;
+  --info-foreground: 200 100% 80%;
 }
 
 @layer base {

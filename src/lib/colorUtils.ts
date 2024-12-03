@@ -251,6 +251,13 @@ export const defaults: Record<string, ColorConfig> = {
   input: { hue: 303, saturation: 30, lightness: 50, alpha: 1 },
   ring: { hue: 303, saturation: 88, lightness: 40, alpha: 1 },
 
+  success: { hue: 120, saturation: 60, lightness: 50, alpha: 1 },
+  "success-foreground": { hue: 120, saturation: 20, lightness: 90, alpha: 1 },
+  warning: { hue: 45, saturation: 100, lightness: 50, alpha: 1 },
+  "warning-foreground": { hue: 45, saturation: 100, lightness: 20, alpha: 1 },
+  info: { hue: 200, saturation: 100, lightness: 50, alpha: 1 },
+  "info-foreground": { hue: 200, saturation: 100, lightness: 90, alpha: 1 },
+
   // Slight variations for chart colors
   "chart-1": { hue: 303, saturation: 85, lightness: 45, alpha: 1 }, // Slightly less saturated primary
   "chart-2": { hue: 265, saturation: 40, lightness: 75, alpha: 1 }, // Slightly more saturated accent
@@ -285,7 +292,13 @@ export const defaultsDark: Record<string, ColorConfig> = {
   input: { hue: 303, saturation: 30, lightness: 50, alpha: 1 },
   ring: { hue: 303, saturation: 88, lightness: 40, alpha: 1 },
 
-  // Slight variations for chart colors in dark mode
+  success: { hue: 120, saturation: 60, lightness: 40, alpha: 1 },
+  "success-foreground": { hue: 120, saturation: 20, lightness: 80, alpha: 1 },
+  warning: { hue: 45, saturation: 100, lightness: 40, alpha: 1 },
+  "warning-foreground": { hue: 45, saturation: 100, lightness: 30, alpha: 1 },
+  info: { hue: 200, saturation: 100, lightness: 40, alpha: 1 },
+  "info-foreground": { hue: 200, saturation: 100, lightness: 80, alpha: 1 },
+
   "chart-1": { hue: 303, saturation: 85, lightness: 45, alpha: 1 }, // Slightly less saturated primary
   "chart-2": { hue: 265, saturation: 40, lightness: 75, alpha: 1 }, // Slightly more saturated accent
   "chart-3": { hue: 310, saturation: 88, lightness: 35, alpha: 1 }, // Variant of primary with hue shift
@@ -363,6 +376,27 @@ export const generateThemeColorsFromPrimary = (
       normalizedHue + 120,
       baseSaturation,
       isDarkMode ? 90 : 10
+    ),
+
+    success: createColor(normalizedHue + 120, 60, isDarkMode ? 40 : 50),
+    "success-foreground": createColor(
+      normalizedHue + 120,
+      20,
+      isDarkMode ? 80 : 90
+    ),
+
+    warning: createColor(normalizedHue + 45, 100, isDarkMode ? 40 : 50),
+    "warning-foreground": createColor(
+      normalizedHue + 45,
+      100,
+      isDarkMode ? 30 : 20
+    ),
+
+    info: createColor(normalizedHue + 200, 100, isDarkMode ? 40 : 50),
+    "info-foreground": createColor(
+      normalizedHue + 200,
+      100,
+      isDarkMode ? 80 : 90
     ),
 
     "chart-1": createColor(normalizedHue, 85, 55),
@@ -661,23 +695,3 @@ export const tailwindColorPalette = {
     950: "#4c0519",
   },
 };
-
-// export const generateChartColorsFromPrimary = (
-//   baseHue: number,
-//   isDarkMode: boolean
-// ): Record<string, ColorConfig> => {
-//   const chartColors: Record<string, ColorConfig> = {};
-//   const lightness = isDarkMode ? 30 : 70;
-//   const saturation = 80;
-
-//   for (let i = 0; i < 5; i++) {
-//     chartColors[`chartColor${i + 1}`] = {
-//       hue: (baseHue + i * 30) % 360,
-//       saturation: saturation,
-//       lightness: lightness,
-//       alpha: 1,
-//     };
-//   }
-
-//   return chartColors;
-// };
