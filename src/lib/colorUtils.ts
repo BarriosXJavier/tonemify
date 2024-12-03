@@ -49,33 +49,32 @@ export const rgbToHSL = (r: number, g: number, b: number): ColorConfig => {
   r /= 255;
   g /= 255;
   b /= 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const l = (max + min) / 2;
+
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
   let h = 0,
     s = 0;
+  const l = (max + min) / 2;
 
   if (max !== min) {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r:
-        h = (g - b) / d + (g < b ? 6 : 0);
-        break;
-      case g:
-        h = (b - r) / d + 2;
-        break;
-      case b:
-        h = (r - g) / d + 4;
-        break;
+    const delta = max - min;
+    s = l > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+
+    if (max === r) {
+      h = (g - b) / delta + (g < b ? 6 : 0);
+    } else if (max === g) {
+      h = (b - r) / delta + 2;
+    } else {
+      h = (r - g) / delta + 4;
     }
+
     h /= 6;
   }
 
   return {
-    hue: Math.round(h * 360),
-    saturation: Math.round(s * 100),
-    lightness: Math.round(l * 100),
+    hue: h * 360,
+    saturation: s * 100,
+    lightness: l * 100,
     alpha: 1,
   };
 };
@@ -86,38 +85,10 @@ export function hslToHex(
   lightness: number,
   alpha: number = 1
 ): string {
-  hue = hue / 360;
-  saturation = saturation / 100;
-  lightness = lightness / 100;
-
-  let r, g, b;
-
-  if (saturation === 0) {
-    r = g = b = lightness; // achromatic
-  } else {
-    const hue2rgb = (p: number, q: number, t: number) => {
-      if (t < 0) t += 1;
-      if (t > 1) t -= 1;
-      if (t < 1 / 6) return p + (q - p) * 6 * t;
-      if (t < 1 / 2) return q;
-      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-      return p;
-    };
-
-    const q =
-      lightness < 0.5
-        ? lightness * (1 + saturation)
-        : lightness + saturation - lightness * saturation;
-    const p = 2 * lightness - q;
-    r = hue2rgb(p, q, hue + 1 / 3);
-    g = hue2rgb(p, q, hue);
-    b = hue2rgb(p, q, hue - 1 / 3);
-  }
+  const { r, g, b } = hslToRGB({ hue, saturation, lightness, alpha });
 
   const toHex = (x: number) => {
-    const hex = Math.round(x * 255)
-      .toString(16)
-      .padStart(2, "0");
+    const hex = Math.round(x).toString(16).padStart(2, "0");
     return hex;
   };
 
@@ -132,24 +103,41 @@ export function hslToHex(
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const hslToRGB = ({ hue, saturation, lightness, alpha }: ColorConfig) => {
+export const hslToRGB = ({
+  hue,
+  saturation,
+  lightness,
+}: ColorConfig): { r: number; g: number; b: number } => {
+  const h = hue / 360;
   const s = saturation / 100;
   const l = lightness / 100;
-  const k = (n: number) => (n + hue / 30) % 12;
-  const a = s * Math.min(l, 1 - l);
-  const f = (n: number) =>
-    l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
 
-  return {
-    r: Math.round(255 * f(0)),
-    g: Math.round(255 * f(8)),
-    b: Math.round(255 * f(4)),
-  };
+  let r: number, g: number, b: number;
+
+  if (s === 0) {
+    r = g = b = l * 255; // Achromatic
+  } else {
+    const hue2rgb = (p: number, q: number, t: number) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    };
+
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+
+    r = hue2rgb(p, q, h + 1 / 3) * 255;
+    g = hue2rgb(p, q, h) * 255;
+    b = hue2rgb(p, q, h - 1 / 3) * 255;
+  }
+
+  return { r, g, b };
 };
 
-export function parseToHSL(
-  color: string
-): {
+export function parseToHSL(color: string): {
   hue: number;
   saturation: number;
   lightness: number;
@@ -334,22 +322,48 @@ export const generateThemeColorsFromPrimary = (
 
     card: createColor(normalizedHue, 50, isDarkMode ? 10 : 90),
     "card-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 13),
+
     popover: createColor(normalizedHue, 69, isDarkMode ? 5 : 95),
     "popover-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
 
     primary: createColor(normalizedHue, baseSaturation, baseLightness),
-    "primary-foreground": createColor(normalizedHue, 0, isDarkMode ? 100 : 0),
+    "primary-foreground": createColor(
+      normalizedHue,
+      baseSaturation,
+      isDarkMode ? 90 : 10
+    ),
 
-    secondary: createColor(normalizedHue, 30, isDarkMode ? 13 : 70),
-    "secondary-foreground": createColor(normalizedHue, 0, isDarkMode ? 100 : 0),
+    secondary: createColor(normalizedHue + 30, baseSaturation, baseLightness),
+    "secondary-foreground": createColor(
+      normalizedHue + 30,
+      baseSaturation,
+      isDarkMode ? 90 : 10
+    ),
 
-    accent: createColor(-38, 30, isDarkMode ? 15 : 80),
-    "accent-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 13),
-    muted: createColor(-38, 30, isDarkMode ? 15 : 85),
-    "muted-foreground": createColor(normalizedHue, 5, isDarkMode ? 60 : 35),
+    accent: createColor(normalizedHue + 60, baseSaturation, baseLightness),
+    "accent-foreground": createColor(
+      normalizedHue + 60,
+      baseSaturation,
+      isDarkMode ? 90 : 13
+    ),
 
-    destructive: createColor(0, 69, 30),
-    "destructive-foreground": createColor(0, 5, 90),
+    muted: createColor(normalizedHue - 30, baseSaturation, baseLightness),
+    "muted-foreground": createColor(
+      normalizedHue - 30,
+      baseSaturation,
+      isDarkMode ? 60 : 35
+    ),
+
+    destructive: createColor(
+      normalizedHue + 120,
+      baseSaturation,
+      baseLightness
+    ),
+    "destructive-foreground": createColor(
+      normalizedHue + 120,
+      baseSaturation,
+      isDarkMode ? 90 : 10
+    ),
 
     "chart-1": createColor(normalizedHue, 85, 55),
     "chart-2": createColor(normalizedHue + 15, 80, 50),
