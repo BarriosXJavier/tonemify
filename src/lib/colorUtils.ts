@@ -325,80 +325,81 @@ export const generateThemeColorsFromPrimary = (
   isDarkMode: boolean
 ) => {
   const normalizedHue = ((baseHue % 360) + 360) % 360;
+  const primaryColor = createColor(
+    normalizedHue,
+    baseSaturation,
+    baseLightness
+  );
+  const primaryForegroundColor = createColor(
+    normalizedHue,
+    baseSaturation,
+    isDarkMode ? 90 : 10
+  );
+  const destructiveColor = createColor(
+    0, // Pure red hue
+    Math.min(100, baseSaturation + 20), // Slightly more saturated
+    50 // Constant lightness
+  );
+  const destructiveForegroundColor = createColor(
+    0,
+    baseSaturation,
+    10 // Constant lightness
+  );
 
   return {
     background: createColor(normalizedHue, 69, isDarkMode ? 3 : 95),
     foreground: createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
     border: createColor(normalizedHue, 30, isDarkMode ? 18 : 50),
-    ring: createColor(normalizedHue, 97, 48),
+    ring: primaryColor, // Similar to primary and constant in light/dark
     input: createColor(normalizedHue, 30, 18),
-
     card: createColor(normalizedHue, 50, isDarkMode ? 10 : 90),
     "card-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 13),
-
     popover: createColor(normalizedHue, 69, isDarkMode ? 5 : 95),
     "popover-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
-
-    primary: createColor(normalizedHue, baseSaturation, baseLightness),
-    "primary-foreground": createColor(
-      normalizedHue,
-      baseSaturation,
-      isDarkMode ? 90 : 10
-    ),
-
+    primary: primaryColor,
+    "primary-foreground": primaryForegroundColor,
     secondary: createColor(normalizedHue + 30, baseSaturation, baseLightness),
     "secondary-foreground": createColor(
       normalizedHue + 30,
       baseSaturation,
       isDarkMode ? 90 : 10
     ),
-
     accent: createColor(normalizedHue + 60, baseSaturation, baseLightness),
     "accent-foreground": createColor(
       normalizedHue + 60,
       baseSaturation,
       isDarkMode ? 90 : 13
     ),
-
     muted: createColor(normalizedHue - 30, baseSaturation, baseLightness),
     "muted-foreground": createColor(
       normalizedHue - 30,
       baseSaturation,
       isDarkMode ? 60 : 35
     ),
-
-    destructive: createColor(
-      normalizedHue + 120,
-      baseSaturation,
-      baseLightness
+    destructive: destructiveColor,
+    "destructive-foreground": destructiveForegroundColor,
+    success: createColor(
+      120, // Pure green hue
+      Math.min(100, baseSaturation + 10),
+      isDarkMode ? 40 : 50
     ),
-    "destructive-foreground": createColor(
-      normalizedHue + 120,
-      baseSaturation,
-      isDarkMode ? 90 : 10
-    ),
-
-    success: createColor(normalizedHue + 120, 60, isDarkMode ? 40 : 50),
     "success-foreground": createColor(
-      normalizedHue + 120,
-      20,
+      120,
+      Math.max(20, baseSaturation - 40),
       isDarkMode ? 80 : 90
     ),
-
-    warning: createColor(normalizedHue + 45, 100, isDarkMode ? 40 : 50),
-    "warning-foreground": createColor(
-      normalizedHue + 45,
+    warning: createColor(
+      45, // Warm yellow-orange hue
       100,
-      isDarkMode ? 30 : 20
+      isDarkMode ? 40 : 50
     ),
-
-    info: createColor(normalizedHue + 200, 100, isDarkMode ? 40 : 50),
-    "info-foreground": createColor(
-      normalizedHue + 200,
+    "warning-foreground": createColor(45, 100, isDarkMode ? 30 : 20),
+    info: createColor(
+      210, // Slightly more saturated blue
       100,
-      isDarkMode ? 80 : 90
+      isDarkMode ? 40 : 50
     ),
-
+    "info-foreground": createColor(210, 100, isDarkMode ? 80 : 90),
     "chart-1": createColor(normalizedHue, 85, 55),
     "chart-2": createColor(normalizedHue + 15, 80, 50),
     "chart-3": createColor(normalizedHue + 3, 83, 52),

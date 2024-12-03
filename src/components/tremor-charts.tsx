@@ -209,11 +209,11 @@ export default function AnalyticsDashboard() {
         title="Radar Chart - Performance Metrics"
         subtitle="Current vs Previous Period"
       >
-        <div className="h-[200px] mt-4">
+        <div className="h-full mt-4">
           <RechartsRadarChart
             outerRadius={90}
             width={250}
-            height={200}
+            height={250}
             data={radarData}
           >
             <PolarGrid />
