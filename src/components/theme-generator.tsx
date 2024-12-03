@@ -101,6 +101,7 @@ export default function ThemeGenerator() {
       const darkSectionMatch = inputString.match(darkSectionRegex);
 
       const parseColorValue = (value: string): ColorConfig | null => {
+        value = value.trim();
         const hslFunctionRegex =
           /^(?:hsl|hsla)\(\s*([\d.-]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
         const hslSpaceRegex =
