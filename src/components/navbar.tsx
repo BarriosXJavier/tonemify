@@ -62,7 +62,7 @@ export default function Header() {
       <NavigationMenuItem key={href}>
         <Link href={href} legacyBehavior passHref>
           <NavigationMenuLink
-            className={`${navigationMenuTriggerStyle()} transition-colors duration-200 ease-in-out text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground`}
+            className={`${navigationMenuTriggerStyle()} transition-colors duration-300 ease-in-out hover:bg-accent hover:text-accent-foreground`}
           >
             {icon}
             <span className={icon ? "hidden xl:inline" : undefined}>
@@ -93,7 +93,7 @@ export default function Header() {
       <Link
         key={href}
         href={href}
-        className="flex items-center space-x-3 text-lg font-medium transition-colors duration-200 ease-in-out text-primary dark:text-primary-foreground hover:text-secondary dark:hover:text-secondary-foreground"
+        className="flex items-center space-x-3 text-xl font-medium border-b border-border py-2 transition-colors duration-200 ease-in-out text-foreground hover:text-accent-foreground hover:bg-accent"
         onClick={() => setIsOpen(false)}
       >
         {icon && <span className="inline-block">{icon}</span>}
@@ -103,10 +103,10 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between bg-background dark:bg-dark-background border-b border-border dark:border-dark-border font-mono">
+    <header className="sticky top-0 z-50 px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between border-b border-border">
       <Link className="flex items-center justify-center" href="/">
-        <Gem className="h-6 w-6 text-primary dark:text-primary-foreground" />
-        <span className="ml-1 text-xl sm:text-2xl font-bold text-primary dark:text-primary-foreground">
+        <Gem className="h-6 w-6 text-primary" />
+        <span className="ml-1 text-xl sm:text-2xl font-bold text-primary">
           TonemifyLabs
         </span>
       </Link>
@@ -125,21 +125,21 @@ export default function Header() {
             <Button
               variant="ghost"
               size="lg"
-              className="h-12 w-12 bg-background dark:bg-dark-background border border-border"
+              className="h-12 w-12 bg-primary border border-border"
             >
               <MenuIcon />
             </Button>
           </SheetTrigger>
           <SheetContent
             side="right"
-            className="w-[80%] sm:w-[300px] bg-background dark:bg-dark-background"
+            className="w-[80%] sm:w-[300px] bg-background"
           >
             <SheetHeader>
-              <SheetTitle className="text-lg font-bold text-primary dark:text-primary-foreground sr-only">
+              <SheetTitle className="text-lg font-bold text-foreground sr-only">
                 Menu
               </SheetTitle>
             </SheetHeader>
-            <nav className="flex flex-col space-y-6 mt-8 font-mono">
+            <nav className="flex flex-col space-y-6 mt-8 font-mono text-lg">
               {navigationLinks.map(renderMobileLink)}
             </nav>
           </SheetContent>
