@@ -103,7 +103,7 @@ const ChartCard = ({
 }) => (
   <Card className="overflow-hidden transition-all hover:shadow-lg">
     <CardHeader className="pb-2 bg-card">
-      <CardTitle className="text-lg font-semibold text-primary">
+      <CardTitle className="text-lg font-semibold text-foreground">
         {title}
       </CardTitle>
       <p className="text-sm text-muted-foreground">{subtitle}</p>
