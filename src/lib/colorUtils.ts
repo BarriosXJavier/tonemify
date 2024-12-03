@@ -332,25 +332,24 @@ export const generateThemeColorsFromPrimary = (
     baseSaturation,
     baseLightness
   );
-  const primaryForegroundColor = createColor(normalizedHue, 0, 100); // White
+  const primaryForegroundColor = createColor(normalizedHue, 0, 100);
   const destructiveColor = createColor(
     0,
     Math.min(100, baseSaturation + 20),
     50
-  ); // Pure red
-  const destructiveForegroundColor = createColor(0, 5, 90); // High-contrast light red
-  const inputColor = createColor(normalizedHue, 30, 18); // Constant for input
+  );
+  const destructiveForegroundColor = createColor(0, 5, 90);
+  const inputColor = createColor(normalizedHue, 30, 18); 
 
-  // Muted color - made slightly lighter
   const mutedColor = createColor(
     normalizedHue - 30,
     baseSaturation,
     Math.min(100, baseLightness + 10)
-  ); // Lighter than before
+  );
 
-  // Adjust accent to be a heavier (more saturated) version of muted
+  // (more saturated) version of muted
   const accentColor = createColor(
-    normalizedHue - 30, // Keep the same hue as muted
+    normalizedHue - 30,
     Math.min(100, baseSaturation + 20), // More saturated than muted
     Math.max(0, baseLightness - 15) // Darker (heavier) than muted
   );
