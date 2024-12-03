@@ -26,9 +26,7 @@ export function ColorPicker({ color, onChange, className }: ColorPickerProps) {
     setInputColor(newColor);
     if (/^#[0-9A-F]{6}$/i.test(newColor)) {
       setIsValidColor(true);
-      // Preserve alpha from original color if it exists
-      const alpha = color.length === 9 ? color.slice(7) : "ff";
-      onChange(newColor + alpha);
+      onChange(newColor); // Pass the color directly
     } else {
       setIsValidColor(false);
     }

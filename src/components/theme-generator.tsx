@@ -190,12 +190,16 @@ export default function ThemeGenerator() {
       }
 
       let baseHue: number | undefined;
+      let baseSaturation: number | undefined;
+      let baseLightness: number | undefined;
 
       if (Object.keys(parsedColorsLight).length > 0) {
         const primaryColor = parsedColorsLight["primary"];
         if (primaryColor) {
           parsedColorsDark["primary"] = primaryColor;
           baseHue = primaryColor.hue;
+          baseSaturation = primaryColor.saturation;
+          baseLightness = primaryColor.lightness;
         }
       }
 
@@ -203,12 +207,20 @@ export default function ThemeGenerator() {
         const parsedColor = parseColorValue(inputString);
         if (parsedColor) {
           baseHue = parsedColor.hue;
+          baseSaturation = parsedColor.saturation;
+          baseLightness = parsedColor.lightness;
         }
       }
 
-      if (baseHue !== undefined) {
+      if (
+        baseHue !== undefined &&
+        baseSaturation !== undefined &&
+        baseLightness !== undefined
+      ) {
         const generatedColorsLight = generateThemeColorsFromPrimary(
           baseHue,
+          baseSaturation,
+          baseLightness,
           false
         );
         Object.keys(generatedColorsLight).forEach((key) => {
@@ -220,11 +232,13 @@ export default function ThemeGenerator() {
 
         const generatedColorsDark = generateThemeColorsFromPrimary(
           baseHue,
+          baseSaturation,
+          baseLightness,
           true
         );
         Object.keys(generatedColorsDark).forEach((key) => {
           if (!parsedColorsDark[key]) {
-            parsedColorsDark[key] =
+            parsedColorsDark[key as keyof typeof generatedColorsDark] =
               generatedColorsDark[key as keyof typeof generatedColorsDark];
           }
         });
@@ -287,7 +301,7 @@ export default function ThemeGenerator() {
   const updateColor = (
     colorName: string,
     property: keyof ColorConfig,
-    value: number
+    value: string
   ): void => {
     if (activeMode === "light") {
       setColorsLight((prev) => {
@@ -374,8 +388,20 @@ export default function ThemeGenerator() {
 
     generateRandomTheme: () => {
       const randomHue = Math.floor(Math.random() * 360);
-      const newColorsLight = generateThemeColorsFromPrimary(randomHue, false);
-      const newColorsDark = generateThemeColorsFromPrimary(randomHue, true);
+      const randomSaturation = Math.floor(Math.random() * 100);
+      const randomLightness = Math.floor(Math.random() * 100);
+      const newColorsLight = generateThemeColorsFromPrimary(
+        randomHue,
+        randomSaturation,
+        randomLightness,
+        false
+      );
+      const newColorsDark = generateThemeColorsFromPrimary(
+        randomHue,
+        randomSaturation,
+        randomLightness,
+        true
+      );
       setColorsLight(newColorsLight);
       setColorsDark(newColorsDark);
       updateCSSVariables(
@@ -849,7 +875,7 @@ or the primary color e.g --primary: 255 81% 95%;`}
                 alpha: currentColors[activeColor!].alpha ?? 1,
               }}
               onChange={(property, value) =>
-                updateColor(activeColor!, property, value)
+                updateColor(activeColor!, property, value.toString())
               }
               onHexChange={() => {}}
             />

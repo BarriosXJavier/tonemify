@@ -34,14 +34,14 @@ export function hexToHSL(hex: string) {
         h = (r - g) / delta + 4;
         break;
     }
-    h *= 60;
+    h /= 6;
   }
 
   return {
-    hue: Math.round(h),
-    saturation: Math.round(s * 100),
-    lightness: Math.round(l * 100),
-    alpha: alpha ?? 1,
+    hue: h * 360,
+    saturation: s * 100,
+    lightness: l * 100,
+    alpha: alpha,
   };
 }
 
@@ -80,25 +80,55 @@ export const rgbToHSL = (r: number, g: number, b: number): ColorConfig => {
   };
 };
 
-export function hslToHex(h: number, s: number, l: number, a: number): string {
-  h = ((h % 360) + 360) % 360;
-  s = Math.min(Math.max(s, 0), 100);
-  l = Math.min(Math.max(l, 0), 100);
-  a = Math.min(Math.max(a, 0), 1);
-  l /= 100;
-  const f = (n: number) => {
-    const k = (n + h / 30) % 12;
-    const color =
-      l -
-      a *
-        (s / 100) *
-        Math.min(l, 1 - l) *
-        Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * color)
+export function hslToHex(
+  hue: number,
+  saturation: number,
+  lightness: number,
+  alpha: number = 1
+): string {
+  hue = hue / 360;
+  saturation = saturation / 100;
+  lightness = lightness / 100;
+
+  let r, g, b;
+
+  if (saturation === 0) {
+    r = g = b = lightness; // achromatic
+  } else {
+    const hue2rgb = (p: number, q: number, t: number) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    };
+
+    const q =
+      lightness < 0.5
+        ? lightness * (1 + saturation)
+        : lightness + saturation - lightness * saturation;
+    const p = 2 * lightness - q;
+    r = hue2rgb(p, q, hue + 1 / 3);
+    g = hue2rgb(p, q, hue);
+    b = hue2rgb(p, q, hue - 1 / 3);
+  }
+
+  const toHex = (x: number) => {
+    const hex = Math.round(x * 255)
       .toString(16)
       .padStart(2, "0");
+    return hex;
   };
-  return `#${f(0)}${f(8)}${f(4)}`;
+
+  const hex = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  if (alpha < 1) {
+    const alphaHex = Math.round(alpha * 255)
+      .toString(16)
+      .padStart(2, "0");
+    return `${hex}${alphaHex}`;
+  }
+  return hex;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -117,12 +147,21 @@ const hslToRGB = ({ hue, saturation, lightness, alpha }: ColorConfig) => {
   };
 };
 
-export const parseToHSL = (color: string): ColorConfig | null => {
+export function parseToHSL(
+  color: string
+): {
+  hue: number;
+  saturation: number;
+  lightness: number;
+  alpha: number;
+} | null {
   const hslFunctionRegex =
     /^(?:hsl|hsla)\(\s*([\d.-]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
+  const hslSpaceRegex =
+    /^([\d.-]+)(?:deg)?\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
+  const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
   const rgbFunctionRegex =
     /^(?:rgb|rgba)\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
-  const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
 
   let match;
   if ((match = color.match(hslFunctionRegex))) {
@@ -136,28 +175,44 @@ export const parseToHSL = (color: string): ColorConfig | null => {
           : parseFloat(match[4])
         : 1,
     };
+  } else if ((match = color.match(hslSpaceRegex))) {
+    return {
+      hue: parseFloat(match[1]),
+      saturation: parseFloat(match[2]),
+      lightness: parseFloat(match[3]),
+      alpha: match[4]
+        ? match[4].endsWith("%")
+          ? parseFloat(match[4]) / 100
+          : parseFloat(match[4])
+        : 1,
+    };
+  } else if ((match = color.match(hexRegex))) {
+    return hexToHSL(color);
   } else if ((match = color.match(rgbFunctionRegex))) {
     const r = parseFloat(match[1]);
     const g = parseFloat(match[2]);
     const b = parseFloat(match[3]);
-    return rgbToHSL(r, g, b);
-  } else if ((match = color.match(hexRegex))) {
-    return hexToHSL(color);
+    const alpha = match[4]
+      ? match[4].endsWith("%")
+        ? parseFloat(match[4]) / 100
+        : parseFloat(match[4])
+      : 1;
+    return { ...rgbToHSL(r, g, b), alpha };
   } else {
     return null;
   }
-};
+}
 
-export const convertColor = (
+export function convertColor(
   color: string,
   outputFormat: "hex" | "rgb" | "rgba" | "hsl" | "hsla" | "custom"
-): string | null => {
+): string | null {
   const hsl = parseToHSL(color);
   if (!hsl) return null;
 
   switch (outputFormat) {
     case "hex":
-      return hslToHex(hsl.hue, hsl.saturation, hsl.lightness, hsl.alpha ?? 1);
+      return hslToHex(hsl.hue, hsl.saturation, hsl.lightness, hsl.alpha);
     case "rgb":
       const { r, g, b } = hslToRGB(hsl);
       return `rgb(${r}, ${g}, ${b})`;
@@ -175,7 +230,7 @@ export const convertColor = (
     default:
       return null;
   }
-};
+}
 
 export function getCSSVariable(varName: string): string {
   const computedStyle = getComputedStyle(document.documentElement);
@@ -264,6 +319,8 @@ export const createColor = (
 
 export const generateThemeColorsFromPrimary = (
   baseHue: number,
+  baseSaturation: number,
+  baseLightness: number,
   isDarkMode: boolean
 ) => {
   const normalizedHue = ((baseHue % 360) + 360) % 360;
@@ -280,8 +337,8 @@ export const generateThemeColorsFromPrimary = (
     popover: createColor(normalizedHue, 69, isDarkMode ? 5 : 95),
     "popover-foreground": createColor(normalizedHue, 5, isDarkMode ? 90 : 10),
 
-    primary: createColor(normalizedHue, 97, 48),
-    "primary-foreground": createColor(normalizedHue, 0, 100),
+    primary: createColor(normalizedHue, baseSaturation, baseLightness),
+    "primary-foreground": createColor(normalizedHue, 0, isDarkMode ? 100 : 0),
 
     secondary: createColor(normalizedHue, 30, isDarkMode ? 13 : 70),
     "secondary-foreground": createColor(normalizedHue, 0, isDarkMode ? 100 : 0),
