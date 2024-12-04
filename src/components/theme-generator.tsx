@@ -422,7 +422,7 @@ export default function ThemeGenerator() {
             <Button
               variant="outline"
               onClick={() => setConvertDialogOpen(true)}
-              className="flex items-center text-primary dark:text-primary-foreground"
+              className="flex items-center bg-primary text-primary-foreground border border-border"
               title="Convert Color Format"
             >
               Convert Color
@@ -470,7 +470,7 @@ export default function ThemeGenerator() {
                     </div>
                   )}
                   <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={handleConvert}>
+                    <Button variant="outline" onClick={handleConvert} className="bg-primary text-foreground">
                       Convert
                     </Button>
                     <Button variant="outline" onClick={handleCopy}>
@@ -550,10 +550,10 @@ export default function ThemeGenerator() {
               onClick={() =>
                 setDialogState((prev) => ({ ...prev, paste: true }))
               }
-              className="flex items-center text-primary dark:text-primary-foreground"
+              className="flex items-center text-foreground"
               title="Paste Theme"
             >
-              <Clipboard className="w-4 h-4 mr-2" />
+              <Clipboard className="w-4 h-4 mr-2" />{""}
             </Button>
             <Button
               variant="outline"
@@ -696,7 +696,7 @@ export default function ThemeGenerator() {
         </div>
       </div>
 
-      {/* Dialogs */}
+
       {/* Paste Dialog */}
       <Dialog
         open={dialogState.paste}
@@ -708,24 +708,12 @@ export default function ThemeGenerator() {
           <DialogHeader>
             <DialogTitle>Paste Theme</DialogTitle>
           </DialogHeader>
-          <textarea
+            <textarea
             value={pasteInput}
             onChange={(e) => setPasteInput(e.target.value)}
             className="w-full h-40 sm:h-48 md:h-60 border rounded p-2 text-black dark:text-white"
-            placeholder={`Paste your CSS theme...
-
-Expected format(css variable format):
-:root {
-  --color-name: 255 81% 95%;
-  /* other classes */
-}
-.dark {
-  --color-name: 255 50% 10% 0.9;
-  /* other classes */
-}
-  
-or the primary color e.g --primary: 255 81% 95%;`}
-          />
+            placeholder="Paste your shadcn theme or single hex/hsl color value..."
+            />
           <div className="flex justify-end space-x-2 mt-4">
             <Button variant="outline" onClick={() => handlePasteTheme()}>
               Apply
