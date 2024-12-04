@@ -422,7 +422,7 @@ export default function ThemeGenerator() {
             <Button
               variant="outline"
               onClick={() => setConvertDialogOpen(true)}
-              className="flex items-center bg-primary text-primary-foreground border border-border"
+              className="flex items-center border border-input"
               title="Convert Color Format"
             >
               Convert Color
@@ -465,12 +465,16 @@ export default function ThemeGenerator() {
                     <option value="custom">Custom (--primary: h s% l%;)</option>
                   </select>
                   {convertedColor && (
-                    <div className="p-2 border rounded bg-background text-primary">
+                    <div className="p-2 border rounded">
                       Converted Color: <strong>{convertedColor}</strong>
                     </div>
                   )}
                   <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={handleConvert} className="bg-primary text-foreground">
+                    <Button
+                      variant="outline"
+                      onClick={handleConvert}
+                      className=""
+                    >
                       Convert
                     </Button>
                     <Button variant="outline" onClick={handleCopy}>
@@ -550,15 +554,16 @@ export default function ThemeGenerator() {
               onClick={() =>
                 setDialogState((prev) => ({ ...prev, paste: true }))
               }
-              className="flex items-center text-foreground"
+              className="flex items-center"
               title="Paste Theme"
             >
-              <Clipboard className="w-4 h-4 mr-2" />{""}
+              <Clipboard className="w-4 h-4 mr-1" />
+              <span>Paste Theme</span>
             </Button>
             <Button
               variant="outline"
               onClick={actions.generateRandomTheme}
-              className="flex items-center text-primary dark:text-primary-foreground"
+              className="flex items-center"
               title="Generate Random Theme"
             >
               Random Theme
@@ -566,7 +571,7 @@ export default function ThemeGenerator() {
             <Button
               variant="outline"
               onClick={actions.resetToDefault}
-              className="flex items-center text-primary dark:text-foreground"
+              className="flex items-center"
               title="Reset Theme"
             >
               <RefreshCcw className="w-4 h-4 mr-2" />
@@ -577,25 +582,27 @@ export default function ThemeGenerator() {
               onClick={() =>
                 setDialogState((prev) => ({ ...prev, save: true }))
               }
-              className="flex items-center text-primary dark:text-foreground"
+              className="flex items-center"
               title="Save Theme"
             >
-              <Save className="w-4 h-4 mr-2" />
+              <Save className="w-4 h-4 mr-1" />
+              <span>Save Current Theme</span>
             </Button>
             <Button
               variant="outline"
               onClick={actions.copyTheme}
-              className="flex items-center text-primary dark:text-foreground"
+              className="flex items-center"
               title="Copy Theme"
             >
-              <Copy className="w-4 h-4 mr-2" />
+              <Copy className="w-4 h-4 mr-1" />
+              <span>Copy Current Theme</span>
             </Button>
             <Button
               variant="outline"
               onClick={() =>
                 setDialogState((prev) => ({ ...prev, viewSaved: true }))
               }
-              className="flex items-center text-primary dark:text-foreground"
+              className="flex items-center"
               title="View Saved Themes"
             >
               View Saved
@@ -696,7 +703,6 @@ export default function ThemeGenerator() {
         </div>
       </div>
 
-
       {/* Paste Dialog */}
       <Dialog
         open={dialogState.paste}
@@ -708,12 +714,12 @@ export default function ThemeGenerator() {
           <DialogHeader>
             <DialogTitle>Paste Theme</DialogTitle>
           </DialogHeader>
-            <textarea
+          <textarea
             value={pasteInput}
             onChange={(e) => setPasteInput(e.target.value)}
             className="w-full h-40 sm:h-48 md:h-60 border rounded p-2 text-black dark:text-white"
             placeholder="Paste your shadcn theme or single hex/hsl color value..."
-            />
+          />
           <div className="flex justify-end space-x-2 mt-4">
             <Button variant="outline" onClick={() => handlePasteTheme()}>
               Apply
