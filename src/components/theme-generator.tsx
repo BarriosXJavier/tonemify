@@ -558,7 +558,7 @@ export default function ThemeGenerator() {
               title="Paste Theme"
             >
               <Clipboard className="w-4 h-4 mr-1" />
-              <span>Paste Theme</span>
+              <span>Paste Theme/Hex</span>
             </Button>
             <Button
               variant="outline"
@@ -586,7 +586,7 @@ export default function ThemeGenerator() {
               title="Save Theme"
             >
               <Save className="w-4 h-4 mr-1" />
-              <span>Save Current Theme</span>
+              <span>Save Current</span>
             </Button>
             <Button
               variant="outline"
@@ -595,7 +595,7 @@ export default function ThemeGenerator() {
               title="Copy Theme"
             >
               <Copy className="w-4 h-4 mr-1" />
-              <span>Copy Current Theme</span>
+              <span>Copy Current</span>
             </Button>
             <Button
               variant="outline"
@@ -712,7 +712,7 @@ export default function ThemeGenerator() {
       >
         <DialogContent className="bg-background/60 p-4 sm:p-6 md:p-8 max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto">
           <DialogHeader>
-            <DialogTitle>Paste Theme</DialogTitle>
+            <DialogTitle>Paste Theme/Hex value</DialogTitle>
           </DialogHeader>
           <textarea
             value={pasteInput}
