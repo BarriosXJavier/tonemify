@@ -618,7 +618,7 @@ export default function ThemeGenerator() {
                 variant="outline"
                 title="Light Mode"
               >
-                <Sun className="w-4 h-4 mr-2" />
+                <Sun className="w-4 h-4 mr-2 text-foreground" />
                 {activeMode === "light" && (
                   <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
                     active
@@ -635,7 +635,7 @@ export default function ThemeGenerator() {
                 variant="outline"
                 title="Dark Mode"
               >
-                <Moon className="w-4 h-4 mr-2" />
+                <Moon className="w-4 h-4 mr-2 text-foreground" />
                 {activeMode === "dark" && (
                   <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
                     active
