@@ -26,7 +26,7 @@ export function ColorPicker({ color, onChange, className }: ColorPickerProps) {
     setInputColor(newColor);
     if (/^#[0-9A-F]{6}$/i.test(newColor)) {
       setIsValidColor(true);
-      onChange(newColor); // Pass the color directly
+      onChange(newColor);
     } else {
       setIsValidColor(false);
     }
@@ -60,7 +60,7 @@ export function ColorPicker({ color, onChange, className }: ColorPickerProps) {
         onChange={(e) => handleColorChange(e.target.value)}
         className={cn(
           "h-10 w-28 rounded-md border px-3 py-2 text-sm bg-white text-black",
-          isValidColor ? "border-input" : "border-red-500"
+          isValidColor ? "border-input" : "border-red-500",
         )}
         placeholder="#FFFFFF"
         aria-label="Enter hex color"
