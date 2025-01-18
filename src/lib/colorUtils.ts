@@ -351,7 +351,7 @@ export const generateThemeColorsFromPrimary = (
   const accentColor = createColor(
     normalizedHue - 30,
     Math.min(100, baseSaturation + 20), // More saturated than muted
-    Math.max(0, baseLightness - 15) // Darker (heavier) than muted
+    Math.max(0, baseLightness - 15) // Darker than muted
   );
 
   return {

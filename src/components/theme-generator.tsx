@@ -106,11 +106,15 @@ export default function ThemeGenerator() {
           /^(?:hsl|hsla)\(\s*([\d.-]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
         const hslSpaceRegex =
           /^([\d.-]+)(?:deg)?\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
+        const hslNoBracketsRegex =
+          /^([\d.-]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?$/i;
         const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
         const rgbFunctionRegex =
           /^(?:rgb|rgba)\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
+        const rgbSpaceRegex =
+          /^([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?$/i;
         const customFormatRegex =
-          /^([\d.-]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?$/i;
+          /^([\d.-]+)\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
 
         let match;
         if ((match = value.match(hslFunctionRegex))) {
@@ -124,7 +128,10 @@ export default function ThemeGenerator() {
                 : parseFloat(match[4])
               : 1,
           };
-        } else if ((match = value.match(hslSpaceRegex))) {
+        } else if (
+          (match = value.match(hslSpaceRegex)) ||
+          (match = value.match(hslNoBracketsRegex))
+        ) {
           return {
             hue: parseFloat(match[1]),
             saturation: parseFloat(match[2]),
@@ -137,7 +144,10 @@ export default function ThemeGenerator() {
           };
         } else if ((match = value.match(hexRegex))) {
           return hexToHSL(value);
-        } else if ((match = value.match(rgbFunctionRegex))) {
+        } else if (
+          (match = value.match(rgbFunctionRegex)) ||
+          (match = value.match(rgbSpaceRegex))
+        ) {
           const r = parseFloat(match[1]);
           const g = parseFloat(match[2]);
           const b = parseFloat(match[3]);
@@ -162,7 +172,6 @@ export default function ThemeGenerator() {
           return null;
         }
       };
-
       const parseSection = (
         section: string,
         target: Record<string, ColorConfig>
@@ -181,8 +190,6 @@ export default function ThemeGenerator() {
 
       if (lightSectionMatch) {
         parseSection(lightSectionMatch[1], parsedColorsLight);
-      } else {
-        parseSection(inputString, parsedColorsLight);
       }
 
       if (darkSectionMatch) {
@@ -193,14 +200,16 @@ export default function ThemeGenerator() {
       let baseSaturation: number | undefined;
       let baseLightness: number | undefined;
 
-      if (Object.keys(parsedColorsLight).length > 0) {
+      if (parsedColorsLight["primary"]) {
         const primaryColor = parsedColorsLight["primary"];
-        if (primaryColor) {
-          parsedColorsDark["primary"] = primaryColor;
-          baseHue = primaryColor.hue;
-          baseSaturation = primaryColor.saturation;
-          baseLightness = primaryColor.lightness;
-        }
+        baseHue = primaryColor.hue;
+        baseSaturation = primaryColor.saturation;
+        baseLightness = primaryColor.lightness;
+      } else if (parsedColorsDark["primary"]) {
+        const primaryColor = parsedColorsDark["primary"];
+        baseHue = primaryColor.hue;
+        baseSaturation = primaryColor.saturation;
+        baseLightness = primaryColor.lightness;
       }
 
       if (!baseHue) {
