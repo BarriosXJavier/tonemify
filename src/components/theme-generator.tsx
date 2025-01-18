@@ -108,13 +108,13 @@ export default function ThemeGenerator() {
           /^([\d.-]+)(?:deg)?\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
         const hslNoBracketsRegex =
           /^([\d.-]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?$/i;
+        const customFormatRegex =
+          /^(?:--[\w-]+:\s*)?([\d.-]+)\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?;?$/i;
         const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
         const rgbFunctionRegex =
           /^(?:rgb|rgba)\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
         const rgbSpaceRegex =
           /^([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?$/i;
-        const customFormatRegex =
-          /^([\d.-]+)\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
         const radiusRegex = /^([\d.]+)rem$/i;
 
         let match;
@@ -129,10 +129,29 @@ export default function ThemeGenerator() {
                 : parseFloat(match[4])
               : 1,
           };
-        } else if (
-          (match = value.match(hslSpaceRegex)) ||
-          (match = value.match(hslNoBracketsRegex))
-        ) {
+        } else if ((match = value.match(hslSpaceRegex))) {
+          return {
+            hue: parseFloat(match[1]),
+            saturation: parseFloat(match[2]),
+            lightness: parseFloat(match[3]),
+            alpha: match[4]
+              ? match[4].endsWith("%")
+                ? parseFloat(match[4]) / 100
+                : parseFloat(match[4])
+              : 1,
+          };
+        } else if ((match = value.match(hslNoBracketsRegex))) {
+          return {
+            hue: parseFloat(match[1]),
+            saturation: parseFloat(match[2]),
+            lightness: parseFloat(match[3]),
+            alpha: match[4]
+              ? match[4].endsWith("%")
+                ? parseFloat(match[4]) / 100
+                : parseFloat(match[4])
+              : 1,
+          };
+        } else if ((match = value.match(customFormatRegex))) {
           return {
             hue: parseFloat(match[1]),
             saturation: parseFloat(match[2]),
@@ -145,10 +164,7 @@ export default function ThemeGenerator() {
           };
         } else if ((match = value.match(hexRegex))) {
           return hexToHSL(value);
-        } else if (
-          (match = value.match(rgbFunctionRegex)) ||
-          (match = value.match(rgbSpaceRegex))
-        ) {
+        } else if ((match = value.match(rgbFunctionRegex))) {
           const r = parseFloat(match[1]);
           const g = parseFloat(match[2]);
           const b = parseFloat(match[3]);
@@ -158,17 +174,16 @@ export default function ThemeGenerator() {
               : parseFloat(match[4])
             : 1;
           return { ...rgbToHSL(r, g, b), alpha };
-        } else if ((match = value.match(customFormatRegex))) {
-          return {
-            hue: parseFloat(match[1]),
-            saturation: parseFloat(match[2]),
-            lightness: parseFloat(match[3]),
-            alpha: match[4]
-              ? match[4].endsWith("%")
-                ? parseFloat(match[4]) / 100
-                : parseFloat(match[4])
-              : 1,
-          };
+        } else if ((match = value.match(rgbSpaceRegex))) {
+          const r = parseFloat(match[1]);
+          const g = parseFloat(match[2]);
+          const b = parseFloat(match[3]);
+          const alpha = match[4]
+            ? match[4].endsWith("%")
+              ? parseFloat(match[4]) / 100
+              : parseFloat(match[4])
+            : 1;
+          return { ...rgbToHSL(r, g, b), alpha };
         } else if ((match = value.match(radiusRegex))) {
           return `${parseFloat(match[1])}rem`;
         } else {
@@ -375,7 +390,7 @@ export default function ThemeGenerator() {
       .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
       .join("\n");
 
-    return `:root {\n${lightVariables}\n}\n\n.dark {\n${darkVariables}\n}`;
+    return `:root {\n${lightVariables}\n  --radius: ${selectedRadius};\n}\n\n.dark {\n${darkVariables}\n  --radius: ${selectedRadius};\n}`;
   };
 
   const actions = {
