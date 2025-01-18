@@ -87,8 +87,8 @@ export default function ThemeGenerator() {
 
   const handlePasteTheme = (input?: string) => {
     try {
-      const parsedColorsLight: Record<string, ColorConfig> = {};
-      const parsedColorsDark: Record<string, ColorConfig> = {};
+      const parsedColorsLight: Record<string, ColorConfig | string> = {};
+      const parsedColorsDark: Record<string, ColorConfig | string> = {};
       const failedVariables: string[] = [];
       const inputString = input || pasteInput;
 
@@ -100,7 +100,7 @@ export default function ThemeGenerator() {
       const lightSectionMatch = inputString.match(lightSectionRegex);
       const darkSectionMatch = inputString.match(darkSectionRegex);
 
-      const parseColorValue = (value: string): ColorConfig | null => {
+      const parseColorValue = (value: string): ColorConfig | string | null => {
         value = value.trim();
         const hslFunctionRegex =
           /^(?:hsl|hsla)\(\s*([\d.-]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
@@ -115,6 +115,7 @@ export default function ThemeGenerator() {
           /^([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?$/i;
         const customFormatRegex =
           /^([\d.-]+)\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
+        const radiusRegex = /^([\d.]+)rem$/i;
 
         let match;
         if ((match = value.match(hslFunctionRegex))) {
@@ -168,20 +169,23 @@ export default function ThemeGenerator() {
                 : parseFloat(match[4])
               : 1,
           };
+        } else if ((match = value.match(radiusRegex))) {
+          return `${parseFloat(match[1])}rem`;
         } else {
           return null;
         }
       };
+
       const parseSection = (
         section: string,
-        target: Record<string, ColorConfig>
+        target: Record<string, ColorConfig | string>
       ) => {
         let match;
         while ((match = variableRegex.exec(section)) !== null) {
           const [, name, value] = match;
-          const colorConfig = parseColorValue(value.trim());
-          if (colorConfig) {
-            target[name] = colorConfig;
+          const parsedValue = parseColorValue(value.trim());
+          if (parsedValue) {
+            target[name] = parsedValue;
           } else {
             failedVariables.push(name);
           }
@@ -201,12 +205,12 @@ export default function ThemeGenerator() {
       let baseLightness: number | undefined;
 
       if (parsedColorsLight["primary"]) {
-        const primaryColor = parsedColorsLight["primary"];
+        const primaryColor = parsedColorsLight["primary"] as ColorConfig;
         baseHue = primaryColor.hue;
         baseSaturation = primaryColor.saturation;
         baseLightness = primaryColor.lightness;
       } else if (parsedColorsDark["primary"]) {
-        const primaryColor = parsedColorsDark["primary"];
+        const primaryColor = parsedColorsDark["primary"] as ColorConfig;
         baseHue = primaryColor.hue;
         baseSaturation = primaryColor.saturation;
         baseLightness = primaryColor.lightness;
@@ -214,7 +218,7 @@ export default function ThemeGenerator() {
 
       if (!baseHue) {
         const parsedColor = parseColorValue(inputString);
-        if (parsedColor) {
+        if (parsedColor && typeof parsedColor !== "string") {
           baseHue = parsedColor.hue;
           baseSaturation = parsedColor.saturation;
           baseLightness = parsedColor.lightness;
@@ -261,7 +265,12 @@ export default function ThemeGenerator() {
       } else {
         if (Object.keys(parsedColorsLight).length > 0) {
           const finalColorsLight = { ...colorsLight, ...parsedColorsLight };
-          setColorsLight(finalColorsLight);
+          const filteredColorsLight = Object.fromEntries(
+            Object.entries(finalColorsLight).filter(
+              ([, value]) => typeof value !== "string"
+            )
+          ) as Record<string, ColorConfig>;
+          setColorsLight(filteredColorsLight);
           if (activeMode === "light") {
             updateCSSVariables(finalColorsLight);
           }
@@ -269,7 +278,12 @@ export default function ThemeGenerator() {
 
         if (Object.keys(parsedColorsDark).length > 0) {
           const finalColorsDark = { ...colorsDark, ...parsedColorsDark };
-          setColorsDark(finalColorsDark);
+          const filteredColorsDark = Object.fromEntries(
+            Object.entries(finalColorsDark).filter(
+              ([, value]) => typeof value !== "string"
+            )
+          ) as Record<string, ColorConfig>;
+          setColorsDark(filteredColorsDark);
           if (activeMode === "dark") {
             updateCSSVariables(finalColorsDark);
           }
@@ -294,16 +308,25 @@ export default function ThemeGenerator() {
     }
   };
 
+  const radiusValues = ["0", "0.3rem", "0.5rem", "0.75rem", "1rem"];
+  const [selectedRadius, setSelectedRadius] = useState<string>("0.5rem");
+
+  const handleRadiusChange = (radius: string) => {
+    setSelectedRadius(radius);
+    document.documentElement.style.setProperty("--radius", radius);
+  };
+
   const updateCSSVariables = (
-    themeColors: Record<string, ColorConfig>
+    themeColors: Record<string, ColorConfig | string>
   ): void => {
     const style = document.documentElement.style;
     Object.entries(themeColors).forEach(([name, config]) => {
-      const alpha = config.alpha ?? 1;
-      const value = `${config.hue} ${config.saturation}% ${config.lightness}%${
-        includeAlpha && alpha < 1 ? ` / ${alpha * 100}%` : ""
-      }`;
-      style.setProperty(`--${name}`, value);
+      if (name === "radius") {
+        style.setProperty(`--${name}`, config as string);
+      } else {
+        const { hue, saturation, lightness } = config as ColorConfig;
+        style.setProperty(`--${name}`, `${hue} ${saturation}% ${lightness}%`);
+      }
     });
   };
 
@@ -499,6 +522,7 @@ export default function ThemeGenerator() {
                 </div>
               </DialogContent>
             </Dialog>
+
             <Dialog
               open={convertDialogOpen}
               onOpenChange={setConvertDialogOpen}
@@ -651,6 +675,21 @@ export default function ThemeGenerator() {
                   </span>
                 )}
               </Button>
+            </div>
+
+            <div className="flex flex-wrap gap-2 justify-center">
+              {radiusValues.map((radius) => (
+                <Button
+                  key={radius}
+                  variant="outline"
+                  onClick={() => handleRadiusChange(radius)}
+                  className={`${
+                    selectedRadius === radius ? "bg-primary text-white" : ""
+                  }`}
+                >
+                  {radius}
+                </Button>
+              ))}
             </div>
           </div>
 
