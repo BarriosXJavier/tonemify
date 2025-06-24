@@ -107,7 +107,7 @@ export default function Header() {
       <Link className="flex items-center justify-center" href="/">
         <Gem className="h-6 w-6 text-foreground" />
         <span className="ml-1 text-xl sm:text-2xl font-bold text-foreground">
-          TonemifyLabs
+          Tonemify
         </span>
       </Link>
 

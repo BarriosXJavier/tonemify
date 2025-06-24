@@ -16,7 +16,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "TonemifyLabs",
+  title: "Tonemify",
   description: "Generate ShadCN themes with ease",
 };
 
