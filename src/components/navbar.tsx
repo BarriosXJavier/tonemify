@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Github, MenuIcon, Gem } from "lucide-react";
+import { Github, Menu, Gem, X } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -13,9 +13,8 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
+  SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import SupportDropdown from "./support";
@@ -37,11 +36,11 @@ export default function Header() {
     {
       href: "https://github.com/BarriosXJavier/tonemify",
       label: "GitHub",
-      icon: <Github className="h-5 w-5 mr-2" />,
+      icon: <Github className="h-4 w-4" />,
     },
     {
       href: "#",
-      label: "Support project",
+      label: "Support",
       isComponent: true,
       component: <SupportDropdown />,
     },
@@ -62,12 +61,13 @@ export default function Header() {
       <NavigationMenuItem key={href}>
         <Link href={href} legacyBehavior passHref>
           <NavigationMenuLink
-            className={`${navigationMenuTriggerStyle()} transition-colors duration-300 ease-in-out hover:bg-accent hover:text-accent-foreground`}
+            className={`${navigationMenuTriggerStyle()} group relative px-3 py-2 text-sm font-medium rounded-full transition-all duration-200 hover:bg-accent/10 hover:backdrop-blur-sm`}
           >
-            {icon}
-            <span className={icon ? "hidden xl:inline" : undefined}>
+            <span className="flex items-center gap-2">
+              {icon}
               {label}
             </span>
+            <span className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </NavigationMenuLink>
         </Link>
       </NavigationMenuItem>
@@ -93,57 +93,73 @@ export default function Header() {
       <Link
         key={href}
         href={href}
-        className="flex items-center space-x-3 text-xl font-medium border-b border-border py-2 transition-colors duration-200 ease-in-out text-foreground hover:text-accent-foreground hover:bg-accent"
+        className="flex items-center gap-3 px-4 py-3 text-base font-medium rounded-lg transition-all duration-200 hover:bg-accent/10 hover:backdrop-blur-sm active:scale-95"
         onClick={() => setIsOpen(false)}
       >
-        {icon && <span className="inline-block">{icon}</span>}
-        <span>{label}</span>
+        {icon}
+        {label}
       </Link>
     );
   };
 
   return (
-    <header className="sticky top-0 z-50 px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between border-b border-border">
-      <Link className="flex items-center justify-center" href="/">
-        <Gem className="h-6 w-6 text-foreground" />
-        <span className="ml-1 text-xl sm:text-2xl font-bold text-foreground">
-          Tonemify
-        </span>
-      </Link>
+    <header className="sticky top-0 z-50 backdrop-blur-2xl bg-background/60 border-b border-border/20 shadow-lg shadow-black/5">
+      <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-background/80 backdrop-blur-2xl" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          <Link className="flex items-center gap-2 group" href="/">
+            <div className="relative">
+              <Gem className="h-6 w-6 text-foreground transition-transform duration-200 group-hover:rotate-12" />
+              <div className="absolute inset-0 h-6 w-6 bg-foreground/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              Tonemify
+            </span>
+          </Link>
 
-      <div className="hidden lg:flex items-center space-x-4">
-        <NavigationMenu>
-          <NavigationMenuList>
-            {navigationLinks.map(renderDesktopLink)}
-          </NavigationMenuList>
-        </NavigationMenu>
-      </div>
+          <nav className="hidden lg:block">
+            <NavigationMenu>
+              <NavigationMenuList className="gap-1">
+                {navigationLinks.map(renderDesktopLink)}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </nav>
 
-      <div className="lg:hidden">
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button
-              variant="ghost"
-              size="lg"
-              className="h-12 w-12 bg-primary border border-border"
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden h-10 w-10 rounded-full hover:bg-accent/10 transition-all duration-200"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side="right"
+              className="w-80 border-l border-border/20 backdrop-blur-2xl bg-background/70 shadow-2xl"
             >
-              <MenuIcon />
-            </Button>
-          </SheetTrigger>
-          <SheetContent
-            side="right"
-            className="w-[80%] sm:w-[300px] bg-background"
-          >
-            <SheetHeader>
-              <SheetTitle className="text-lg font-bold text-foreground sr-only">
-                Menu
-              </SheetTitle>
-            </SheetHeader>
-            <nav className="flex flex-col space-y-6 mt-8 font-mono text-lg">
-              {navigationLinks.map(renderMobileLink)}
-            </nav>
-          </SheetContent>
-        </Sheet>
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+              <div className="flex items-center justify-between pt-4 pb-6">
+                <div className="flex items-center gap-2">
+                  <Gem className="h-5 w-5" />
+                  <span className="font-semibold">Menu</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <nav className="flex flex-col gap-2">
+                {navigationLinks.map(renderMobileLink)}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );
