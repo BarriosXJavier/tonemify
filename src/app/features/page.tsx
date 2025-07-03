@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 
 import { FC } from "react";
+import Faqs from "@/components/faqs";
 
 interface FeatureItemProps {
   icon: FC<{ className?: string }>;
@@ -98,6 +99,7 @@ const FeaturesSection = () => {
           ))}
         </ul>
       </CardContent>
+      <Faqs />
     </Card>
   );
 };
