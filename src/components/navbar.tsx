@@ -21,7 +21,7 @@ import SupportDropdown from "./support";
 
 interface NavigationLink {
   href: string;
-  label: string;
+  label?: string;
   icon?: React.ReactNode;
   isComponent?: boolean;
   component?: React.ReactNode;
@@ -31,11 +31,9 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navigationLinks: NavigationLink[] = [
-    { href: "/features", label: "Features" },
     { href: "/contact", label: "Contact" },
     {
       href: "https://github.com/BarriosXJavier/tonemify",
-      label: "GitHub",
       icon: <Github className="h-4 w-4" />,
     },
     {

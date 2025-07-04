@@ -34,7 +34,7 @@ export default function SupportDropdown() {
           variant="ghost"
           className="flex items-center space-x-2 text-sm font-semibold text-foreground hover:text-accent-foreground hover:bg-accent hover:ring"
         >
-          <span>Support project</span>
+          <span>Buy me a coffee</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48">
