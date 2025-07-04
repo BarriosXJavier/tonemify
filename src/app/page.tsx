@@ -1,15 +1,15 @@
 import Faqs from "@/components/faqs";
 import Hero from "@/components/hero";
-import ShadcnComponentsDemo from "@/components/preview-container";
 
 import ThemeGenerator from "@/components/theme-generator";
+import ThemeShowcase from "@/components/theme-showcase";
 
 export default function Home() {
   return (
     <main>
       <Hero />
       <ThemeGenerator />
-      <ShadcnComponentsDemo />
+      <ThemeShowcase />
       <Faqs />
     </main>
   );

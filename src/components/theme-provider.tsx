@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 interface ThemeProviderProps {
   children: ReactNode;
   defaultTheme?: "light" | "dark" | "system";
-  attribute?: string;
+  attribute?: "class" | "data-theme";
   enableSystem?: boolean;
   disableTransitionOnChange?: boolean;
 }

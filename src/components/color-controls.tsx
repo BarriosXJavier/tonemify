@@ -35,7 +35,7 @@ export function ColorControls({
   }%, ${(100 - color.alpha) / 100})`;
 
   const getHueGradient = () => {
-    const stops = [];
+    const stops: string[] = [];
     for (let i = 0; i <= 360; i += 60) {
       stops.push(`hsl(${i}, ${color.saturation}%, ${color.lightness}%)`);
     }

@@ -1,37 +1,38 @@
 import React, { useState } from "react";
-import { tailwindColorPalette } from "../lib/colorUtils";
-import { CheckIcon, CopyIcon, XIcon } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { Toaster } from "@/components/ui/toaster";
+import { Check, Copy, X } from "lucide-react";
+import { toast } from "sonner";
+import { tailwindColorPalette } from "@/lib/colorUtils";
+import { Button } from "./ui/button";
 
 type Color = keyof typeof tailwindColorPalette | null;
 
 const TailwindColorPicker = () => {
   const [selectedColor, setSelectedColor] = useState<Color>(null);
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
-  const { toast } = useToast();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleColorSelect = (color: keyof typeof tailwindColorPalette) => {
     setSelectedColor(color);
     setCopiedColor(null);
+
+    // Auto-scroll to the selected color palette
+    setTimeout(() => {
+      const selectedColorSection = document.querySelector(
+        `[data-color-section="${color}"]`,
+      );
+      if (selectedColorSection) {
+        selectedColorSection.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100);
   };
 
   const handleColorCopy = (colorHex: string, colorName: string) => {
     navigator.clipboard.writeText(colorHex);
     setCopiedColor(colorName);
-    toast({
-      title: "Color Copied",
-      description: `Copied ${colorName} to clipboard!`,
-    });
+    toast.success(`Copied ${colorName} to clipboard!`);
   };
 
   const handleReset = () => {
@@ -39,78 +40,141 @@ const TailwindColorPicker = () => {
     setCopiedColor(null);
   };
 
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <div className="w-full max-w-md mx-auto">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-full">
-            {selectedColor
-              ? `${selectedColor}`
-              : "Select from Tailwind color palettes"}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-full max-h-96 overflow-y-auto">
-          <DropdownMenuLabel className="flex items-center justify-between">
-            <span>Tailwind Color Palette</span>
-            {selectedColor && (
-              <Button variant="ghost" onClick={handleReset}>
-                <XIcon className="w-4 h-4" />
+    <div className="w-full max-w-md mx-auto relative">
+      <Button
+        onClick={toggleDropdown}
+        className="w-full px-4 py-2 text-left border border-border rounded-md bg-background hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-colors"
+      >
+        {selectedColor
+          ? `${selectedColor}`
+          : "Select from Tailwind color palettes"}
+      </Button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
+          <div className="flex items-center justify-between p-3 border-b border-border">
+            <span className="font-medium">Tailwind Color Palette</span>
+            <div className="flex items-center gap-2">
+              {selectedColor && (
+                <Button
+                  onClick={handleReset}
+                  className="p-1 hover:bg-accent rounded"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+              <Button
+                onClick={toggleDropdown}
+                className="p-1 hover:bg-accent rounded"
+              >
+                <X className="w-4 h-4" />
               </Button>
-            )}
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {Object.keys(tailwindColorPalette).map((color) => (
-            <DropdownMenuItem
-              key={color}
-              onClick={() =>
-                handleColorSelect(color as keyof typeof tailwindColorPalette)
-              }
-            >
-              <span>{color}</span>
-            </DropdownMenuItem>
-          ))}
+            </div>
+          </div>
+
+          {/* Color Selection Grid */}
+          <div className="p-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {Object.entries(tailwindColorPalette).map(
+                ([colorName, shades]) => (
+                  <div
+                    key={colorName}
+                    onClick={() =>
+                      handleColorSelect(
+                        colorName as keyof typeof tailwindColorPalette,
+                      )
+                    }
+                    className={`cursor-pointer p-3 rounded-lg border-2 transition-all hover:border-primary ${selectedColor === colorName
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:bg-accent"
+                      }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      {/* Color preview circles */}
+                      <div className="flex -space-x-1">
+                        {Object.entries(shades)
+                          .slice(0, 3)
+                          .map(([shade, hex]) => (
+                            <div
+                              key={shade}
+                              className="w-4 h-4 rounded-full border border-border shadow-sm"
+                              style={{ backgroundColor: hex }}
+                            />
+                          ))}
+                        {Object.keys(shades).length > 3 && (
+                          <div className="w-4 h-4 rounded-full bg-muted border border-border shadow-sm flex items-center justify-center">
+                            <span className="text-xs text-muted-foreground">+</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <span className="text-sm font-medium capitalize">
+                      {colorName}
+                    </span>
+                  </div>
+                ),
+              )}
+            </div>
+          </div>
+
+          {/* Selected Color Shades */}
           {selectedColor && (
-            <>
-              <DropdownMenuSeparator />
-              <div className="p-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div
+              className="border-t border-gray-200 p-3"
+              data-color-section={selectedColor}
+            >
+              <h4 className="font-medium mb-3 capitalize">
+                {selectedColor} Shades
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {Object.entries(tailwindColorPalette[selectedColor]).map(
                   ([shade, hex]) => (
                     <div
                       key={shade}
-                      className={`border rounded-md cursor-pointer transition-all duration-200 ease-in-out hover:ring-2 hover:ring-offset-2 hover:ring-gray-400 dark:hover:ring-gray-600 ${
-                        copiedColor === `${selectedColor}-${shade}`
-                          ? "ring-2 ring-offset-2 ring-green-500 dark:ring-green-400"
+                      className={`group relative border rounded-md cursor-pointer transition-all duration-200 hover:ring-2 hover:ring-offset-2 hover:ring-ring/50 ${copiedColor === `${selectedColor}-${shade}`
+                          ? "ring-2 ring-offset-2 ring-success"
                           : ""
-                      }`}
+                        }`}
                       style={{ backgroundColor: hex }}
                       onClick={() =>
                         handleColorCopy(hex, `${selectedColor}-${shade}`)
                       }
                     >
-                      <div className="flex items-center justify-between p-4 h-32">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium text-white dark:text-black">
-                            {selectedColor}-{shade}
-                          </span>
-                          <span className="text-xs text-white dark:text-black">
-                            {hex}
-                          </span>
+                      <div className="flex flex-col items-center justify-center p-3 h-20 text-center">
+                        {/* Color circle */}
+                        <div
+                          className="w-6 h-6 rounded-full border-2 border-border shadow-sm mb-1"
+                          style={{ backgroundColor: hex }}
+                        />
+                        <span className="text-xs font-medium text-foreground mix-blend-difference">
+                          {shade}
+                        </span>
+                        <span className="text-xs text-foreground mix-blend-difference opacity-80">
+                          {hex}
+                        </span>
+
+                        {/* Copy indicator */}
+                        <div className="absolute top-1 right-1">
+                          {copiedColor === `${selectedColor}-${shade}` ? (
+                            <Check className="w-3 h-3 text-foreground mix-blend-difference" />
+                          ) : (
+                            <Copy className="w-3 h-3 text-foreground mix-blend-difference opacity-0 group-hover:opacity-100 transition-opacity" />
+                          )}
                         </div>
-                        {copiedColor === `${selectedColor}-${shade}` ? (
-                          <CheckIcon className="w-4 h-4 text-white dark:text-black" />
-                        ) : (
-                          <CopyIcon className="w-4 h-4 text-white dark:text-black opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out" />
-                        )}
                       </div>
                     </div>
-                  )
+                  ),
                 )}
               </div>
-            </>
+            </div>
           )}
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <Toaster />
+        </div>
+      )}
     </div>
   );
 };

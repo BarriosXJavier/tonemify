@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Copy, RefreshCcw, Save, Clipboard, Moon, Sun } from "lucide-react";
+import {
+  Copy,
+  RefreshCcw,
+  Save,
+  Clipboard,
+  Moon,
+  Sun,
+  ArrowDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { convertColor, rgbToHSL } from "@/lib/colorUtils";
@@ -67,12 +75,15 @@ export default function ThemeGenerator() {
   };
 
   useEffect(() => {
-    const themes = Object.keys(localStorage).reduce((acc, key) => {
-      if (key.startsWith("theme-")) {
-        acc[key] = localStorage.getItem(key) || "";
-      }
-      return acc;
-    }, {} as Record<string, string>);
+    const themes = Object.keys(localStorage).reduce(
+      (acc, key) => {
+        if (key.startsWith("theme-")) {
+          acc[key] = localStorage.getItem(key) || "";
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
     setSavedThemes(themes);
   }, []);
 
@@ -193,7 +204,7 @@ export default function ThemeGenerator() {
 
       const parseSection = (
         section: string,
-        target: Record<string, ColorConfig | string>
+        target: Record<string, ColorConfig | string>,
       ) => {
         let match;
         while ((match = variableRegex.exec(section)) !== null) {
@@ -249,7 +260,7 @@ export default function ThemeGenerator() {
           baseHue,
           baseSaturation,
           baseLightness,
-          false
+          false,
         );
         Object.keys(generatedColorsLight).forEach((key) => {
           if (!parsedColorsLight[key]) {
@@ -262,7 +273,7 @@ export default function ThemeGenerator() {
           baseHue,
           baseSaturation,
           baseLightness,
-          true
+          true,
         );
         Object.keys(generatedColorsDark).forEach((key) => {
           if (!parsedColorsDark[key]) {
@@ -282,8 +293,8 @@ export default function ThemeGenerator() {
           const finalColorsLight = { ...colorsLight, ...parsedColorsLight };
           const filteredColorsLight = Object.fromEntries(
             Object.entries(finalColorsLight).filter(
-              ([, value]) => typeof value !== "string"
-            )
+              ([, value]) => typeof value !== "string",
+            ),
           ) as Record<string, ColorConfig>;
           setColorsLight(filteredColorsLight);
           if (activeMode === "light") {
@@ -295,8 +306,8 @@ export default function ThemeGenerator() {
           const finalColorsDark = { ...colorsDark, ...parsedColorsDark };
           const filteredColorsDark = Object.fromEntries(
             Object.entries(finalColorsDark).filter(
-              ([, value]) => typeof value !== "string"
-            )
+              ([, value]) => typeof value !== "string",
+            ),
           ) as Record<string, ColorConfig>;
           setColorsDark(filteredColorsDark);
           if (activeMode === "dark") {
@@ -307,8 +318,8 @@ export default function ThemeGenerator() {
         if (failedVariables.length > 0) {
           toast.error(
             `Failed to parse the following variables: ${failedVariables.join(
-              ", "
-            )}. Others were updated successfully.`
+              ", ",
+            )}. Others were updated successfully.`,
           );
         } else {
           toast.success("Theme updated successfully!");
@@ -332,7 +343,7 @@ export default function ThemeGenerator() {
   };
 
   const updateCSSVariables = (
-    themeColors: Record<string, ColorConfig | string>
+    themeColors: Record<string, ColorConfig | string>,
   ): void => {
     const style = document.documentElement.style;
     Object.entries(themeColors).forEach(([name, config]) => {
@@ -348,7 +359,7 @@ export default function ThemeGenerator() {
   const updateColor = (
     colorName: string,
     property: keyof ColorConfig,
-    value: string
+    value: string,
   ): void => {
     if (activeMode === "light") {
       setColorsLight((prev) => {
@@ -441,18 +452,18 @@ export default function ThemeGenerator() {
         randomHue,
         randomSaturation,
         randomLightness,
-        false
+        false,
       );
       const newColorsDark = generateThemeColorsFromPrimary(
         randomHue,
         randomSaturation,
         randomLightness,
-        true
+        true,
       );
       setColorsLight(newColorsLight);
       setColorsDark(newColorsDark);
       updateCSSVariables(
-        activeMode === "light" ? newColorsLight : newColorsDark
+        activeMode === "light" ? newColorsLight : newColorsDark,
       );
       toast.success("Random theme generated!");
     },
@@ -495,11 +506,11 @@ export default function ThemeGenerator() {
                     onChange={(e) =>
                       setSelectedFormat(
                         e.target.value as
-                          | "hex"
-                          | "rgb"
-                          | "rgba"
-                          | "hsl"
-                          | "hsla"
+                        | "hex"
+                        | "rgb"
+                        | "rgba"
+                        | "hsl"
+                        | "hsla",
                       )
                     }
                     className="w-full p-2 border rounded"
@@ -559,11 +570,11 @@ export default function ThemeGenerator() {
                     onChange={(e) =>
                       setSelectedFormat(
                         e.target.value as
-                          | "hex"
-                          | "rgb"
-                          | "rgba"
-                          | "hsl"
-                          | "hsla"
+                        | "hex"
+                        | "rgb"
+                        | "rgba"
+                        | "hsl"
+                        | "hsla",
                       )
                     }
                     className="w-full p-2 border rounded"
@@ -658,11 +669,10 @@ export default function ThemeGenerator() {
             <div className="flex gap-2">
               <Button
                 onClick={() => actions.switchTheme("light")}
-                className={`relative flex items-center min-w-[100px] justify-start ${
-                  activeMode === "light"
+                className={`relative flex items-center min-w-[100px] justify-start ${activeMode === "light"
                     ? "bg-primary text-white"
                     : "text-primary"
-                }`}
+                  }`}
                 variant="outline"
                 title="Light Mode"
               >
@@ -675,11 +685,10 @@ export default function ThemeGenerator() {
               </Button>
               <Button
                 onClick={() => actions.switchTheme("dark")}
-                className={`relative flex items-center min-w-[100px] justify-start ${
-                  activeMode === "dark"
+                className={`relative flex items-center min-w-[100px] justify-start ${activeMode === "dark"
                     ? "bg-primary text-white"
                     : "text-primary"
-                }`}
+                  }`}
                 variant="outline"
                 title="Dark Mode"
               >
@@ -698,34 +707,37 @@ export default function ThemeGenerator() {
                   key={radius}
                   variant="outline"
                   onClick={() => handleRadiusChange(radius)}
-                  className={`${
-                    selectedRadius === radius ? "bg-primary text-white" : ""
-                  }`}
+                  className={`${selectedRadius === radius ? "bg-primary text-white" : ""
+                    }`}
                 >
                   {radius}
                 </Button>
               ))}
             </div>
           </div>
-
+          <div className="flex flex-col items-center space-y-2">
+            <p className="text-foreground">
+              You can click on a color to adjust
+            </p>
+            <ArrowDown className="animate-bounce" />
+          </div>
           {/* Color Cards Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {Object.entries(currentColors).map(([name, config]) => {
               const validColor = isValidColor(config);
               const alpha = config.alpha ?? 1;
               const backgroundColor = validColor
-                ? `hsl(${config.hue}, ${config.saturation}%, ${
-                    config.lightness
-                  }%${includeAlpha && alpha < 1 ? ` / ${alpha * 100}%` : ""})`
+                ? `hsl(${config.hue}, ${config.saturation}%, ${config.lightness
+                }%${includeAlpha && alpha < 1 ? ` / ${alpha * 100}%` : ""})`
                 : "transparent";
 
               const hexValue = validColor
                 ? hslToHex(
-                    config.hue,
-                    config.saturation,
-                    config.lightness,
-                    alpha
-                  )
+                  config.hue,
+                  config.saturation,
+                  config.lightness,
+                  alpha,
+                )
                 : "N/A";
 
               // Determine text color based on background lightness
@@ -903,6 +915,7 @@ export default function ThemeGenerator() {
               </ul>
             )}
           </div>
+
           <div className="flex justify-end mt-4">
             <Button
               variant="outline"
@@ -934,7 +947,7 @@ export default function ThemeGenerator() {
               onChange={(property, value) =>
                 updateColor(activeColor!, property, value.toString())
               }
-              onHexChange={() => {}}
+              onHexChange={() => { }}
             />
           )}
         </DialogContent>
