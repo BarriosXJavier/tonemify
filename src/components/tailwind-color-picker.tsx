@@ -48,7 +48,7 @@ const TailwindColorPicker = () => {
     <div className="w-full max-w-md mx-auto relative">
       <Button
         onClick={toggleDropdown}
-        className="w-full px-4 py-2 text-left border border-border rounded-md bg-background hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-colors"
+        className="w-full px-4 py-2 text-left border border-border rounded-md bg-primary hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-colors"
       >
         {selectedColor
           ? `${selectedColor}`
@@ -58,19 +58,13 @@ const TailwindColorPicker = () => {
       {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
           <div className="flex items-center justify-between p-3 border-b border-border">
-            <span className="font-medium">Tailwind Color Palette</span>
+            <span className="font-medium text-foreground">
+              Tailwind Color Palette
+            </span>
             <div className="flex items-center gap-2">
-              {selectedColor && (
-                <Button
-                  onClick={handleReset}
-                  className="p-1 hover:bg-accent rounded"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              )}
               <Button
                 onClick={toggleDropdown}
-                className="p-1 hover:bg-accent rounded"
+                className="p-1 hover:bg-accent rounded bg-background"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -107,8 +101,15 @@ const TailwindColorPicker = () => {
                             />
                           ))}
                         {Object.keys(shades).length > 3 && (
-                          <div className="w-4 h-4 rounded-full bg-muted border border-border shadow-sm flex items-center justify-center">
-                            <span className="text-xs text-muted-foreground">+</span>
+                          <div
+                            className="w-4 h-4 rounded-full border border-border shadow-sm flex items-center justify-center"
+                            style={{
+                              backgroundColor: Object.values(shades)[3],
+                            }}
+                          >
+                            <span className="text-xs text-muted-foreground">
+                              +
+                            </span>
                           </div>
                         )}
                       </div>
@@ -128,8 +129,8 @@ const TailwindColorPicker = () => {
               className="border-t border-gray-200 p-3"
               data-color-section={selectedColor}
             >
-              <h4 className="font-medium mb-3 capitalize">
-                {selectedColor} Shades
+              <h4 className="font-medium mb-3 ">
+                {selectedColor} shades (click a shade to copy)
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {Object.entries(tailwindColorPalette[selectedColor]).map(
@@ -151,10 +152,10 @@ const TailwindColorPicker = () => {
                           className="w-6 h-6 rounded-full border-2 border-border shadow-sm mb-1"
                           style={{ backgroundColor: hex }}
                         />
-                        <span className="text-xs font-medium text-foreground mix-blend-difference">
+                        <span className="text-xs font-medium text-card-foreground ">
                           {shade}
                         </span>
-                        <span className="text-xs text-foreground mix-blend-difference opacity-80">
+                        <span className="text-xs text-card-foreground ">
                           {hex}
                         </span>
 

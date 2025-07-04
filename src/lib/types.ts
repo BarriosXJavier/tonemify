@@ -18,4 +18,3 @@ export interface ThemeColors {
 //       pie: ColorConfig[];
 //       scatter: ColorConfig;
 //     };
-
