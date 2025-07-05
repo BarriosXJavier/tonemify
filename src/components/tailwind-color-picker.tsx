@@ -41,6 +41,9 @@ const TailwindColorPicker = () => {
   };
 
   const toggleDropdown = () => {
+    if (isOpen) {
+      handleReset();
+    }
     setIsOpen(!isOpen);
   };
 
