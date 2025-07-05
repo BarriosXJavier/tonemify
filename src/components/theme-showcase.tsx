@@ -121,11 +121,31 @@ const ThemeShowcase = () => {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 h-auto">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="buttons">Buttons</TabsTrigger>
-          <TabsTrigger value="inputs-controls">Inputs</TabsTrigger>
-          <TabsTrigger value="display">Display</TabsTrigger>
+        <TabsList className="flex w-full h-auto">
+          <TabsTrigger
+            value="overview"
+            className="flex-1 data-[state=active]:w-full"
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="buttons"
+            className="flex-1 data-[state=active]:w-full"
+          >
+            Buttons
+          </TabsTrigger>
+          <TabsTrigger
+            value="inputs-controls"
+            className="flex-1 data-[state=active]:w-full"
+          >
+            Inputs
+          </TabsTrigger>
+          <TabsTrigger
+            value="display"
+            className="flex-1 data-[state=active]:w-full"
+          >
+            Display
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-6">
@@ -138,7 +158,6 @@ const ThemeShowcase = () => {
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-4">
                   <Avatar>
-                    {/* Updated src to a theme-neutral placeholder image URL */}
                     <AvatarImage
                       src="https://placehold.co/40x40?text=JD"
                       alt="User"

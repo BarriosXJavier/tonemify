@@ -2,8 +2,8 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { ColorPicker } from "@/components/color-picker";
-import { hslToHex } from "@/lib/colorUtils";
-import { hexToHSL } from "@/lib/colorUtils";
+import { hslToHex } from "@/lib/color-utils";
+import { hexToHSL } from "@/lib/color-utils";
 
 interface ColorConfig {
   hue: number;

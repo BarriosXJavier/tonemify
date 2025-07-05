@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { convertColor, rgbToHSL } from "@/lib/colorUtils";
+import { convertColor, rgbToHSL } from "@/lib/color-utils";
 import {
   Dialog,
   DialogContent,
@@ -24,11 +24,11 @@ import { ColorControls } from "@/components/color-controls";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
 import { Checkbox } from "@/components/ui/checkbox";
-import { hslToHex } from "@/lib/colorUtils";
-import { defaults, defaultsDark } from "@/lib/colorUtils";
+import { hslToHex } from "@/lib/color-utils";
+import { defaults, defaultsDark } from "@/lib/color-utils";
 import { ColorConfig } from "@/lib/types";
-import { generateThemeColorsFromPrimary } from "@/lib/colorUtils";
-import { hexToHSL } from "@/lib/colorUtils";
+import { generateThemeColorsFromPrimary } from "@/lib/color-utils";
+import { hexToHSL } from "@/lib/color-utils";
 import TailwindColorPicker from "./tailwind-color-picker";
 
 export default function ThemeGenerator() {

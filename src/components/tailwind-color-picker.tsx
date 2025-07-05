@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Check, Copy, X } from "lucide-react";
 import { toast } from "sonner";
-import { tailwindColorPalette } from "@/lib/colorUtils";
+import { tailwindColorPalette } from "@/lib/color-utils";
 import { Button } from "./ui/button";
 
 type Color = keyof typeof tailwindColorPalette | null;
