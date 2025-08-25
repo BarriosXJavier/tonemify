@@ -15,7 +15,6 @@ const TailwindColorPicker = () => {
     setSelectedColor(color);
     setCopiedColor(null);
 
-    // Auto-scroll to the selected color palette
     setTimeout(() => {
       const selectedColorSection = document.querySelector(
         `[data-color-section="${color}"]`,

@@ -3,7 +3,7 @@ import { ColorConfig } from "./types";
 export function hexToHSL(hex: string) {
   hex = hex.replace("#", "");
 
-  const hasAlpha = hex.length === 8; // 8 characters for #RRGGBBAA
+  const hasAlpha = hex.length === 8;
   let alpha = 1;
 
   if (hasAlpha) {
@@ -102,7 +102,6 @@ export function hslToHex(
   return hex;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const hslToRGB = ({
   hue,
   saturation,
@@ -347,11 +346,10 @@ export const generateThemeColorsFromPrimary = (
     Math.min(100, baseLightness + 10)
   );
 
-  // (more saturated) version of muted
   const accentColor = createColor(
     normalizedHue - 30,
-    Math.min(100, baseSaturation + 20), // More saturated than muted
-    Math.max(0, baseLightness - 15) // Darker than muted
+    Math.min(100, baseSaturation + 20), 
+    Math.max(0, baseLightness - 15) 
   );
 
   return {

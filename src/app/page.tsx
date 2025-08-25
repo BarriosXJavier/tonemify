@@ -1,16 +1,16 @@
-import Faqs from "@/components/faqs";
 import Hero from "@/components/hero";
-
 import ThemeGenerator from "@/components/theme-generator";
-import ThemeShowcase from "@/components/theme-showcase";
 
 export default function Home() {
   return (
-    <main>
+    <main className="container mx-auto px-4">
       <Hero />
-      <ThemeGenerator />
-      <ThemeShowcase />
-      <Faqs />
+      <div id="theme-generator" className="my-16 scroll-mt-20">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          Create Your Color Palette
+        </h2>
+        <ThemeGenerator />
+      </div>
     </main>
   );
 }

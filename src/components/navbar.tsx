@@ -6,15 +6,13 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { MenuIcon, Github, Coffee, Diamond, Heart } from "lucide-react";
+import { MenuIcon, Github, Coffee, Diamond, Heart, Save } from "lucide-react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import Image from "next/image";
 
-export function Navbar() {
+export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-background/95 via-background/98 to-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        {/* Logo - Always on the left */}
         <Link href="/" className="flex items-center space-x-2">
           <div className="flex items-center space-x-1 group text-foreground">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center text-foreground">
@@ -35,8 +33,19 @@ export function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Navigation - Right side */}
-        <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
+        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <Link
+            href="/saved"
+            className="group relative flex items-center transition-all hover:text-foreground text-foreground/70 hover:scale-105"
+          >
+            Saved
+          </Link>
+          <Link
+            href="/glassmorphism"
+            className="group relative flex items-center transition-all hover:text-foreground text-foreground/70 hover:scale-105"
+          >
+            Glassmorphism
+          </Link>
           <Link
             href="https://github.com/BarriosXJavier/tonemify"
             target="_blank"
@@ -44,18 +53,13 @@ export function Navbar() {
             className="group relative flex items-center transition-all hover:text-foreground  hover:scale-105"
           >
             <Github className="h-5 w-5 transition-colors group-hover:text-primary" />
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-primary/60 transition-all group-hover:w-full"></span>
           </Link>
 
           <Link
             href="/contact"
             className="group relative flex items-center transition-all hover:text-foreground text-foreground/70 hover:scale-105"
           >
-            <div className="h-5 w-5 mr-2 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center transition-transform group-hover:scale-110">
-              <div className="h-2 w-2 bg-primary-foreground rounded-full"></div>
-            </div>
             Contact
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-primary/60 transition-all group-hover:w-full"></span>
           </Link>
 
           <Link
@@ -64,16 +68,10 @@ export function Navbar() {
             rel="noopener noreferrer"
             className="group relative flex items-center transition-all hover:text-foreground text-foreground/70 hover:scale-105"
           >
-            <div className="relative mr-2">
-              <Coffee className="h-5 w-5 transition-colors group-hover:text-primary" />
-              <Heart className="absolute -top-1 -right-1 h-3 w-3 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
             Buy me a coffee
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-primary/60 transition-all group-hover:w-full"></span>
           </Link>
         </nav>
 
-        {/* Mobile Menu Trigger - Right side */}
         <Sheet>
           <SheetTrigger asChild>
             <Button
@@ -103,6 +101,20 @@ export function Navbar() {
             </Link>
             <nav className="flex flex-col gap-3 text-lg">
               <Link
+                href="/saved"
+                className="group flex w-full items-center py-3 px-3 text-lg font-semibold rounded-lg transition-all hover:bg-muted/50 hover:translate-x-1"
+              >
+                <Save className="h-5 w-5 mr-3 transition-colors group-hover:text-primary" />
+                Saved
+              </Link>
+              <Link
+                href="/glassmorphism"
+                className="group flex w-full items-center py-3 px-3 text-lg font-semibold rounded-lg transition-all hover:bg-muted/50 hover:translate-x-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 mr-3 transition-colors group-hover:text-primary"><path d="M21.17 16.83a1 1 0 0 0-1.17-1.17H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2.17a1 1 0 0 0-.83.17Z"/></svg>
+                Glassmorphism
+              </Link>
+              <Link
                 href="https://github.com/BarriosXJavier/tonemify"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -115,21 +127,14 @@ export function Navbar() {
                 href="/contact"
                 className="group flex w-full items-center py-3 px-3 text-lg font-semibold rounded-lg transition-all hover:bg-muted/50 hover:translate-x-1"
               >
-                <div className="h-5 w-5 mr-3 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-                  <div className="h-2 w-2 bg-primary-foreground rounded-full"></div>
-                </div>
                 Contact
               </Link>
               <Link
-                href="https://www.buymeacoffee.com/yourprofile"
+                href="https://www.buymeacoffee.com/barrios"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex w-full items-center py-3 px-3 text-lg font-semibold rounded-lg transition-all hover:bg-muted/50 hover:translate-x-1"
+                className="group flex w-full items-center py-3 px-3 text-lg font-semibold rounded-lg transition-all hover:bg-muted/50 hover.translate-x-1"
               >
-                <div className="relative mr-3">
-                  <Coffee className="h-5 w-5 transition-colors group-hover:text-primary" />
-                  <Heart className="absolute -top-1 -right-1 h-3 w-3 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
                 Buy me a coffee
               </Link>
             </nav>
@@ -139,3 +144,4 @@ export function Navbar() {
     </header>
   );
 }
+

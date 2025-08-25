@@ -30,6 +30,7 @@ import { ColorConfig } from "@/lib/types";
 import { generateThemeColorsFromPrimary } from "@/lib/color-utils";
 import { hexToHSL } from "@/lib/color-utils";
 import TailwindColorPicker from "./tailwind-color-picker";
+import ThemeShowcase from "./theme-showcase";
 
 export default function ThemeGenerator() {
   const [colorsLight, setColorsLight] =
@@ -383,7 +384,7 @@ export default function ThemeGenerator() {
   };
 
   const generateThemeCSS = (): string => {
-    const formatColor = ({
+    const formatColor = ({ 
       hue,
       saturation,
       lightness,
@@ -472,9 +473,9 @@ export default function ThemeGenerator() {
   const currentColors = activeMode === "light" ? colorsLight : colorsDark;
 
   return (
-    <div className="min-h-screen font-mono">
-      <div className="container max-w-4xl mx-auto px-4 py-6">
-        <div className="space-y-4">
+    <div className="font-mono">
+      <div className="">
+        <div className="lg:col-span-2 space-y-4">
           {/* Control Buttons */}
           <div className="flex flex-wrap gap-2 justify-center">
             <Button
@@ -506,11 +507,7 @@ export default function ThemeGenerator() {
                     onChange={(e) =>
                       setSelectedFormat(
                         e.target.value as
-                        | "hex"
-                        | "rgb"
-                        | "rgba"
-                        | "hsl"
-                        | "hsla",
+                        | "hex" | "rgb" | "rgba" | "hsl" | "hsla",
                       )
                     }
                     className="w-full p-2 border rounded"
@@ -570,11 +567,7 @@ export default function ThemeGenerator() {
                     onChange={(e) =>
                       setSelectedFormat(
                         e.target.value as
-                        | "hex"
-                        | "rgb"
-                        | "rgba"
-                        | "hsl"
-                        | "hsla",
+                        | "hex" | "rgb" | "rgba" | "hsl" | "hsla",
                       )
                     }
                     className="w-full p-2 border rounded"
@@ -669,10 +662,11 @@ export default function ThemeGenerator() {
             <div className="flex gap-2">
               <Button
                 onClick={() => actions.switchTheme("light")}
-                className={`relative flex items-center min-w-[100px] justify-start ${activeMode === "light"
+                className={`relative flex items-center min-w-[100px] justify-start ${ 
+                  activeMode === "light"
                     ? "bg-primary text-white"
                     : "text-primary"
-                  }`}
+                }`}
                 variant="outline"
                 title="Light Mode"
               >
@@ -685,10 +679,11 @@ export default function ThemeGenerator() {
               </Button>
               <Button
                 onClick={() => actions.switchTheme("dark")}
-                className={`relative flex items-center min-w-[100px] justify-start ${activeMode === "dark"
+                className={`relative flex items-center min-w-[100px] justify-start ${ 
+                  activeMode === "dark"
                     ? "bg-primary text-white"
                     : "text-primary"
-                  }`}
+                }`}
                 variant="outline"
                 title="Dark Mode"
               >
@@ -707,8 +702,9 @@ export default function ThemeGenerator() {
                   key={radius}
                   variant="outline"
                   onClick={() => handleRadiusChange(radius)}
-                  className={`${selectedRadius === radius ? "bg-primary text-white" : ""
-                    }`}
+                  className={`${ 
+                    selectedRadius === radius ? "bg-primary text-white" : "" 
+                  }`}
                 >
                   {radius}
                 </Button>
@@ -776,6 +772,11 @@ export default function ThemeGenerator() {
 
           <TailwindColorPicker />
         </div>
+         <div className="lg:col-span-3">
+           <div className="sticky top-24">
+             <ThemeShowcase />
+           </div>
+         </div>
       </div>
 
       {/* Paste Dialog */}
@@ -947,7 +948,7 @@ export default function ThemeGenerator() {
               onChange={(property, value) =>
                 updateColor(activeColor!, property, value.toString())
               }
-              onHexChange={() => { }}
+              onHexChange={() => {}}
             />
           )}
         </DialogContent>

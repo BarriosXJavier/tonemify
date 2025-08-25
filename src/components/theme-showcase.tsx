@@ -100,9 +100,7 @@ import {
 
 const ThemeShowcase = () => {
   const [sliderValue, setSliderValue] = useState([50]);
-  // Removed setProgress as it was unused
   const [progress] = useState(66);
-  // Allow date to be undefined to match SelectSingleEventHandler type
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedFramework, setSelectedFramework] = useState("");
 
@@ -368,8 +366,6 @@ const ThemeShowcase = () => {
                 </Button>
 
                 <Button variant="secondary" className="w-full">
-                  {" "}
-                  {/* Added new button for BellIcon */}
                   <BellIcon className="h-4 w-4 mr-2" />
                   Get Notifications
                 </Button>
@@ -529,7 +525,6 @@ const ThemeShowcase = () => {
                         className="w-full justify-start text-left font-normal"
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {/* Check if date is defined before formatting */}
                         {date ? format(date, "PPP") : <span>Pick a date</span>}
                       </Button>
                     </PopoverTrigger>
@@ -560,7 +555,6 @@ const ThemeShowcase = () => {
                 <Badge variant="secondary">Secondary</Badge>
                 <Badge variant="outline">Outline</Badge>
                 <Badge variant="destructive">Error</Badge>
-                {/* Updated hover styles for better contrast and common practice */}
                 <Badge className="bg-success hover:bg-success/80 text-success-foreground">
                   Success
                 </Badge>
@@ -662,19 +656,19 @@ const ThemeShowcase = () => {
                     </h4>
                     <div className="text-sm text-muted-foreground">
                       <p>
-                        <strong>July 4, 2025:</strong> User 'Alice' logged in
+                        <strong>July 4, 2025:</strong> User &apos;Alice&apos; logged in
                         from a new device.
                       </p>
                       <p>
-                        <strong>July 3, 2025:</strong> Document 'Project X
-                        Proposal' was updated.
+                        <strong>July 3, 2025:</strong> Document &apos;Project X
+                        Proposal&apos; was updated.
                       </p>
                       <p>
-                        <strong>July 3, 2025:</strong> New task 'Review Q3
-                        Budget' assigned to 'Bob'.
+                        <strong>July 3, 2025:</strong> New task &apos;Review Q3
+                        Budget&apos; assigned to &apos;Bob&apos;.
                       </p>
                       <p>
-                        <strong>July 2, 2025:</strong> User 'Charlie' changed
+                        <strong>July 2, 2025:</strong> User &apos;Charlie&apos; changed
                         their profile picture.
                       </p>
                       <p>
@@ -682,35 +676,35 @@ const ThemeShowcase = () => {
                         completed successfully.
                       </p>
                       <p>
-                        <strong>July 1, 2025:</strong> New user 'Diana'
+                        <strong>July 1, 2025:</strong> New user &apos;Diana&apos;
                         registered an account.
                       </p>
                       <p>
                         <strong>July 1, 2025:</strong> Reminder: Meeting with
-                        'Eve' at 10 AM tomorrow.
+                        &apos;Eve&apos; at 10 AM tomorrow.
                       </p>
                       <p>
-                        <strong>June 30, 2025:</strong> 'Frank' commented on
-                        'Design Mockup V2'.
+                        <strong>June 30, 2025:</strong> &apos;Frank&apos; commented on
+                        &apos;Design Mockup V2&apos;.
                       </p>
                       <p>
                         <strong>June 29, 2025:</strong> Data backup initiated
                         and completed.
                       </p>
                       <p>
-                        <strong>June 28, 2025:</strong> 'Grace' uploaded 5 new
-                        files to 'Shared Drive'.
+                        <strong>June 28, 2025:</strong> &apos;Grace&apos; uploaded 5 new
+                        files to &apos;Shared Drive&apos;.
                       </p>
                       <p>
                         <strong>June 27, 2025:</strong> Security patch applied
                         to server infrastructure.
                       </p>
                       <p>
-                        <strong>June 26, 2025:</strong> 'Heidi' updated her
+                        <strong>June 26, 2025:</strong> &apos;Heidi&apos; updated her
                         contact information.
                       </p>
                       <p>
-                        <strong>June 25, 2025:</strong> New feature 'Dark Mode'
+                        <strong>June 25, 2025:</strong> New feature &apos;Dark Mode&apos;
                         deployed to production.
                       </p>
                     </div>

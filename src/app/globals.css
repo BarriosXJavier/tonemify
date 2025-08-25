@@ -34,15 +34,10 @@ body {
   --radius: 1rem;
 
   --chart-1: 26 85% 50%;
-  /* Primary Orange */
   --chart-2: 46 85% 50%;
-  /* Warm Yellow */
   --chart-3: 6 85% 50%;
-  /* Warm Red */
   --chart-4: 66 85% 50%;
-  /* Warm Green */
   --chart-5: 206 85% 50%;
-  /* Complementary Blue */
 
   --success: 120 60% 50%;
   --success-foreground: 120 20% 90%;
@@ -75,15 +70,10 @@ body {
   --radius: 1rem;
 
   --chart-1: 26 75% 45%;
-  /* Darker Orange */
   --chart-2: 46 75% 45%;
-  /* Darker Yellow */
   --chart-3: 6 75% 45%;
-  /* Darker Red */
   --chart-4: 66 75% 45%;
-  /* Darker Green */
   --chart-5: 206 75% 45%;
-  /* Darker Blue */
 
   --success: 120 60% 40%;
   --success-foreground: 120 20% 80%;
