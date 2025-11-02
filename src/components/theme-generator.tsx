@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import {
   Copy,
@@ -33,6 +33,9 @@ import { generateThemeColorsFromPrimary } from "@/lib/color-utils";
 import { hexToHSL } from "@/lib/color-utils";
 import TailwindColorPicker from "./tailwind-color-picker";
 import ThemeShowcase from "./theme-showcase";
+import KeyboardShortcutsDialog from "./keyboard-shortcuts-dialog";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { KeyboardShortcut, getModifierKey } from "@/lib/keyboard-shortcuts";
 
 interface ThemeHistoryEntry {
   light: Record<string, ColorConfig>;
@@ -536,6 +539,57 @@ export default function ThemeGenerator() {
     },
   };
 
+  // Keyboard shortcuts configuration
+  const modifierKey = getModifierKey();
+  const shortcuts: KeyboardShortcut[] = useMemo(() => [
+    {
+      key: "z",
+      [modifierKey]: true,
+      description: "Undo theme change",
+      action: () => navigateHistory("prev"),
+    },
+    {
+      key: "y",
+      [modifierKey]: true,
+      description: "Redo theme change",
+      action: () => navigateHistory("next"),
+    },
+    {
+      key: "c",
+      [modifierKey]: true,
+      description: "Copy theme CSS",
+      action: actions.copyTheme,
+    },
+    {
+      key: "s",
+      [modifierKey]: true,
+      description: "Save theme",
+      action: () => setDialogState((prev) => ({ ...prev, save: true })),
+    },
+    {
+      key: "r",
+      [modifierKey]: true,
+      description: "Generate random theme",
+      action: actions.generateRandomTheme,
+    },
+    {
+      key: "l",
+      [modifierKey]: true,
+      description: "Switch to light mode",
+      action: () => actions.switchTheme("light"),
+    },
+    {
+      key: "d",
+      [modifierKey]: true,
+      description: "Switch to dark mode",
+      action: () => actions.switchTheme("dark"),
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [modifierKey]);
+
+  // Register keyboard shortcuts
+  useKeyboardShortcuts(shortcuts);
+
   const currentColors = activeMode === "light" ? colorsLight : colorsDark;
 
   return (
@@ -544,6 +598,7 @@ export default function ThemeGenerator() {
         <div className="lg:col-span-2 space-y-4">
           {/* Control Buttons */}
           <div className="flex flex-wrap gap-2 justify-center">
+            <KeyboardShortcutsDialog shortcuts={shortcuts} />
             <Button
               variant="outline"
               onClick={() => setConvertDialogOpen(true)}
