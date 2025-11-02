@@ -418,11 +418,14 @@ export default function ThemeGenerator() {
       newHistory.push({ light: lightColors, dark: darkColors });
       if (newHistory.length > maxHistorySize) {
         newHistory.shift();
-        return newHistory;
       }
       return newHistory;
     });
-    setHistoryIndex((prev) => Math.min(prev + 1, maxHistorySize - 1));
+    setHistoryIndex((prev) => {
+      const newHistory = themeHistory.slice(0, prev + 1);
+      newHistory.push({ light: lightColors, dark: darkColors });
+      return Math.min(newHistory.length - 1, maxHistorySize - 1);
+    });
   };
 
   const navigateHistory = (direction: "prev" | "next") => {
