@@ -328,6 +328,25 @@ export default function ThemeGenerator() {
           }
         }
 
+        // Add pasted theme to history
+        const finalLight = Object.keys(parsedColorsLight).length > 0
+          ? Object.fromEntries(
+              Object.entries({ ...colorsLight, ...parsedColorsLight }).filter(
+                ([, value]) => typeof value !== "string",
+              ),
+            ) as Record<string, ColorConfig>
+          : colorsLight;
+        
+        const finalDark = Object.keys(parsedColorsDark).length > 0
+          ? Object.fromEntries(
+              Object.entries({ ...colorsDark, ...parsedColorsDark }).filter(
+                ([, value]) => typeof value !== "string",
+              ),
+            ) as Record<string, ColorConfig>
+          : colorsDark;
+        
+        addToHistory(finalLight, finalDark);
+
         if (failedVariables.length > 0) {
           toast.error(
             `Failed to parse the following variables: ${failedVariables.join(
@@ -781,6 +800,95 @@ export default function ThemeGenerator() {
               ))}
             </div>
           </div>
+
+          {/* Recent Themes History */}
+          {themeHistory.length > 1 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-foreground">
+                  Recent Themes ({themeHistory.length})
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setThemeHistory([themeHistory[historyIndex]]);
+                    setHistoryIndex(0);
+                    toast.success("History cleared!");
+                  }}
+                  className="text-xs h-7"
+                >
+                  Clear History
+                </Button>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-2 scroll-smooth">
+                {themeHistory.map((entry, index) => {
+                  const isActive = index === historyIndex;
+                  const colors = activeMode === "light" ? entry.light : entry.dark;
+                  
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setHistoryIndex(index);
+                        setColorsLight(entry.light);
+                        setColorsDark(entry.dark);
+                        updateCSSVariables(activeMode === "light" ? entry.light : entry.dark);
+                        toast.success(`Loaded theme ${index + 1}`);
+                      }}
+                      className={`
+                        flex-shrink-0 
+                        rounded-lg 
+                        border-2 
+                        transition-all 
+                        duration-200 
+                        hover:scale-105
+                        ${isActive ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/50"}
+                      `}
+                      title={`Theme ${index + 1}${isActive ? " (Active)" : ""}`}
+                    >
+                      <div className="w-32 h-20 rounded-md overflow-hidden p-2 flex flex-col gap-1">
+                        <div className="flex gap-1 h-1/2">
+                          <div
+                            className="flex-1 rounded-sm"
+                            style={{
+                              backgroundColor: `hsl(${colors.background?.hue ?? 0}, ${colors.background?.saturation ?? 0}%, ${colors.background?.lightness ?? 0}%)`,
+                            }}
+                          />
+                          <div
+                            className="flex-1 rounded-sm"
+                            style={{
+                              backgroundColor: `hsl(${colors.primary?.hue ?? 0}, ${colors.primary?.saturation ?? 0}%, ${colors.primary?.lightness ?? 0}%)`,
+                            }}
+                          />
+                        </div>
+                        <div className="flex gap-1 h-1/2">
+                          <div
+                            className="flex-1 rounded-sm"
+                            style={{
+                              backgroundColor: `hsl(${colors.secondary?.hue ?? 0}, ${colors.secondary?.saturation ?? 0}%, ${colors.secondary?.lightness ?? 0}%)`,
+                            }}
+                          />
+                          <div
+                            className="flex-1 rounded-sm"
+                            style={{
+                              backgroundColor: `hsl(${colors.accent?.hue ?? 0}, ${colors.accent?.saturation ?? 0}%, ${colors.accent?.lightness ?? 0}%)`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                      {isActive && (
+                        <div className="text-[10px] text-center pb-1 font-medium text-primary">
+                          Active
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col items-center space-y-2">
             <p className="text-foreground">
               You can click on a color to adjust
