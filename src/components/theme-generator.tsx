@@ -36,6 +36,11 @@ import ThemeShowcase from "./theme-showcase";
 import KeyboardShortcutsDialog from "./keyboard-shortcuts-dialog";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { KeyboardShortcut, getModifierKey } from "@/lib/keyboard-shortcuts";
+import ColorHarmonyPicker from "./color-harmony-picker";
+import ThemePresetsPicker from "./theme-presets-picker";
+import ShareThemeDialog from "./share-theme-dialog";
+import AccessibilityChecker from "./accessibility-checker";
+import { getThemeFromURL } from "@/lib/url-sharing";
 
 interface ThemeHistoryEntry {
   light: Record<string, ColorConfig>;
@@ -101,6 +106,19 @@ export default function ThemeGenerator() {
       {} as Record<string, string>,
     );
     setSavedThemes(themes);
+
+    // Load theme from URL if present (only on mount)
+    const urlTheme = getThemeFromURL();
+    if (urlTheme) {
+      setColorsLight(urlTheme.light);
+      setColorsDark(urlTheme.dark);
+      const initialMode = activeMode === "light" ? urlTheme.light : urlTheme.dark;
+      updateCSSVariables(initialMode);
+      setThemeHistory([{ light: urlTheme.light, dark: urlTheme.dark }]);
+      setHistoryIndex(0);
+      toast.success("Theme loaded from URL!");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isValidColor = (config: ColorConfig): boolean => {
@@ -541,6 +559,27 @@ export default function ThemeGenerator() {
       );
       toast.success("Random theme generated!");
     },
+
+    applyHarmony: (
+      lightColors: Record<string, ColorConfig>,
+      darkColors: Record<string, ColorConfig>
+    ) => {
+      addToHistory(lightColors, darkColors);
+      setColorsLight(lightColors);
+      setColorsDark(darkColors);
+      updateCSSVariables(activeMode === "light" ? lightColors : darkColors);
+    },
+
+    applyPreset: (
+      lightColors: Record<string, ColorConfig>,
+      darkColors: Record<string, ColorConfig>,
+      presetName: string
+    ) => {
+      addToHistory(lightColors, darkColors);
+      setColorsLight(lightColors);
+      setColorsDark(darkColors);
+      updateCSSVariables(activeMode === "light" ? lightColors : darkColors);
+    },
   };
 
   // Keyboard shortcuts configuration
@@ -603,6 +642,26 @@ export default function ThemeGenerator() {
           {/* Control Buttons */}
           <div className="flex flex-wrap gap-2 justify-center">
             <KeyboardShortcutsDialog shortcuts={shortcuts} />
+            <ThemePresetsPicker
+              activeMode={activeMode}
+              onApplyPreset={actions.applyPreset}
+            />
+            <ColorHarmonyPicker
+              currentHue={currentColors.primary?.hue ?? 0}
+              currentSaturation={currentColors.primary?.saturation ?? 70}
+              currentLightness={currentColors.primary?.lightness ?? 50}
+              activeMode={activeMode}
+              onApplyHarmony={actions.applyHarmony}
+            />
+            <ShareThemeDialog
+              lightColors={colorsLight}
+              darkColors={colorsDark}
+            />
+            <AccessibilityChecker
+              lightColors={colorsLight}
+              darkColors={colorsDark}
+              activeMode={activeMode}
+            />
             <Button
               variant="outline"
               onClick={() => setConvertDialogOpen(true)}
