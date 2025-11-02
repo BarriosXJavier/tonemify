@@ -416,12 +416,16 @@ export default function ThemeGenerator() {
     if (newIndex !== historyIndex) {
       setHistoryIndex(newIndex);
       const entry = themeHistory[newIndex];
-      setColorsLight(entry.light);
-      setColorsDark(entry.dark);
-      updateCSSVariables(activeMode === "light" ? entry.light : entry.dark);
-      toast.success(
-        `Navigated to theme ${newIndex + 1} of ${themeHistory.length}`,
-      );
+      
+      // Safety check to ensure entry exists
+      if (entry && entry.light && entry.dark) {
+        setColorsLight(entry.light);
+        setColorsDark(entry.dark);
+        updateCSSVariables(activeMode === "light" ? entry.light : entry.dark);
+        toast.success(
+          `Navigated to theme ${newIndex + 1} of ${themeHistory.length}`,
+        );
+      }
     }
   };
 
