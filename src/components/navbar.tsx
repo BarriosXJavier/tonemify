@@ -59,7 +59,7 @@ export default function Navbar() {
             href="/contact"
             className="group relative flex items-center transition-all hover:text-foreground text-foreground/70 hover:scale-105"
           >
-            Contact
+            Contact/About
           </Link>
 
           <Link
