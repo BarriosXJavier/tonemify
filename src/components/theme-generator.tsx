@@ -10,6 +10,8 @@ import {
   Moon,
   Sun,
   ArrowDown,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -31,6 +33,11 @@ import { generateThemeColorsFromPrimary } from "@/lib/color-utils";
 import { hexToHSL } from "@/lib/color-utils";
 import TailwindColorPicker from "./tailwind-color-picker";
 import ThemeShowcase from "./theme-showcase";
+
+interface ThemeHistoryEntry {
+  light: Record<string, ColorConfig>;
+  dark: Record<string, ColorConfig>;
+}
 
 export default function ThemeGenerator() {
   const [colorsLight, setColorsLight] =
@@ -55,6 +62,11 @@ export default function ThemeGenerator() {
     "hex" | "rgb" | "rgba" | "hsl" | "hsla"
   >("hex");
   const [convertedColor, setConvertedColor] = useState<string | null>(null);
+  const [themeHistory, setThemeHistory] = useState<ThemeHistoryEntry[]>([
+    { light: defaults, dark: defaultsDark },
+  ]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  const maxHistorySize = 50;
 
   const handleConvert = () => {
     const result = convertColor(colorInput.trim(), selectedFormat);
@@ -357,6 +369,40 @@ export default function ThemeGenerator() {
     });
   };
 
+  const addToHistory = (
+    lightColors: Record<string, ColorConfig>,
+    darkColors: Record<string, ColorConfig>,
+  ) => {
+    setThemeHistory((prev) => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push({ light: lightColors, dark: darkColors });
+      if (newHistory.length > maxHistorySize) {
+        newHistory.shift();
+        return newHistory;
+      }
+      return newHistory;
+    });
+    setHistoryIndex((prev) => Math.min(prev + 1, maxHistorySize - 1));
+  };
+
+  const navigateHistory = (direction: "prev" | "next") => {
+    const newIndex =
+      direction === "prev"
+        ? Math.max(0, historyIndex - 1)
+        : Math.min(themeHistory.length - 1, historyIndex + 1);
+
+    if (newIndex !== historyIndex) {
+      setHistoryIndex(newIndex);
+      const entry = themeHistory[newIndex];
+      setColorsLight(entry.light);
+      setColorsDark(entry.dark);
+      updateCSSVariables(activeMode === "light" ? entry.light : entry.dark);
+      toast.success(
+        `Navigated to theme ${newIndex + 1} of ${themeHistory.length}`,
+      );
+    }
+  };
+
   const updateColor = (
     colorName: string,
     property: keyof ColorConfig,
@@ -461,6 +507,7 @@ export default function ThemeGenerator() {
         randomLightness,
         true,
       );
+      addToHistory(newColorsLight, newColorsDark);
       setColorsLight(newColorsLight);
       setColorsDark(newColorsDark);
       updateCSSVariables(
@@ -612,14 +659,37 @@ export default function ThemeGenerator() {
               <Clipboard className="w-4 h-4 mr-1" />
               <span>Paste Theme/Hex</span>
             </Button>
-            <Button
-              variant="outline"
-              onClick={actions.generateRandomTheme}
-              className="flex items-center"
-              title="Generate Random Theme"
-            >
-              Random Theme
-            </Button>
+            <div className="flex gap-1 items-center">
+              <Button
+                variant="outline"
+                onClick={() => navigateHistory("prev")}
+                disabled={historyIndex === 0}
+                className="flex items-center px-2"
+                title="Previous Theme"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
+                onClick={actions.generateRandomTheme}
+                className="flex items-center"
+                title="Generate Random Theme"
+              >
+                Random Theme
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigateHistory("next")}
+                disabled={historyIndex === themeHistory.length - 1}
+                className="flex items-center px-2"
+                title="Next Theme"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+              <span className="flex items-center text-xs text-muted-foreground px-2">
+                {historyIndex + 1}/{themeHistory.length}
+              </span>
+            </div>
             <Button
               variant="outline"
               onClick={actions.resetToDefault}

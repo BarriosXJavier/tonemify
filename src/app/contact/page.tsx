@@ -96,7 +96,7 @@ export default function ContactMePage() {
             onClick={() =>
               window.open(
                 "https://x.com/messages/compose?recipient_id=1803751087003848704",
-                "_blank"
+                "_blank",
               )
             }
             variant="outline"
