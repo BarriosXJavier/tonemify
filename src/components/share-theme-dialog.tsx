@@ -58,7 +58,7 @@ export default function ShareThemeDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button variant="outline" className="flex items-center justify-center gap-2 h-12 w-full">
           <Share2 className="w-4 h-4" />
           <span>Share Theme</span>
         </Button>

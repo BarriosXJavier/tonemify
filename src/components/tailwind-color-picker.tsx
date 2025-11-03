@@ -47,14 +47,16 @@ const TailwindColorPicker = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto relative">
+    <div className="w-full relative">
       <Button
         onClick={toggleDropdown}
-        className="w-full px-4 py-2 text-left border border-border rounded-md bg-primary hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-colors"
+        variant="outline"
+        className="w-full h-12 px-4 text-left flex items-center justify-center gap-2"
+        title="Select from Tailwind Color Palettes"
       >
         {selectedColor
           ? `${selectedColor}`
-          : "Select from Tailwind color palettes"}
+          : "Tailwind Colors"}
       </Button>
 
       {isOpen && (
@@ -92,24 +94,24 @@ const TailwindColorPicker = () => {
                   >
                     <div className="flex items-center gap-2 mb-2">
                       {/* Color preview circles */}
-                      <div className="flex -space-x-1">
+                      <div className="flex -space-x-2">
                         {Object.entries(shades)
                           .slice(0, 3)
                           .map(([shade, hex]) => (
                             <div
                               key={shade}
-                              className="w-4 h-4 rounded-full border border-border shadow-sm"
+                              className="w-8 h-8 rounded-full border-2 border-border shadow-sm"
                               style={{ backgroundColor: hex }}
                             />
                           ))}
                         {Object.keys(shades).length > 3 && (
                           <div
-                            className="w-4 h-4 rounded-full border border-border shadow-sm flex items-center justify-center"
+                            className="w-8 h-8 rounded-full border-2 border-border shadow-sm flex items-center justify-center"
                             style={{
                               backgroundColor: Object.values(shades)[3],
                             }}
                           >
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-sm font-bold text-foreground mix-blend-difference">
                               +
                             </span>
                           </div>
@@ -148,25 +150,25 @@ const TailwindColorPicker = () => {
                         handleColorCopy(hex, `${selectedColor}-${shade}`)
                       }
                     >
-                      <div className="flex flex-col items-center justify-center p-3 h-20 text-center">
+                      <div className="flex flex-col items-center justify-center p-4 h-28 text-center">
                         {/* Color circle */}
                         <div
-                          className="w-6 h-6 rounded-full border-2 border-border shadow-sm mb-1"
+                          className="w-10 h-10 rounded-full border-2 border-border shadow-md mb-2"
                           style={{ backgroundColor: hex }}
                         />
-                        <span className="text-xs font-medium text-card-foreground ">
+                        <span className="text-sm font-medium text-card-foreground">
                           {shade}
                         </span>
-                        <span className="text-xs text-card-foreground ">
+                        <span className="text-xs text-card-foreground">
                           {hex}
                         </span>
 
                         {/* Copy indicator */}
-                        <div className="absolute top-1 right-1">
+                        <div className="absolute top-2 right-2">
                           {copiedColor === `${selectedColor}-${shade}` ? (
-                            <Check className="w-3 h-3 text-foreground mix-blend-difference" />
+                            <Check className="w-4 h-4 text-foreground mix-blend-difference" />
                           ) : (
-                            <Copy className="w-3 h-3 text-foreground mix-blend-difference opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <Copy className="w-4 h-4 text-foreground mix-blend-difference opacity-0 group-hover:opacity-100 transition-opacity" />
                           )}
                         </div>
                       </div>

@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning={true} className="antialiased">
-      <body className={`${montserrat.className} bg-background`}>
+      <body className={`${montserrat.className} bg-background min-h-screen flex flex-col`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -35,7 +35,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Navbar />
-          {children}
+          <main className="flex-1">
+            {children}
+          </main>
           <Footer />
           <Toaster position="bottom-right" />
           <Analytics />

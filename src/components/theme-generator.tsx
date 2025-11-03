@@ -10,8 +10,6 @@ import {
   Moon,
   Sun,
   ArrowDown,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -33,7 +31,6 @@ import { generateThemeColorsFromPrimary } from "@/lib/color-utils";
 import { hexToHSL } from "@/lib/color-utils";
 import TailwindColorPicker from "./tailwind-color-picker";
 import ThemeShowcase from "./theme-showcase";
-import KeyboardShortcutsDialog from "./keyboard-shortcuts-dialog";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { KeyboardShortcut, getModifierKey } from "@/lib/keyboard-shortcuts";
 import ColorHarmonyPicker from "./color-harmony-picker";
@@ -596,18 +593,6 @@ export default function ThemeGenerator() {
   const modifierKey = getModifierKey();
   const shortcuts: KeyboardShortcut[] = useMemo(() => [
     {
-      key: "z",
-      [modifierKey]: true,
-      description: "Undo theme change",
-      action: () => navigateHistory("prev"),
-    },
-    {
-      key: "y",
-      [modifierKey]: true,
-      description: "Redo theme change",
-      action: () => navigateHistory("next"),
-    },
-    {
       key: "c",
       [modifierKey]: true,
       description: "Copy theme CSS",
@@ -649,287 +634,246 @@ export default function ThemeGenerator() {
     <div className="font-mono">
       <div className="">
         <div className="lg:col-span-2 space-y-4">
-          {/* Control Buttons */}
-          <div className="flex flex-wrap gap-2 justify-center">
-            <KeyboardShortcutsDialog shortcuts={shortcuts} />
-            <ThemePresetsPicker
-              activeMode={activeMode}
-              onApplyPreset={actions.applyPreset}
-            />
-            {/* Temporarily disabled */}
-            {/* <ColorHarmonyPicker
-              currentHue={currentColors.primary?.hue ?? 0}
-              currentSaturation={currentColors.primary?.saturation ?? 70}
-              currentLightness={currentColors.primary?.lightness ?? 50}
-              activeMode={activeMode}
-              onApplyHarmony={actions.applyHarmony}
-            /> */}
-            <ShareThemeDialog
-              lightColors={colorsLight}
-              darkColors={colorsDark}
-            />
-            {/* Temporarily disabled */}
-            {/* <AccessibilityChecker
-              lightColors={colorsLight}
-              darkColors={colorsDark}
-              activeMode={activeMode}
-            /> */}
-            <Button
-              variant="outline"
-              onClick={() => setConvertDialogOpen(true)}
-              className="flex items-center border border-input"
-              title="Convert Color Format"
-            >
-              Convert Color
-            </Button>
-            <Dialog
-              open={convertDialogOpen}
-              onOpenChange={setConvertDialogOpen}
-            >
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Convert Color</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <Input
-                    type="text"
-                    value={colorInput}
-                    onChange={(e) => setColorInput(e.target.value)}
-                    placeholder="Enter color value (e.g., hsl(255, 81%, 95%), #ff5733)"
-                    className="w-full p-2 border rounded"
-                  />
-                  <select
-                    value={selectedFormat}
-                    onChange={(e) =>
-                      setSelectedFormat(
-                        e.target.value as
-                        | "hex" | "rgb" | "rgba" | "hsl" | "hsla",
-                      )
-                    }
-                    className="w-full p-2 border rounded"
-                  >
-                    <option value="hex">HEX</option>
-                    <option value="rgb">RGB</option>
-                    <option value="rgba">RGBA</option>
-                    <option value="hsl">HSL</option>
-                    <option value="hsla">HSLA</option>
-                    <option value="custom">Custom (--primary: h s% l%;)</option>
-                  </select>
-                  {convertedColor && (
-                    <div className="p-2 border rounded">
-                      Converted Color: <strong>{convertedColor}</strong>
-                    </div>
-                  )}
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      onClick={handleConvert}
-                      className=""
-                    >
-                      Convert
-                    </Button>
-                    <Button variant="outline" onClick={handleCopy}>
-                      Copy
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setConvertDialogOpen(false)}
-                    >
-                      Close
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-
-            <Dialog
-              open={convertDialogOpen}
-              onOpenChange={setConvertDialogOpen}
-            >
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Convert Color</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <Input
-                    type="text"
-                    value={colorInput}
-                    onChange={(e) => setColorInput(e.target.value)}
-                    placeholder="Enter color value (e.g., hsl(255, 81%, 95%), #ff5733)"
-                    className="w-full p-2 border rounded"
-                  />
-                  <select
-                    value={selectedFormat}
-                    onChange={(e) =>
-                      setSelectedFormat(
-                        e.target.value as
-                        | "hex" | "rgb" | "rgba" | "hsl" | "hsla",
-                      )
-                    }
-                    className="w-full p-2 border rounded"
-                  >
-                    <option value="hex">HEX</option>
-                    <option value="rgb">RGB</option>
-                    <option value="rgba">RGBA</option>
-                    <option value="hsl">HSL</option>
-                    <option value="hsla">HSLA</option>
-                  </select>
-                  {convertedColor && (
-                    <div className="p-2 border rounded bg-background text-primary">
-                      Converted Color: <strong>{convertedColor}</strong>
-                    </div>
-                  )}
-                  <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={handleConvert}>
-                      Convert
-                    </Button>
-                    <Button variant="outline" onClick={handleCopy}>
-                      Copy
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setConvertDialogOpen(false)}
-                    >
-                      Close
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-
-            <Button
-              variant="outline"
-              onClick={() =>
-                setDialogState((prev) => ({ ...prev, paste: true }))
-              }
-              className="flex items-center"
-              title="Paste Theme"
-            >
-              <Clipboard className="w-4 h-4 mr-1" />
-              <span>Paste Theme/Hex</span>
-            </Button>
-            <div className="flex gap-1 items-center">
-              <Button
-                variant="outline"
-                onClick={() => navigateHistory("prev")}
-                disabled={historyIndex === 0}
-                className="flex items-center px-2"
-                title="Previous Theme"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="outline"
-                onClick={actions.generateRandomTheme}
-                className="flex items-center"
-                title="Generate Random Theme"
-              >
-                Random Theme
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => navigateHistory("next")}
-                disabled={historyIndex === themeHistory.length - 1}
-                className="flex items-center px-2"
-                title="Next Theme"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-              <span className="flex items-center text-xs text-muted-foreground px-2">
-                {historyIndex + 1}/{themeHistory.length}
-              </span>
-            </div>
-            <Button
-              variant="outline"
-              onClick={actions.resetToDefault}
-              className="flex items-center"
-              title="Reset Theme"
-            >
-              <RefreshCcw className="w-4 h-4 mr-2" />
-              Reset
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() =>
-                setDialogState((prev) => ({ ...prev, save: true }))
-              }
-              className="flex items-center"
-              title="Save Theme"
-            >
-              <Save className="w-4 h-4 mr-1" />
-              <span>Save Current</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={actions.copyTheme}
-              className="flex items-center"
-              title="Copy Theme"
-            >
-              <Copy className="w-4 h-4 mr-1" />
-              <span>Copy Current</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() =>
-                setDialogState((prev) => ({ ...prev, viewSaved: true }))
-              }
-              className="flex items-center"
-              title="View Saved Themes"
-            >
-              View Saved
-            </Button>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => actions.switchTheme("light")}
-                className={`relative flex items-center min-w-[100px] justify-start ${ 
-                  activeMode === "light"
-                    ? "bg-primary text-white"
-                    : "text-primary"
-                }`}
-                variant="outline"
-                title="Light Mode"
-              >
-                <Sun className="w-4 h-4 mr-2 text-foreground" />
-                {activeMode === "light" && (
-                  <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
-                    active
-                  </span>
-                )}
-              </Button>
-              <Button
-                onClick={() => actions.switchTheme("dark")}
-                className={`relative flex items-center min-w-[100px] justify-start ${ 
-                  activeMode === "dark"
-                    ? "bg-primary text-white"
-                    : "text-primary"
-                }`}
-                variant="outline"
-                title="Dark Mode"
-              >
-                <Moon className="w-4 h-4 mr-2 text-foreground" />
-                {activeMode === "dark" && (
-                  <span className="absolute right-2 top-0.5 text-[10px] font-medium opacity-80">
-                    active
-                  </span>
-                )}
-              </Button>
-            </div>
-
-            <div className="flex flex-wrap gap-2 justify-center">
-              {radiusValues.map((radius) => (
+          {/* Control Buttons - Organized by Function */}
+          <div className="space-y-3 max-w-5xl mx-auto">
+            {/* Primary Actions Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-stretch">
+              {/* Theme Presets */}
+              <ThemePresetsPicker
+                activeMode={activeMode}
+                onApplyPreset={actions.applyPreset}
+              />
+              
+              {/* Navigation & Random Generator */}
+              <div className="flex gap-2 items-center justify-center border border-border rounded-lg p-2 bg-muted/30">
                 <Button
-                  key={radius}
-                  variant="outline"
-                  onClick={() => handleRadiusChange(radius)}
-                  className={`${ 
-                    selectedRadius === radius ? "bg-primary text-white" : "" 
-                  }`}
+                  variant="ghost"
+                  onClick={() => navigateHistory("prev")}
+                  disabled={historyIndex === 0}
+                  className="h-9 px-3 flex items-center justify-center gap-1"
+                  title="Previous Theme"
                 >
-                  {radius}
+                  ← prev
                 </Button>
-              ))}
+                <div className="h-6 w-px bg-border" />
+                <div className="flex flex-col items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    onClick={actions.generateRandomTheme}
+                    className="flex items-center justify-center gap-2 h-9 px-3 bg-secondary hover:bg-secondary/80 whitespace-nowrap"
+                    title="Generate Random Theme"
+                  >
+                    🎲 Random Theme
+                  </Button>
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {historyIndex + 1}/{themeHistory.length}
+                  </span>
+                </div>
+                <div className="h-6 w-px bg-border" />
+                <Button
+                  variant="ghost"
+                  onClick={() => navigateHistory("next")}
+                  disabled={historyIndex === themeHistory.length - 1}
+                  className="h-9 px-3 flex items-center justify-center gap-1"
+                  title="Next Theme"
+                >
+                  next →
+                </Button>
+              </div>
+            </div>
+
+            {/* Actions Grid - Equal Sizes */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setDialogState((prev) => ({ ...prev, save: true }))
+                }
+                className="flex items-center justify-center gap-2 h-12"
+                title="Save Theme"
+              >
+                <Save className="w-4 h-4" />
+                Save
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={actions.copyTheme}
+                className="flex items-center justify-center gap-2 h-12"
+                title="Copy Theme CSS"
+              >
+                <Copy className="w-4 h-4" />
+                Copy
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setDialogState((prev) => ({ ...prev, paste: true }))
+                }
+                className="flex items-center justify-center gap-2 h-12"
+                title="Import Theme"
+              >
+                <Clipboard className="w-4 h-4" />
+                Import
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={actions.resetToDefault}
+                className="flex items-center justify-center gap-2 h-12"
+                title="Reset to Default"
+              >
+                <RefreshCcw className="w-4 h-4" />
+                Reset
+              </Button>
+            </div>
+
+            {/* Tailwind Color Picker - Full Width */}
+            <TailwindColorPicker />
+
+            {/* Secondary Actions - Equal Sizes */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setDialogState((prev) => ({ ...prev, viewSaved: true }))
+                }
+                className="flex items-center justify-center gap-2 h-12"
+                title="View Saved Themes"
+              >
+                View Saved
+              </Button>
+              
+              <ShareThemeDialog
+                lightColors={colorsLight}
+                darkColors={colorsDark}
+              />
+              
+              <Button
+                variant="outline"
+                onClick={() => setConvertDialogOpen(true)}
+                className="flex items-center justify-center gap-2 h-12"
+                title="Convert Color Format"
+              >
+                Convert Color
+              </Button>
+            </div>
+
+            {/* Mode & Radius Controls */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-stretch">
+              {/* Light/Dark Mode Toggle - Takes full width */}
+              <div className="flex gap-2 border border-border rounded-lg p-2 bg-muted/30">
+                <Button
+                  onClick={() => actions.switchTheme("light")}
+                  className={`relative flex-1 flex items-center justify-center gap-2 h-9 ${ 
+                    activeMode === "light"
+                      ? "bg-primary text-white"
+                      : "text-primary"
+                  }`}
+                  variant="outline"
+                  title="Light Mode"
+                >
+                  <Sun className="w-4 h-4 text-foreground" />
+                  Light
+                  {activeMode === "light" && (
+                    <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500" />
+                  )}
+                </Button>
+                <Button
+                  onClick={() => actions.switchTheme("dark")}
+                  className={`relative flex-1 flex items-center justify-center gap-2 h-9 ${ 
+                    activeMode === "dark"
+                      ? "bg-primary text-white"
+                      : "text-primary"
+                  }`}
+                  variant="outline"
+                  title="Dark Mode"
+                >
+                  <Moon className="w-4 h-4 text-foreground" />
+                  Dark
+                  {activeMode === "dark" && (
+                    <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500" />
+                  )}
+                </Button>
+              </div>
+
+              {/* Border Radius Selector */}
+              <div className="flex items-center justify-center gap-2 border border-border rounded-lg p-2 bg-muted/30">
+                <span className="text-sm text-muted-foreground font-medium">Border Radius:</span>
+                <div className="flex gap-1">
+                  {radiusValues.map((radius) => (
+                    <Button
+                      key={radius}
+                      variant={selectedRadius === radius ? "default" : "ghost"}
+                      onClick={() => handleRadiusChange(radius)}
+                      className="h-9 px-2 text-xs"
+                      title={`Border radius: ${radius}`}
+                    >
+                      {radius}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
+
+          {/* Duplicate Dialog - Keep only one */}
+          <Dialog
+            open={convertDialogOpen}
+            onOpenChange={setConvertDialogOpen}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Convert Color</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <Input
+                  type="text"
+                  value={colorInput}
+                  onChange={(e) => setColorInput(e.target.value)}
+                  placeholder="Enter color value (e.g., hsl(255, 81%, 95%), #ff5733)"
+                  className="w-full p-2 border rounded"
+                />
+                <select
+                  value={selectedFormat}
+                  onChange={(e) =>
+                    setSelectedFormat(
+                      e.target.value as
+                      | "hex" | "rgb" | "rgba" | "hsl" | "hsla",
+                    )
+                  }
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="hex">HEX</option>
+                  <option value="rgb">RGB</option>
+                  <option value="rgba">RGBA</option>
+                  <option value="hsl">HSL</option>
+                  <option value="hsla">HSLA</option>
+                  <option value="custom">Custom (--primary: h s% l%;)</option>
+                </select>
+                {convertedColor && (
+                  <div className="p-2 border rounded bg-background text-primary">
+                    Converted Color: <strong>{convertedColor}</strong>
+                  </div>
+                )}
+                <div className="flex justify-end space-x-2">
+                  <Button variant="outline" onClick={handleConvert}>
+                    Convert
+                  </Button>
+                  <Button variant="outline" onClick={handleCopy}>
+                    Copy
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setConvertDialogOpen(false)}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Recent Themes History */}
           {themeHistory.length > 1 && (
@@ -1091,8 +1035,6 @@ export default function ThemeGenerator() {
               );
             })}
           </div>
-
-          <TailwindColorPicker />
         </div>
          <div className="lg:col-span-3">
            <div className="sticky top-24">

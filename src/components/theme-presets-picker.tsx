@@ -59,7 +59,7 @@ export default function ThemePresetsPicker({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button variant="outline" className="flex items-center justify-center gap-2 h-full w-full">
           <Sparkles className="w-4 h-4" />
           <span>Theme Presets</span>
         </Button>

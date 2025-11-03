@@ -52,10 +52,10 @@ export default function KeyboardShortcutsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
-          <Keyboard className="w-4 h-4" />
-          <span className="hidden sm:inline">Shortcuts</span>
-        </Button>
+        <button className="group relative flex items-center transition-all hover:text-foreground text-foreground/70 hover:scale-105">
+          <Keyboard className="w-4 h-4 mr-1" />
+          <span>Shortcuts</span>
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>

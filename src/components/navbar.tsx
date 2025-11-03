@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "./ui/button";
 import {
@@ -8,10 +10,52 @@ import {
 } from "@/components/ui/sheet";
 import { MenuIcon, Save, Github } from "lucide-react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import KeyboardShortcutsDialog from "./keyboard-shortcuts-dialog";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { KeyboardShortcut, getModifierKey } from "@/lib/keyboard-shortcuts";
+import { useMemo } from "react";
 
 export default function Navbar() {
+  // Keyboard shortcuts configuration (no actions in navbar, just for display)
+  const modifierKey = getModifierKey();
+  const shortcuts: KeyboardShortcut[] = useMemo(() => [
+    {
+      key: "c",
+      [modifierKey]: true,
+      description: "Copy theme CSS",
+      action: () => {},
+    },
+    {
+      key: "s",
+      [modifierKey]: true,
+      description: "Save theme",
+      action: () => {},
+    },
+    {
+      key: "r",
+      [modifierKey]: true,
+      description: "Generate random theme",
+      action: () => {},
+    },
+    {
+      key: "l",
+      [modifierKey]: true,
+      description: "Switch to light mode",
+      action: () => {},
+    },
+    {
+      key: "d",
+      [modifierKey]: true,
+      description: "Switch to dark mode",
+      action: () => {},
+    },
+  ], [modifierKey]);
+
+  // Register empty shortcuts (actual shortcuts registered in ThemeGenerator)
+  useKeyboardShortcuts([]);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-background/95 via-background/98 to-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-background/95 via-background/98 to-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
       <Link
         href="https://github.com/BarriosXJavier/tonemify"
         target="_blank"
@@ -60,6 +104,8 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium mr-16">
+          <KeyboardShortcutsDialog shortcuts={shortcuts} />
+          
           <Link
             href="/saved"
             className="group relative flex items-center transition-all hover:text-foreground text-foreground/70 hover:scale-105"
