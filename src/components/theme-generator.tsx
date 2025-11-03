@@ -72,6 +72,7 @@ export default function ThemeGenerator() {
   ]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const maxHistorySize = 50;
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleConvert = () => {
     const result = convertColor(colorInput.trim(), selectedFormat);
@@ -109,7 +110,8 @@ export default function ThemeGenerator() {
     if (urlTheme) {
       setColorsLight(urlTheme.light);
       setColorsDark(urlTheme.dark);
-      const initialMode = activeMode === "light" ? urlTheme.light : urlTheme.dark;
+      const initialMode =
+        activeMode === "light" ? urlTheme.light : urlTheme.dark;
       updateCSSVariables(initialMode);
       setThemeHistory([{ light: urlTheme.light, dark: urlTheme.dark }]);
       setHistoryIndex(0);
@@ -347,22 +349,24 @@ export default function ThemeGenerator() {
         }
 
         // Add pasted theme to history
-        const finalLight = Object.keys(parsedColorsLight).length > 0
-          ? Object.fromEntries(
-              Object.entries({ ...colorsLight, ...parsedColorsLight }).filter(
-                ([, value]) => typeof value !== "string",
-              ),
-            ) as Record<string, ColorConfig>
-          : colorsLight;
-        
-        const finalDark = Object.keys(parsedColorsDark).length > 0
-          ? Object.fromEntries(
-              Object.entries({ ...colorsDark, ...parsedColorsDark }).filter(
-                ([, value]) => typeof value !== "string",
-              ),
-            ) as Record<string, ColorConfig>
-          : colorsDark;
-        
+        const finalLight =
+          Object.keys(parsedColorsLight).length > 0
+            ? (Object.fromEntries(
+                Object.entries({ ...colorsLight, ...parsedColorsLight }).filter(
+                  ([, value]) => typeof value !== "string",
+                ),
+              ) as Record<string, ColorConfig>)
+            : colorsLight;
+
+        const finalDark =
+          Object.keys(parsedColorsDark).length > 0
+            ? (Object.fromEntries(
+                Object.entries({ ...colorsDark, ...parsedColorsDark }).filter(
+                  ([, value]) => typeof value !== "string",
+                ),
+              ) as Record<string, ColorConfig>)
+            : colorsDark;
+
         addToHistory(finalLight, finalDark);
 
         if (failedVariables.length > 0) {
@@ -415,17 +419,17 @@ export default function ThemeGenerator() {
         // Remove any future history if we're not at the end
         const newHistory = prev.slice(0, currentIndex + 1);
         newHistory.push({ light: lightColors, dark: darkColors });
-        
+
         // Keep only last maxHistorySize entries
         if (newHistory.length > maxHistorySize) {
           newHistory.shift();
           // When we shift, index stays the same (pointing to what's now the last item)
           return newHistory;
         }
-        
+
         return newHistory;
       });
-      
+
       // Return the new index position
       const projectedLength = Math.min(currentIndex + 2, maxHistorySize);
       return projectedLength - 1;
@@ -441,7 +445,7 @@ export default function ThemeGenerator() {
     if (newIndex !== historyIndex) {
       setHistoryIndex(newIndex);
       const entry = themeHistory[newIndex];
-      
+
       // Safety check to ensure entry exists
       if (entry && entry.light && entry.dark) {
         setColorsLight(entry.light);
@@ -481,7 +485,7 @@ export default function ThemeGenerator() {
   };
 
   const generateThemeCSS = (): string => {
-    const formatColor = ({ 
+    const formatColor = ({
       hue,
       saturation,
       lightness,
@@ -569,7 +573,7 @@ export default function ThemeGenerator() {
 
     applyHarmony: (
       lightColors: Record<string, ColorConfig>,
-      darkColors: Record<string, ColorConfig>
+      darkColors: Record<string, ColorConfig>,
     ) => {
       addToHistory(lightColors, darkColors);
       setColorsLight(lightColors);
@@ -580,7 +584,7 @@ export default function ThemeGenerator() {
     applyPreset: (
       lightColors: Record<string, ColorConfig>,
       darkColors: Record<string, ColorConfig>,
-      presetName: string
+      presetName: string,
     ) => {
       addToHistory(lightColors, darkColors);
       setColorsLight(lightColors);
@@ -591,182 +595,176 @@ export default function ThemeGenerator() {
 
   // Keyboard shortcuts configuration
   const modifierKey = getModifierKey();
-  const shortcuts: KeyboardShortcut[] = useMemo(() => [
-    {
-      key: "c",
-      [modifierKey]: true,
-      description: "Copy theme CSS",
-      action: actions.copyTheme,
-    },
-    {
-      key: "s",
-      [modifierKey]: true,
-      description: "Save theme",
-      action: () => setDialogState((prev) => ({ ...prev, save: true })),
-    },
-    {
-      key: "r",
-      [modifierKey]: true,
-      description: "Generate random theme",
-      action: actions.generateRandomTheme,
-    },
-    {
-      key: "l",
-      [modifierKey]: true,
-      description: "Switch to light mode",
-      action: () => actions.switchTheme("light"),
-    },
-    {
-      key: "d",
-      [modifierKey]: true,
-      description: "Switch to dark mode",
-      action: () => actions.switchTheme("dark"),
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [modifierKey]);
+  const shortcuts: KeyboardShortcut[] = useMemo(
+    () => [
+      {
+        key: "c",
+        [modifierKey]: true,
+        description: "Copy theme CSS",
+        action: actions.copyTheme,
+      },
+      {
+        key: "s",
+        [modifierKey]: true,
+        description: "Save theme",
+        action: () => setDialogState((prev) => ({ ...prev, save: true })),
+      },
+      {
+        key: "r",
+        [modifierKey]: true,
+        description: "Generate random theme",
+        action: actions.generateRandomTheme,
+      },
+      {
+        key: "l",
+        [modifierKey]: true,
+        description: "Switch to light mode",
+        action: () => actions.switchTheme("light"),
+      },
+      {
+        key: "d",
+        [modifierKey]: true,
+        description: "Switch to dark mode",
+        action: () => actions.switchTheme("dark"),
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    ],
+    [modifierKey],
+  );
 
   // Register keyboard shortcuts
   useKeyboardShortcuts(shortcuts);
 
   const currentColors = activeMode === "light" ? colorsLight : colorsDark;
 
+  const scrollToPreview = () => {
+    setShowPreview(true);
+    setTimeout(() => {
+      const previewElement = document.getElementById("theme-preview-section");
+      if (previewElement) {
+        previewElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
+  };
+
   return (
     <div className="font-mono">
       <div className="">
+        {!showPreview && (
         <div className="lg:col-span-2 space-y-4">
           {/* Control Buttons - Organized by Function */}
-          <div className="space-y-3 max-w-5xl mx-auto">
-            {/* Primary Actions Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-stretch">
-              {/* Theme Presets */}
-              <ThemePresetsPicker
-                activeMode={activeMode}
-                onApplyPreset={actions.applyPreset}
-              />
-              
+          <div className="space-y-3 w-full px-2 sm:px-4 md:px-6 max-w-7xl mx-auto">
+            {/* Primary Actions Row: Random Theme, Presets, Preview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3 items-stretch">
               {/* Navigation & Random Generator */}
-              <div className="flex gap-2 items-center justify-center border border-border rounded-lg p-2 bg-muted/30">
+              <div className="flex flex-row gap-1.5 sm:gap-2 items-center justify-center border border-border rounded-lg p-1.5 sm:p-2 bg-muted/30 min-h-[60px]">
                 <Button
                   variant="ghost"
                   onClick={() => navigateHistory("prev")}
                   disabled={historyIndex === 0}
-                  className="h-9 px-3 flex items-center justify-center gap-1"
+                  className="h-8 sm:h-9 px-1.5 sm:px-2 md:px-3 flex items-center justify-center gap-0.5 sm:gap-1 text-xs flex-shrink-0"
                   title="Previous Theme"
                 >
-                  ← prev
+                  ← <span className="hidden xs:inline">prev</span>
                 </Button>
-                <div className="h-6 w-px bg-border" />
-                <div className="flex flex-col items-center gap-1">
+                <div className="hidden xs:block h-6 w-px bg-border" />
+                <div className="flex flex-col items-center gap-0.5 sm:gap-1 flex-1 min-w-0">
                   <Button
                     variant="ghost"
                     onClick={actions.generateRandomTheme}
-                    className="flex items-center justify-center gap-2 h-9 px-3 bg-secondary hover:bg-secondary/80 whitespace-nowrap"
+                    className="flex items-center justify-center gap-1 sm:gap-2 h-8 sm:h-9 px-1.5 sm:px-2 md:px-3 bg-secondary hover:bg-secondary/80 whitespace-nowrap text-xs w-full"
                     title="Generate Random Theme"
                   >
-                    🎲 Random Theme
+                    <span className="hidden xs:inline">🎲</span> Random Theme
                   </Button>
-                  <span className="text-xs text-muted-foreground font-medium">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">
                     {historyIndex + 1}/{themeHistory.length}
                   </span>
                 </div>
-                <div className="h-6 w-px bg-border" />
+                <div className="hidden xs:block h-6 w-px bg-border" />
                 <Button
                   variant="ghost"
                   onClick={() => navigateHistory("next")}
                   disabled={historyIndex === themeHistory.length - 1}
-                  className="h-9 px-3 flex items-center justify-center gap-1"
+                  className="h-8 sm:h-9 px-1.5 sm:px-2 md:px-3 flex items-center justify-center gap-0.5 sm:gap-1 text-xs flex-shrink-0"
                   title="Next Theme"
                 >
-                  next →
+                  <span className="hidden xs:inline">next</span> →
                 </Button>
               </div>
-            </div>
 
-            {/* Actions Grid - Equal Sizes */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {/* Theme Presets */}
+              <ThemePresetsPicker
+                activeMode={activeMode}
+                onApplyPresetAction={actions.applyPreset}
+              />
+
+              {/* Preview Button */}
               <Button
                 variant="outline"
-                onClick={() =>
-                  setDialogState((prev) => ({ ...prev, save: true }))
-                }
-                className="flex items-center justify-center gap-2 h-12"
-                title="Save Theme"
+                onClick={scrollToPreview}
+                className="flex items-center justify-center gap-2 h-full min-h-[60px] bg-muted/30 hover:bg-muted/50 text-sm sm:text-base"
+                title="View Theme Preview"
               >
-                <Save className="w-4 h-4" />
-                Save
+                <span className="text-lg sm:text-xl">👁️</span>
+                Preview
               </Button>
-              
-              <Button
-                variant="outline"
-                onClick={actions.copyTheme}
-                className="flex items-center justify-center gap-2 h-12"
-                title="Copy Theme CSS"
-              >
-                <Copy className="w-4 h-4" />
-                Copy
-              </Button>
-              
+            </div>
+            {/* Tailwind Color Picker - Full Width */}
+            <TailwindColorPicker />
+
+            {/* Import + Save + Copy + Convert Color - Third Row */}
+            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-2">
               <Button
                 variant="outline"
                 onClick={() =>
                   setDialogState((prev) => ({ ...prev, paste: true }))
                 }
-                className="flex items-center justify-center gap-2 h-12"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 h-11 sm:h-12 text-xs sm:text-sm px-2 sm:px-4"
                 title="Import Theme"
               >
-                <Clipboard className="w-4 h-4" />
-                Import
+                <Clipboard className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="truncate">Import theme/color</span>
               </Button>
-              
-              <Button
-                variant="outline"
-                onClick={actions.resetToDefault}
-                className="flex items-center justify-center gap-2 h-12"
-                title="Reset to Default"
-              >
-                <RefreshCcw className="w-4 h-4" />
-                Reset
-              </Button>
-            </div>
 
-            {/* Tailwind Color Picker - Full Width */}
-            <TailwindColorPicker />
-
-            {/* Secondary Actions - Equal Sizes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-              <Button
-                variant="outline"
-                onClick={() =>
-                  setDialogState((prev) => ({ ...prev, viewSaved: true }))
-                }
-                className="flex items-center justify-center gap-2 h-12"
-                title="View Saved Themes"
-              >
-                View Saved
-              </Button>
-              
-              <ShareThemeDialog
-                lightColors={colorsLight}
-                darkColors={colorsDark}
-              />
-              
               <Button
                 variant="outline"
                 onClick={() => setConvertDialogOpen(true)}
-                className="flex items-center justify-center gap-2 h-12"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 h-11 sm:h-12 text-xs sm:text-sm px-2 sm:px-4"
                 title="Convert Color Format"
               >
-                Convert Color
+                <span className="truncate">Convert Color</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setDialogState((prev) => ({ ...prev, save: true }))
+                }
+                className="flex items-center justify-center gap-1.5 sm:gap-2 h-11 sm:h-12 text-xs sm:text-sm px-2 sm:px-4"
+                title="Save Theme"
+              >
+                <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="truncate">Save theme</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={actions.copyTheme}
+                className="flex items-center justify-center gap-1.5 sm:gap-2 h-11 sm:h-12 text-xs sm:text-sm px-2 sm:px-4"
+                title="Copy Theme CSS"
+              >
+                <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="truncate">Copy theme</span>
               </Button>
             </div>
 
             {/* Mode & Radius Controls */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 items-stretch">
               {/* Light/Dark Mode Toggle - Takes full width */}
-              <div className="flex gap-2 border border-border rounded-lg p-2 bg-muted/30">
+              <div className="flex gap-2 border border-border rounded-lg p-2 bg-muted/30 min-h-[60px]">
                 <Button
                   onClick={() => actions.switchTheme("light")}
-                  className={`relative flex-1 flex items-center justify-center gap-2 h-9 ${ 
+                  className={`relative flex-1 flex items-center justify-center gap-1.5 sm:gap-2 h-9 sm:h-10 text-xs sm:text-sm ${
                     activeMode === "light"
                       ? "bg-primary text-white"
                       : "text-primary"
@@ -774,15 +772,15 @@ export default function ThemeGenerator() {
                   variant="outline"
                   title="Light Mode"
                 >
-                  <Sun className="w-4 h-4 text-foreground" />
-                  Light
+                  <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-foreground flex-shrink-0" />
+                  <span className="truncate">Light</span>
                   {activeMode === "light" && (
                     <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500" />
                   )}
                 </Button>
                 <Button
                   onClick={() => actions.switchTheme("dark")}
-                  className={`relative flex-1 flex items-center justify-center gap-2 h-9 ${ 
+                  className={`relative flex-1 flex items-center justify-center gap-1.5 sm:gap-2 h-9 sm:h-10 text-xs sm:text-sm ${
                     activeMode === "dark"
                       ? "bg-primary text-white"
                       : "text-primary"
@@ -790,8 +788,8 @@ export default function ThemeGenerator() {
                   variant="outline"
                   title="Dark Mode"
                 >
-                  <Moon className="w-4 h-4 text-foreground" />
-                  Dark
+                  <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-foreground flex-shrink-0" />
+                  <span className="truncate">Dark</span>
                   {activeMode === "dark" && (
                     <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500" />
                   )}
@@ -799,15 +797,17 @@ export default function ThemeGenerator() {
               </div>
 
               {/* Border Radius Selector */}
-              <div className="flex items-center justify-center gap-2 border border-border rounded-lg p-2 bg-muted/30">
-                <span className="text-sm text-muted-foreground font-medium">Border Radius:</span>
-                <div className="flex gap-1">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 border border-border rounded-lg p-2 bg-muted/30 min-h-[60px]">
+                <span className="text-xs sm:text-sm text-muted-foreground font-medium whitespace-nowrap">
+                  Border Radius:
+                </span>
+                <div className="flex gap-1 flex-wrap justify-center">
                   {radiusValues.map((radius) => (
                     <Button
                       key={radius}
                       variant={selectedRadius === radius ? "default" : "ghost"}
                       onClick={() => handleRadiusChange(radius)}
-                      className="h-9 px-2 text-xs"
+                      className="h-8 sm:h-9 px-1.5 sm:px-2 text-xs min-w-[40px]"
                       title={`Border radius: ${radius}`}
                     >
                       {radius}
@@ -816,13 +816,41 @@ export default function ThemeGenerator() {
                 </div>
               </div>
             </div>
+
+            {/* View Saved & Share Theme - Second to Last Row */}
+            <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 sm:gap-3">
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setDialogState((prev) => ({ ...prev, viewSaved: true }))
+                }
+                className="flex items-center justify-center gap-1.5 sm:gap-2 h-11 sm:h-12 text-xs sm:text-sm"
+                title="View Saved Themes"
+              >
+                <span className="truncate">View Saved</span>
+              </Button>
+
+              {/* Share Theme Dialog */}
+              <ShareThemeDialog
+                lightColors={colorsLight}
+                darkColors={colorsDark}
+              />
+            </div>
+
+            {/* Reset - Full Width Last Button */}
+            <Button
+              variant="destructive"
+              onClick={actions.resetToDefault}
+              className="flex items-center justify-center gap-1.5 sm:gap-2 h-11 sm:h-12 w-full text-xs sm:text-sm"
+              title="Reset to Default"
+            >
+              <RefreshCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="truncate">Reset</span>
+            </Button>
           </div>
 
           {/* Duplicate Dialog - Keep only one */}
-          <Dialog
-            open={convertDialogOpen}
-            onOpenChange={setConvertDialogOpen}
-          >
+          <Dialog open={convertDialogOpen} onOpenChange={setConvertDialogOpen}>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Convert Color</DialogTitle>
@@ -839,8 +867,7 @@ export default function ThemeGenerator() {
                   value={selectedFormat}
                   onChange={(e) =>
                     setSelectedFormat(
-                      e.target.value as
-                      | "hex" | "rgb" | "rgba" | "hsl" | "hsla",
+                      e.target.value as "hex" | "rgb" | "rgba" | "hsl" | "hsla",
                     )
                   }
                   className="w-full p-2 border rounded"
@@ -898,8 +925,9 @@ export default function ThemeGenerator() {
               <div className="flex gap-2 overflow-x-auto pb-2 scroll-smooth">
                 {themeHistory.map((entry, index) => {
                   const isActive = index === historyIndex;
-                  const colors = activeMode === "light" ? entry.light : entry.dark;
-                  
+                  const colors =
+                    activeMode === "light" ? entry.light : entry.dark;
+
                   return (
                     <button
                       key={index}
@@ -907,7 +935,9 @@ export default function ThemeGenerator() {
                         setHistoryIndex(index);
                         setColorsLight(entry.light);
                         setColorsDark(entry.dark);
-                        updateCSSVariables(activeMode === "light" ? entry.light : entry.dark);
+                        updateCSSVariables(
+                          activeMode === "light" ? entry.light : entry.dark,
+                        );
                         toast.success(`Loaded theme ${index + 1}`);
                       }}
                       className={`
@@ -989,17 +1019,18 @@ export default function ThemeGenerator() {
               const validColor = isValidColor(config);
               const alpha = config.alpha ?? 1;
               const backgroundColor = validColor
-                ? `hsl(${config.hue}, ${config.saturation}%, ${config.lightness
-                }%${includeAlpha && alpha < 1 ? ` / ${alpha * 100}%` : ""})`
+                ? `hsl(${config.hue}, ${config.saturation}%, ${
+                    config.lightness
+                  }%${includeAlpha && alpha < 1 ? ` / ${alpha * 100}%` : ""})`
                 : "transparent";
 
               const hexValue = validColor
                 ? hslToHex(
-                  config.hue,
-                  config.saturation,
-                  config.lightness,
-                  alpha,
-                )
+                    config.hue,
+                    config.saturation,
+                    config.lightness,
+                    alpha,
+                  )
                 : "N/A";
 
               // Determine text color based on background lightness
@@ -1036,11 +1067,15 @@ export default function ThemeGenerator() {
             })}
           </div>
         </div>
-         <div className="lg:col-span-3">
-           <div className="sticky top-24">
-             <ThemePreview />
-           </div>
-         </div>
+        )}
+        <div className="lg:col-span-3" id="theme-preview-section">
+          <div className="sticky top-24">
+            <ThemePreview 
+              showPreview={showPreview}
+              onContinueEditing={() => setShowPreview(false)}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Paste Dialog */}

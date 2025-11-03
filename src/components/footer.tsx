@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
     <footer className="font-mono bg-background py-10 sm:py-12 px-6 md:px-16 lg:px-24 pt-8 mt-8 text-center border-t border-muted">
       <div className="flex flex-col items-center gap-4">
         <p className="text-muted-foreground text-xs sm:text-sm md:text-base">
-          &copy; Tonemify {new Date().getFullYear()}. All rights reserved.
+          &copy; Tonemify {new Date().getFullYear()}
         </p>
         <Link
           href="https://x.com/barrios__x"

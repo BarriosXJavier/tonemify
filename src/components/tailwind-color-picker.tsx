@@ -56,7 +56,7 @@ const TailwindColorPicker = () => {
       >
         {selectedColor
           ? `${selectedColor}`
-          : "Tailwind Colors"}
+          : "Pick from tailwind palettes"}
       </Button>
 
       {isOpen && (

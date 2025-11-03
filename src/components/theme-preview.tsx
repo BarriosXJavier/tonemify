@@ -71,14 +71,31 @@ const projects = [
   { id: 3, name: "Project Gamma", status: "completed", progress: 100 },
 ];
 
-export default function ThemePreview() {
+interface ThemePreviewProps {
+  showPreview?: boolean;
+  onContinueEditing?: () => void;
+}
+
+export default function ThemePreview({ showPreview = false, onContinueEditing }: ThemePreviewProps) {
   const [notifications, setNotifications] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   return (
     <div className="w-full space-y-4 mt-6">
-      <h2 className="text-2xl font-bold text-foreground">Theme Preview</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-foreground">Theme Preview</h2>
+        {showPreview && onContinueEditing && (
+          <Button 
+            onClick={onContinueEditing}
+            variant="default"
+            size="lg"
+            className="gap-2"
+          >
+            Continue Editing
+          </Button>
+        )}
+      </div>
       <div className="w-full border rounded-lg bg-background overflow-hidden relative">
         <SidebarProvider defaultOpen={true}>
           <div className="flex h-[800px] w-full relative">
