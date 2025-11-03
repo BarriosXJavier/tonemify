@@ -30,7 +30,7 @@ import { ColorConfig } from "@/lib/types";
 import { generateThemeColorsFromPrimary } from "@/lib/color-utils";
 import { hexToHSL } from "@/lib/color-utils";
 import TailwindColorPicker from "./tailwind-color-picker";
-import ThemeShowcase from "./theme-showcase";
+import ThemePreview from "./theme-preview";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { KeyboardShortcut, getModifierKey } from "@/lib/keyboard-shortcuts";
 import ColorHarmonyPicker from "./color-harmony-picker";
@@ -1038,7 +1038,7 @@ export default function ThemeGenerator() {
         </div>
          <div className="lg:col-span-3">
            <div className="sticky top-24">
-             <ThemeShowcase />
+             <ThemePreview />
            </div>
          </div>
       </div>

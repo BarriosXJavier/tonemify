@@ -263,6 +263,16 @@ export const defaults: Record<string, ColorConfig> = {
   "chart-3": { hue: 310, saturation: 88, lightness: 35, alpha: 1 }, // Variant of primary with hue shift
   "chart-4": { hue: 64, saturation: 80, lightness: 40, alpha: 1 }, // Slightly lighter complementary
   "chart-5": { hue: 305, saturation: 85, lightness: 40, alpha: 1 }, // Adjusted offset with hue change
+  
+  // Sidebar colors (light mode)
+  sidebar: { hue: 0, saturation: 0, lightness: 98.5, alpha: 1 },
+  "sidebar-foreground": { hue: 0, saturation: 0, lightness: 14.5, alpha: 1 },
+  "sidebar-primary": { hue: 0, saturation: 0, lightness: 20.5, alpha: 1 },
+  "sidebar-primary-foreground": { hue: 0, saturation: 0, lightness: 98.5, alpha: 1 },
+  "sidebar-accent": { hue: 0, saturation: 0, lightness: 97, alpha: 1 },
+  "sidebar-accent-foreground": { hue: 0, saturation: 0, lightness: 20.5, alpha: 1 },
+  "sidebar-border": { hue: 0, saturation: 0, lightness: 92.2, alpha: 1 },
+  "sidebar-ring": { hue: 0, saturation: 0, lightness: 70.8, alpha: 1 },
 };
 
 export const defaultsDark: Record<string, ColorConfig> = {
@@ -303,6 +313,16 @@ export const defaultsDark: Record<string, ColorConfig> = {
   "chart-3": { hue: 310, saturation: 88, lightness: 35, alpha: 1 }, // Variant of primary with hue shift
   "chart-4": { hue: 64, saturation: 80, lightness: 40, alpha: 1 }, // Slightly lighter complementary
   "chart-5": { hue: 305, saturation: 85, lightness: 40, alpha: 1 }, // Adjusted offset with hue change
+  
+  // Sidebar colors (dark mode)
+  sidebar: { hue: 0, saturation: 0, lightness: 20.5, alpha: 1 },
+  "sidebar-foreground": { hue: 0, saturation: 0, lightness: 98.5, alpha: 1 },
+  "sidebar-primary": { hue: 264.376, saturation: 24.3, lightness: 48.8, alpha: 1 },
+  "sidebar-primary-foreground": { hue: 0, saturation: 0, lightness: 98.5, alpha: 1 },
+  "sidebar-accent": { hue: 0, saturation: 0, lightness: 26.9, alpha: 1 },
+  "sidebar-accent-foreground": { hue: 0, saturation: 0, lightness: 98.5, alpha: 1 },
+  "sidebar-border": { hue: 0, saturation: 0, lightness: 100, alpha: 0.1 },
+  "sidebar-ring": { hue: 0, saturation: 0, lightness: 43.9, alpha: 1 },
 };
 
 export const createColor = (
@@ -403,6 +423,15 @@ export const generateThemeColorsFromPrimary = (
     "chart-3": createColor(normalizedHue + 3, 83, 52),
     "chart-4": createColor(normalizedHue + 7, 82, 51),
     "chart-5": createColor(normalizedHue + 12, 81, 49),
+    // Sidebar colors - Subtle theme integration
+    sidebar: createColor(normalizedHue, 5, isDarkMode ? 18 : 96),
+    "sidebar-foreground": createColor(normalizedHue, 5, isDarkMode ? 92 : 12),
+    "sidebar-primary": createColor(normalizedHue, isDarkMode ? 70 : 15, isDarkMode ? 45 : 25),
+    "sidebar-primary-foreground": createColor(normalizedHue, 5, isDarkMode ? 95 : 95),
+    "sidebar-accent": createColor(normalizedHue, isDarkMode ? 10 : 8, isDarkMode ? 25 : 94),
+    "sidebar-accent-foreground": createColor(normalizedHue, 5, isDarkMode ? 92 : 18),
+    "sidebar-border": createColor(normalizedHue, 10, isDarkMode ? 22 : 88, isDarkMode ? 0.15 : 1),
+    "sidebar-ring": createColor(normalizedHue, 20, isDarkMode ? 40 : 65),
   };
 };
 
