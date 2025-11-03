@@ -413,18 +413,25 @@ export default function ThemeGenerator() {
     lightColors: Record<string, ColorConfig>,
     darkColors: Record<string, ColorConfig>,
   ) => {
-    setThemeHistory((prev) => {
-      const newHistory = prev.slice(0, historyIndex + 1);
-      newHistory.push({ light: lightColors, dark: darkColors });
-      if (newHistory.length > maxHistorySize) {
-        newHistory.shift();
-      }
-      return newHistory;
-    });
-    setHistoryIndex((prev) => {
-      const newHistory = themeHistory.slice(0, prev + 1);
-      newHistory.push({ light: lightColors, dark: darkColors });
-      return Math.min(newHistory.length - 1, maxHistorySize - 1);
+    setHistoryIndex((currentIndex) => {
+      setThemeHistory((prev) => {
+        // Remove any future history if we're not at the end
+        const newHistory = prev.slice(0, currentIndex + 1);
+        newHistory.push({ light: lightColors, dark: darkColors });
+        
+        // Keep only last maxHistorySize entries
+        if (newHistory.length > maxHistorySize) {
+          newHistory.shift();
+          // When we shift, index stays the same (pointing to what's now the last item)
+          return newHistory;
+        }
+        
+        return newHistory;
+      });
+      
+      // Return the new index position
+      const projectedLength = Math.min(currentIndex + 2, maxHistorySize);
+      return projectedLength - 1;
     });
   };
 
@@ -649,22 +656,24 @@ export default function ThemeGenerator() {
               activeMode={activeMode}
               onApplyPreset={actions.applyPreset}
             />
-            <ColorHarmonyPicker
+            {/* Temporarily disabled */}
+            {/* <ColorHarmonyPicker
               currentHue={currentColors.primary?.hue ?? 0}
               currentSaturation={currentColors.primary?.saturation ?? 70}
               currentLightness={currentColors.primary?.lightness ?? 50}
               activeMode={activeMode}
               onApplyHarmony={actions.applyHarmony}
-            />
+            /> */}
             <ShareThemeDialog
               lightColors={colorsLight}
               darkColors={colorsDark}
             />
-            <AccessibilityChecker
+            {/* Temporarily disabled */}
+            {/* <AccessibilityChecker
               lightColors={colorsLight}
               darkColors={colorsDark}
               activeMode={activeMode}
-            />
+            /> */}
             <Button
               variant="outline"
               onClick={() => setConvertDialogOpen(true)}
@@ -969,7 +978,7 @@ export default function ThemeGenerator() {
                       title={`Theme ${index + 1}${isActive ? " (Active)" : ""}`}
                     >
                       <div className="w-32 h-20 rounded-md overflow-hidden p-2 flex flex-col gap-1">
-                        <div className="flex gap-1 h-1/2">
+                        <div className="flex gap-1 h-1/3">
                           <div
                             className="flex-1 rounded-sm"
                             style={{
@@ -979,21 +988,35 @@ export default function ThemeGenerator() {
                           <div
                             className="flex-1 rounded-sm"
                             style={{
-                              backgroundColor: `hsl(${colors.primary?.hue ?? 0}, ${colors.primary?.saturation ?? 0}%, ${colors.primary?.lightness ?? 0}%)`,
+                              backgroundColor: `hsl(${colors.foreground?.hue ?? 0}, ${colors.foreground?.saturation ?? 0}%, ${colors.foreground?.lightness ?? 0}%)`,
                             }}
                           />
                         </div>
-                        <div className="flex gap-1 h-1/2">
+                        <div className="flex gap-1 h-1/3">
+                          <div
+                            className="flex-1 rounded-sm"
+                            style={{
+                              backgroundColor: `hsl(${colors.primary?.hue ?? 0}, ${colors.primary?.saturation ?? 0}%, ${colors.primary?.lightness ?? 0}%)`,
+                            }}
+                          />
                           <div
                             className="flex-1 rounded-sm"
                             style={{
                               backgroundColor: `hsl(${colors.secondary?.hue ?? 0}, ${colors.secondary?.saturation ?? 0}%, ${colors.secondary?.lightness ?? 0}%)`,
                             }}
                           />
+                        </div>
+                        <div className="flex gap-1 h-1/3">
                           <div
                             className="flex-1 rounded-sm"
                             style={{
                               backgroundColor: `hsl(${colors.accent?.hue ?? 0}, ${colors.accent?.saturation ?? 0}%, ${colors.accent?.lightness ?? 0}%)`,
+                            }}
+                          />
+                          <div
+                            className="flex-1 rounded-sm"
+                            style={{
+                              backgroundColor: `hsl(${colors.muted?.hue ?? 0}, ${colors.muted?.saturation ?? 0}%, ${colors.muted?.lightness ?? 0}%)`,
                             }}
                           />
                         </div>
