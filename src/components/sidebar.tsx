@@ -72,7 +72,7 @@ const items = [
 
 const AppSidebar = () => {
   return (
-      <Sidebar collapsible="icon" className="!relative !inset-auto !h-full border-r">
+      <Sidebar collapsible="icon" className="!relative !inset-auto !h-full border-r bg-sidebar">
         <SidebarHeader className="p-4 border-b bg-sidebar">
           <SidebarMenu>
             <SidebarMenuItem>

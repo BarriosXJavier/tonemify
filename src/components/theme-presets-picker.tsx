@@ -19,16 +19,16 @@ import { toast } from "sonner";
 
 interface ThemePresetsPickerProps {
   activeMode: "light" | "dark";
-  onApplyPreset: (
+  onApplyPresetAction: (
     lightColors: Record<string, ColorConfig>,
     darkColors: Record<string, ColorConfig>,
-    presetName: string
+    presetName: string,
   ) => void;
 }
 
 export default function ThemePresetsPicker({
   activeMode,
-  onApplyPreset,
+  onApplyPresetAction,
 }: ThemePresetsPickerProps) {
   const [open, setOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<string>("all");
@@ -40,7 +40,7 @@ export default function ThemePresetsPicker({
       : themePresets.filter((preset) => preset.tags.includes(selectedTag));
 
   const handleApplyPreset = (preset: ThemePreset) => {
-    onApplyPreset(preset.light, preset.dark, preset.name);
+    onApplyPresetAction(preset.light, preset.dark, preset.name);
     setOpen(false);
     toast.success(`${preset.name} theme applied!`);
   };
@@ -59,14 +59,17 @@ export default function ThemePresetsPicker({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center justify-center gap-2 h-full w-full">
+        <Button
+          variant="outline"
+          className="flex items-center justify-center gap-2 h-full w-full"
+        >
           <Sparkles className="w-4 h-4" />
           <span>Theme Presets</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Popular Theme Presets</DialogTitle>
+          <DialogTitle>Presets inspired by popular themes</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -77,7 +80,11 @@ export default function ThemePresetsPicker({
                 All
               </TabsTrigger>
               {allTags.map((tag) => (
-                <TabsTrigger key={tag} value={tag} className="text-xs capitalize">
+                <TabsTrigger
+                  key={tag}
+                  value={tag}
+                  className="text-xs capitalize"
+                >
                   {tag}
                 </TabsTrigger>
               ))}
@@ -98,7 +105,9 @@ export default function ThemePresetsPicker({
                     {/* Header */}
                     <div className="space-y-1">
                       <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-semibold text-base">{preset.name}</h3>
+                        <h3 className="font-semibold text-base">
+                          {preset.name}
+                        </h3>
                         <div className="flex flex-wrap gap-1">
                           {preset.tags.slice(0, 2).map((tag) => (
                             <Badge
@@ -111,14 +120,6 @@ export default function ThemePresetsPicker({
                           ))}
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {preset.description}
-                      </p>
-                      {preset.author && (
-                        <p className="text-xs text-muted-foreground">
-                          by {preset.author}
-                        </p>
-                      )}
                     </div>
 
                     {/* Color Preview */}
