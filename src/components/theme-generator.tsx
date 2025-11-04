@@ -535,7 +535,11 @@ export default function ThemeGenerator() {
         const oklchColor = hslToOKLCH(config);
         return oklchToCSS(oklchColor);
       }
-      return `${config.hue} ${config.saturation}% ${config.lightness}%`;
+      // Round HSL values to 1 decimal place for cleaner output
+      const h = Math.round(config.hue * 10) / 10;
+      const s = Math.round(config.saturation * 10) / 10;
+      const l = Math.round(config.lightness * 10) / 10;
+      return `${h} ${s}% ${l}%`;
     };
 
     const lightVariables = Object.entries(colorsLight)
@@ -1085,14 +1089,25 @@ export default function ThemeGenerator() {
                   }%${includeAlpha && alpha < 1 ? ` / ${alpha * 100}%` : ""})`
                 : "transparent";
 
-              const hexValue = validColor
-                ? hslToHex(
-                    config.hue,
-                    config.saturation,
-                    config.lightness,
-                    alpha,
-                  )
-                : "N/A";
+              // Generate display value based on current format
+              let displayValue = "N/A";
+              if (validColor) {
+                if (colorFormat === 'oklch') {
+                  const oklchColor = hslToOKLCH(config);
+                  const l = Math.round(oklchColor.l * 1000) / 100000;
+                  const c = Math.round(oklchColor.c * 1000) / 1000;
+                  const h = Math.round(oklchColor.h * 100) / 100;
+                  displayValue = alpha < 1 
+                    ? `${l} ${c} ${h} / ${Math.round(alpha * 100)}%`
+                    : `${l} ${c} ${h}`;
+                } else {
+                  // HSL format
+                  const hueRounded = Math.round(config.hue * 10) / 10;
+                  const satRounded = Math.round(config.saturation * 10) / 10;
+                  const lightRounded = Math.round(config.lightness * 10) / 10;
+                  displayValue = `${hueRounded} ${satRounded}% ${lightRounded}%`;
+                }
+              }
 
               // Determine text color based on background lightness
               const textColor =
@@ -1121,7 +1136,7 @@ export default function ThemeGenerator() {
                 >
                   <div className="text-center">
                     <p className="text-sm font-medium">{name}</p>
-                    <p className="text-xs font-bold">{hexValue}</p>
+                    <p className="text-xs font-bold">{displayValue}</p>
                   </div>
                 </Card>
               );

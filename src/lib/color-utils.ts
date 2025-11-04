@@ -788,12 +788,20 @@ export function formatOKLCHForCSS(config: OKLCHConfig): string {
  * Format OKLCH config as full CSS color
  */
 export function oklchToCSS(config: OKLCHConfig): string {
-  const l = (config.l / 100).toFixed(4);
-  const c = config.c.toFixed(4);
-  const h = config.h.toFixed(2);
+  // Round to 4 decimals for L (lightness 0-1)
+  const l = Math.round(config.l * 1000) / 100000; // 4 decimals
+  // Round to 3 decimals for C (chroma, typically 0-0.4)
+  const c = Math.round(config.c * 1000) / 1000; // 3 decimals
+  // Round to 2 decimals for H (hue 0-360)
+  const h = Math.round(config.h * 100) / 100; // 2 decimals
   const alpha = config.alpha ?? 1;
   
   if (alpha < 1) {
+    // Format alpha as percentage if it's a round percentage
+    const alphaPercent = Math.round(alpha * 100);
+    if (alphaPercent === alpha * 100) {
+      return `oklch(${l} ${c} ${h} / ${alphaPercent}%)`;
+    }
     return `oklch(${l} ${c} ${h} / ${alpha})`;
   }
   return `oklch(${l} ${c} ${h})`;
