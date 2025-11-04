@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
+import Link from "next/link";
 import {
   Copy,
   RefreshCcw,
@@ -54,7 +55,6 @@ export default function ThemeGenerator() {
   const [dialogState, setDialogState] = useState({
     paste: false,
     save: false,
-    viewSaved: false,
   });
   const [savedThemes, setSavedThemes] = useState<Record<string, string>>({});
   const [themeInput, setThemeInput] = useState("");
@@ -106,17 +106,27 @@ export default function ThemeGenerator() {
     );
     setSavedThemes(themes);
 
-    // Load theme from URL if present (only on mount)
-    const urlTheme = getThemeFromURL();
-    if (urlTheme) {
-      setColorsLight(urlTheme.light);
-      setColorsDark(urlTheme.dark);
-      const initialMode =
-        activeMode === "light" ? urlTheme.light : urlTheme.dark;
-      updateCSSVariables(initialMode);
-      setThemeHistory([{ light: urlTheme.light, dark: urlTheme.dark }]);
-      setHistoryIndex(0);
-      toast.success("Theme loaded from URL!");
+    // Check for theme to apply from /saved page
+    const themeToApply = localStorage.getItem("theme-to-apply");
+    if (themeToApply) {
+      // Remove the flag
+      localStorage.removeItem("theme-to-apply");
+      // Apply the theme
+      handlePasteTheme(themeToApply);
+      toast.success("Theme applied from saved collection!");
+    } else {
+      // Load theme from URL if present (only on mount)
+      const urlTheme = getThemeFromURL();
+      if (urlTheme) {
+        setColorsLight(urlTheme.light);
+        setColorsDark(urlTheme.dark);
+        const initialMode =
+          activeMode === "light" ? urlTheme.light : urlTheme.dark;
+        updateCSSVariables(initialMode);
+        setThemeHistory([{ light: urlTheme.light, dark: urlTheme.dark }]);
+        setHistoryIndex(0);
+        toast.success("Theme loaded from URL!");
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -840,9 +850,6 @@ export default function ThemeGenerator() {
 
               {/* Color Format Toggle */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 border border-border rounded-lg p-2 bg-muted/30 min-h-[60px]">
-                <span className="text-xs sm:text-sm text-muted-foreground font-medium whitespace-nowrap">
-                  Format:
-                </span>
                 <div className="flex gap-1">
                   <Button
                     variant={colorFormat === "hsl" ? "default" : "ghost"}
@@ -868,9 +875,6 @@ export default function ThemeGenerator() {
 
               {/* Border Radius Selector */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 border border-border rounded-lg p-2 bg-muted/30 min-h-[60px]">
-                <span className="text-xs sm:text-sm text-muted-foreground font-medium whitespace-nowrap">
-                  Radius:
-                </span>
                 <div className="flex gap-1 flex-wrap justify-center">
                   {radiusValues.map((radius) => (
                     <Button
@@ -890,13 +894,13 @@ export default function ThemeGenerator() {
             <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 sm:gap-3">
               <Button
                 variant="outline"
-                onClick={() =>
-                  setDialogState((prev) => ({ ...prev, viewSaved: true }))
-                }
+                asChild
                 className="flex items-center justify-center gap-1.5 sm:gap-2 h-11 sm:h-12 text-xs sm:text-sm"
                 title="View Saved Themes"
               >
-                <span className="truncate">View Saved</span>
+                <Link href="/saved">
+                  <span className="truncate">View Saved</span>
+                </Link>
               </Button>
 
               <ShareThemeDialog
@@ -1225,81 +1229,6 @@ export default function ThemeGenerator() {
               }
             >
               Cancel
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* View Saved Themes Dialog */}
-      <Dialog
-        open={dialogState.viewSaved}
-        onOpenChange={(open) =>
-          setDialogState((prev) => ({ ...prev, viewSaved: open }))
-        }
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Saved Themes</DialogTitle>
-          </DialogHeader>
-          <div className="max-h-96 overflow-y-auto">
-            {Object.entries(savedThemes).length === 0 ? (
-              <p className="text-center text-muted-foreground">
-                No saved themes yet
-              </p>
-            ) : (
-              <ul className="space-y-4">
-                {Object.entries(savedThemes).map(([name, css]) => (
-                  <li key={name} className="border rounded p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <strong>{name}</strong>
-                      <div className="space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            handlePasteTheme(css);
-                            setDialogState((prev) => ({
-                              ...prev,
-                              viewSaved: false,
-                            }));
-                          }}
-                        >
-                          Apply
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => {
-                            localStorage.removeItem(name);
-                            setSavedThemes((prev) => {
-                              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                              const { [name]: _, ...rest } = prev;
-                              return rest;
-                            });
-                            toast.success(`Theme "${name}" deleted`);
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                    <pre className="bg-background text-primary dark:text-foreground p-2 rounded text-xs overflow-x-auto">
-                      {css}
-                    </pre>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <div className="flex justify-end mt-4">
-            <Button
-              variant="outline"
-              onClick={() =>
-                setDialogState((prev) => ({ ...prev, viewSaved: false }))
-              }
-            >
-              Close
             </Button>
           </div>
         </DialogContent>
