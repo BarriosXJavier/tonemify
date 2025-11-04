@@ -72,7 +72,7 @@ export function ColorControls({
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Hue</Label>
               <span className="text-xs text-muted-foreground">
-                {color.hue}°
+                {Math.round(color.hue * 10) / 10}°
               </span>
             </div>
             <Slider
@@ -81,10 +81,11 @@ export function ColorControls({
               max={360}
               step={1}
               onValueChange={([value]) => {
-                onChange("hue", value);
+                const clampedValue = Math.max(0, Math.min(360, Math.round(value * 10) / 10));
+                onChange("hue", clampedValue);
                 onHexChange(
                   hslToHex(
-                    value,
+                    clampedValue,
                     color.saturation,
                     color.lightness,
                     (100 - color.alpha) / 100
@@ -102,7 +103,7 @@ export function ColorControls({
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Saturation</Label>
               <span className="text-xs text-muted-foreground">
-                {color.saturation}%
+                {Math.round(color.saturation * 10) / 10}%
               </span>
             </div>
             <Slider
@@ -111,11 +112,12 @@ export function ColorControls({
               max={100}
               step={1}
               onValueChange={([value]) => {
-                onChange("saturation", value);
+                const clampedValue = Math.max(0, Math.min(100, Math.round(value * 10) / 10));
+                onChange("saturation", clampedValue);
                 onHexChange(
                   hslToHex(
                     color.hue,
-                    value,
+                    clampedValue,
                     color.lightness,
                     (100 - color.alpha) / 100
                   )
@@ -135,7 +137,7 @@ export function ColorControls({
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Lightness</Label>
               <span className="text-xs text-muted-foreground">
-                {color.lightness}%
+                {Math.round(color.lightness * 10) / 10}%
               </span>
             </div>
             <Slider
@@ -144,12 +146,13 @@ export function ColorControls({
               max={100}
               step={1}
               onValueChange={([value]) => {
-                onChange("lightness", value);
+                const clampedValue = Math.max(0, Math.min(100, Math.round(value * 10) / 10));
+                onChange("lightness", clampedValue);
                 onHexChange(
                   hslToHex(
                     color.hue,
                     color.saturation,
-                    value,
+                    clampedValue,
                     (100 - color.alpha) / 100
                   )
                 );
@@ -168,7 +171,7 @@ export function ColorControls({
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Opacity</Label>
               <span className="text-xs text-muted-foreground">
-                {100 - color.alpha}%
+                {Math.round((100 - color.alpha) * 10) / 10}%
               </span>
             </div>
             <Slider
@@ -177,13 +180,14 @@ export function ColorControls({
               max={100}
               step={1}
               onValueChange={([value]) => {
-                onChange("alpha", 100 - value);
+                const clampedValue = Math.max(0, Math.min(100, Math.round(value * 10) / 10));
+                onChange("alpha", 100 - clampedValue);
                 onHexChange(
                   hslToHex(
                     color.hue,
                     color.saturation,
                     color.lightness,
-                    value / 100
+                    clampedValue / 100
                   )
                 );
               }}

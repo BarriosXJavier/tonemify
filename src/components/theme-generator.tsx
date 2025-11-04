@@ -516,13 +516,16 @@ export default function ThemeGenerator() {
   const updateColor = (
     colorName: string,
     property: keyof ColorConfig,
-    value: string,
+    value: string | number,
   ): void => {
+    // Ensure value is a number for numeric properties
+    const numericValue = typeof value === 'string' ? parseFloat(value) : value;
+    
     if (activeMode === "light") {
       setColorsLight((prev) => {
         const newColors = {
           ...prev,
-          [colorName]: { ...prev[colorName], [property]: value },
+          [colorName]: { ...prev[colorName], [property]: numericValue },
         };
         updateCSSVariables(newColors);
         return newColors;
@@ -531,7 +534,7 @@ export default function ThemeGenerator() {
       setColorsDark((prev) => {
         const newColors = {
           ...prev,
-          [colorName]: { ...prev[colorName], [property]: value },
+          [colorName]: { ...prev[colorName], [property]: numericValue },
         };
         updateCSSVariables(newColors);
         return newColors;
@@ -1250,7 +1253,7 @@ export default function ThemeGenerator() {
                 alpha: currentColors[activeColor!].alpha ?? 1,
               }}
               onChange={(property, value) =>
-                updateColor(activeColor!, property, value.toString())
+                updateColor(activeColor!, property, value)
               }
               onHexChange={() => {}}
             />
