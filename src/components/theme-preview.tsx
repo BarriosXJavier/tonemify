@@ -96,7 +96,7 @@ export default function ThemePreview({ showPreview = false, onContinueEditing }:
           </Button>
         )}
       </div>
-      <div className="w-full border rounded-lg bg-background overflow-hidden relative">
+      <div className="w-full border rounded-lg overflow-hidden relative">
         <SidebarProvider defaultOpen={true}>
           <div className="flex h-[800px] w-full relative">
           {/* Sidebar */}

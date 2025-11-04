@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { convertColor, rgbToHSL } from "@/lib/color-utils";
+import { convertColor, rgbToHSL, hslToOKLCH, oklchToCSS, oklchToHSL, parseOKLCH } from "@/lib/color-utils";
 import {
   Dialog,
   DialogContent,
@@ -26,7 +26,7 @@ import { useTheme } from "next-themes";
 import { Checkbox } from "@/components/ui/checkbox";
 import { hslToHex } from "@/lib/color-utils";
 import { defaults, defaultsDark } from "@/lib/color-utils";
-import { ColorConfig } from "@/lib/types";
+import { ColorConfig, ColorFormat } from "@/lib/types";
 import { generateThemeColorsFromPrimary } from "@/lib/color-utils";
 import { hexToHSL } from "@/lib/color-utils";
 import TailwindColorPicker from "./tailwind-color-picker";
@@ -59,6 +59,7 @@ export default function ThemeGenerator() {
   const [savedThemes, setSavedThemes] = useState<Record<string, string>>({});
   const [themeInput, setThemeInput] = useState("");
   const [includeAlpha, setIncludeAlpha] = useState(false);
+  const [colorFormat, setColorFormat] = useState<ColorFormat>("hsl");
   const { setTheme } = useTheme();
   const [activeMode, setActiveMode] = useState<"light" | "dark">("light");
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
@@ -154,6 +155,13 @@ export default function ThemeGenerator() {
           /^([\d.-]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?$/i;
         const customFormatRegex =
           /^(?:--[\w-]+:\s*)?([\d.-]+)\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?;?$/i;
+        
+        // OKLCH format regex patterns
+        const oklchFunctionRegex =
+          /^oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+%?))?\s*\)$/i;
+        const oklchSpaceRegex =
+          /^([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+%?))?$/i;
+        
         const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
         const rgbFunctionRegex =
           /^(?:rgb|rgba)\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
@@ -162,6 +170,47 @@ export default function ThemeGenerator() {
         const radiusRegex = /^([\d.]+)rem$/i;
 
         let match;
+        
+        // Try OKLCH format first (both function and space-separated)
+        if ((match = value.match(oklchFunctionRegex))) {
+          const alpha = match[4] 
+            ? match[4].endsWith("%")
+              ? parseFloat(match[4]) / 100
+              : parseFloat(match[4])
+            : 1;
+          const oklchConfig = {
+            l: parseFloat(match[1]) * 100, // Convert to 0-100 range
+            c: parseFloat(match[2]),
+            h: parseFloat(match[3]),
+            alpha,
+          };
+          return oklchToHSL(oklchConfig);
+        } else if ((match = value.match(oklchSpaceRegex))) {
+          // Check if this looks like OKLCH (L is 0-1 range, not 0-360 like hue)
+          const firstNum = parseFloat(match[1]);
+          const secondNum = parseFloat(match[2]);
+          const thirdNum = parseFloat(match[3]);
+          
+          // OKLCH: L is 0-1, C is typically 0-0.4, H is 0-360
+          // HSL: H is 0-360, S is 0-100%, L is 0-100%
+          if (firstNum <= 1 && secondNum <= 1) {
+            // Likely OKLCH format
+            const alpha = match[4] 
+              ? match[4].endsWith("%")
+                ? parseFloat(match[4]) / 100
+                : parseFloat(match[4])
+              : 1;
+            const oklchConfig = {
+              l: firstNum * 100,
+              c: secondNum,
+              h: thirdNum,
+              alpha,
+            };
+            return oklchToHSL(oklchConfig);
+          }
+        }
+        
+        // Continue with existing HSL parsers
         if ((match = value.match(hslFunctionRegex))) {
           return {
             hue: parseFloat(match[1]),
@@ -420,17 +469,14 @@ export default function ThemeGenerator() {
         const newHistory = prev.slice(0, currentIndex + 1);
         newHistory.push({ light: lightColors, dark: darkColors });
 
-        // Keep only last maxHistorySize entries
         if (newHistory.length > maxHistorySize) {
           newHistory.shift();
-          // When we shift, index stays the same (pointing to what's now the last item)
           return newHistory;
         }
 
         return newHistory;
       });
 
-      // Return the new index position
       const projectedLength = Math.min(currentIndex + 2, maxHistorySize);
       return projectedLength - 1;
     });
@@ -446,7 +492,6 @@ export default function ThemeGenerator() {
       setHistoryIndex(newIndex);
       const entry = themeHistory[newIndex];
 
-      // Safety check to ensure entry exists
       if (entry && entry.light && entry.dark) {
         setColorsLight(entry.light);
         setColorsDark(entry.dark);
@@ -485,25 +530,27 @@ export default function ThemeGenerator() {
   };
 
   const generateThemeCSS = (): string => {
-    const formatColor = ({
-      hue,
-      saturation,
-      lightness,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      alpha,
-    }: ColorConfig): string => {
-      return `${hue} ${saturation}% ${lightness}%`;
+    const formatColor = (config: ColorConfig): string => {
+      if (colorFormat === 'oklch') {
+        const oklchColor = hslToOKLCH(config);
+        return oklchToCSS(oklchColor);
+      }
+      // Round HSL values to 1 decimal place for cleaner output
+      const h = Math.round(config.hue * 10) / 10;
+      const s = Math.round(config.saturation * 10) / 10;
+      const l = Math.round(config.lightness * 10) / 10;
+      return `${h} ${s}% ${l}%`;
     };
 
     const lightVariables = Object.entries(colorsLight)
-      .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
+      .map(([name, config]) => `    --${name}: ${formatColor(config)};`)
       .join("\n");
 
     const darkVariables = Object.entries(colorsDark)
-      .map(([name, config]) => `  --${name}: ${formatColor(config)};`)
+      .map(([name, config]) => `    --${name}: ${formatColor(config)};`)
       .join("\n");
 
-    return `:root {\n${lightVariables}\n  --radius: ${selectedRadius};\n}\n\n.dark {\n${darkVariables}\n  --radius: ${selectedRadius};\n}`;
+    return `:root {\n    --radius: ${selectedRadius};\n${lightVariables}\n  }\n\n  .dark {\n${darkVariables}\n  }`;
   };
 
   const actions = {
@@ -632,7 +679,6 @@ export default function ThemeGenerator() {
     [modifierKey],
   );
 
-  // Register keyboard shortcuts
   useKeyboardShortcuts(shortcuts);
 
   const currentColors = activeMode === "light" ? colorsLight : colorsDark;
@@ -652,11 +698,8 @@ export default function ThemeGenerator() {
       <div className="">
         {!showPreview && (
         <div className="lg:col-span-2 space-y-4">
-          {/* Control Buttons - Organized by Function */}
           <div className="space-y-3 w-full px-2 sm:px-4 md:px-6 max-w-7xl mx-auto">
-            {/* Primary Actions Row: Random Theme, Presets, Preview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3 items-stretch">
-              {/* Navigation & Random Generator */}
               <div className="flex flex-row gap-1.5 sm:gap-2 items-center justify-center border border-border rounded-lg p-1.5 sm:p-2 bg-muted/30 min-h-[60px]">
                 <Button
                   variant="ghost"
@@ -713,7 +756,6 @@ export default function ThemeGenerator() {
             {/* Tailwind Color Picker - Full Width */}
             <TailwindColorPicker />
 
-            {/* Import + Save + Copy + Convert Color - Third Row */}
             <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-2">
               <Button
                 variant="outline"
@@ -759,8 +801,8 @@ export default function ThemeGenerator() {
             </div>
 
             {/* Mode & Radius Controls */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 items-stretch">
-              {/* Light/Dark Mode Toggle - Takes full width */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3 items-stretch">
+              {/* Light/Dark Mode Toggle */}
               <div className="flex gap-2 border border-border rounded-lg p-2 bg-muted/30 min-h-[60px]">
                 <Button
                   onClick={() => actions.switchTheme("light")}
@@ -796,10 +838,38 @@ export default function ThemeGenerator() {
                 </Button>
               </div>
 
+              {/* Color Format Toggle */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 border border-border rounded-lg p-2 bg-muted/30 min-h-[60px]">
+                <span className="text-xs sm:text-sm text-muted-foreground font-medium whitespace-nowrap">
+                  Format:
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    variant={colorFormat === "hsl" ? "default" : "ghost"}
+                    onClick={() => setColorFormat("hsl")}
+                    className="h-8 sm:h-9 px-2 sm:px-3 text-xs"
+                    title="HSL format (Hue Saturation Lightness)"
+                  >
+                    HSL
+                  </Button>
+                  <Button
+                    variant={colorFormat === "oklch" ? "default" : "ghost"}
+                    onClick={() => {
+                      setColorFormat("oklch");
+                      toast.success("OKLCH: Perceptually uniform colors!");
+                    }}
+                    className="h-8 sm:h-9 px-2 sm:px-3 text-xs"
+                    title="OKLCH format (Oklab) - Perceptually uniform"
+                  >
+                    OKLCH
+                  </Button>
+                </div>
+              </div>
+
               {/* Border Radius Selector */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 border border-border rounded-lg p-2 bg-muted/30 min-h-[60px]">
                 <span className="text-xs sm:text-sm text-muted-foreground font-medium whitespace-nowrap">
-                  Border Radius:
+                  Radius:
                 </span>
                 <div className="flex gap-1 flex-wrap justify-center">
                   {radiusValues.map((radius) => (
@@ -817,7 +887,6 @@ export default function ThemeGenerator() {
               </div>
             </div>
 
-            {/* View Saved & Share Theme - Second to Last Row */}
             <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 sm:gap-3">
               <Button
                 variant="outline"
@@ -830,14 +899,12 @@ export default function ThemeGenerator() {
                 <span className="truncate">View Saved</span>
               </Button>
 
-              {/* Share Theme Dialog */}
               <ShareThemeDialog
                 lightColors={colorsLight}
                 darkColors={colorsDark}
               />
             </div>
 
-            {/* Reset - Full Width Last Button */}
             <Button
               variant="destructive"
               onClick={actions.resetToDefault}
@@ -849,7 +916,6 @@ export default function ThemeGenerator() {
             </Button>
           </div>
 
-          {/* Duplicate Dialog - Keep only one */}
           <Dialog open={convertDialogOpen} onOpenChange={setConvertDialogOpen}>
             <DialogContent>
               <DialogHeader>
@@ -902,7 +968,6 @@ export default function ThemeGenerator() {
             </DialogContent>
           </Dialog>
 
-          {/* Recent Themes History */}
           {themeHistory.length > 1 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -1024,14 +1089,25 @@ export default function ThemeGenerator() {
                   }%${includeAlpha && alpha < 1 ? ` / ${alpha * 100}%` : ""})`
                 : "transparent";
 
-              const hexValue = validColor
-                ? hslToHex(
-                    config.hue,
-                    config.saturation,
-                    config.lightness,
-                    alpha,
-                  )
-                : "N/A";
+              // Generate display value based on current format
+              let displayValue = "N/A";
+              if (validColor) {
+                if (colorFormat === 'oklch') {
+                  const oklchColor = hslToOKLCH(config);
+                  const l = Math.round(oklchColor.l * 1000) / 100000;
+                  const c = Math.round(oklchColor.c * 1000) / 1000;
+                  const h = Math.round(oklchColor.h * 100) / 100;
+                  displayValue = alpha < 1 
+                    ? `${l} ${c} ${h} / ${Math.round(alpha * 100)}%`
+                    : `${l} ${c} ${h}`;
+                } else {
+                  // HSL format
+                  const hueRounded = Math.round(config.hue * 10) / 10;
+                  const satRounded = Math.round(config.saturation * 10) / 10;
+                  const lightRounded = Math.round(config.lightness * 10) / 10;
+                  displayValue = `${hueRounded} ${satRounded}% ${lightRounded}%`;
+                }
+              }
 
               // Determine text color based on background lightness
               const textColor =
@@ -1060,7 +1136,7 @@ export default function ThemeGenerator() {
                 >
                   <div className="text-center">
                     <p className="text-sm font-medium">{name}</p>
-                    <p className="text-xs font-bold">{hexValue}</p>
+                    <p className="text-xs font-bold">{displayValue}</p>
                   </div>
                 </Card>
               );
