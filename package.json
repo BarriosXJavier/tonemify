@@ -39,6 +39,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
+    "culori": "^4.0.2",
     "date-fns": "^4.1.0",
     "debounce": "^2.2.0",
     "lucide-react": "^0.552.0",

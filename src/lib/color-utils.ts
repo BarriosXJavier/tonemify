@@ -1,4 +1,5 @@
-import { ColorConfig } from "./types";
+import { ColorConfig, OKLCHConfig } from "./types";
+import { formatHsl, formatCss, oklch, hsl, formatHex } from "culori";
 
 export function hexToHSL(hex: string) {
   hex = hex.replace("#", "");
@@ -723,3 +724,117 @@ export const tailwindColorPalette = {
     950: "#4c0519",
   },
 };
+
+// ============================================================================
+// OKLCH Color Space Support
+// ============================================================================
+
+/**
+ * Convert HSL ColorConfig to OKLCH format
+ */
+export function hslToOKLCH(config: ColorConfig): OKLCHConfig {
+  const hslColor = {
+    mode: "hsl" as const,
+    h: config.hue,
+    s: config.saturation / 100,
+    l: config.lightness / 100,
+    alpha: config.alpha ?? 1,
+  };
+
+  const oklchColor = oklch(hslColor);
+
+  return {
+    l: (oklchColor.l ?? 0) * 100, // Convert to 0-100 range for consistency
+    c: oklchColor.c ?? 0,
+    h: oklchColor.h ?? 0,
+    alpha: oklchColor.alpha ?? 1,
+  };
+}
+
+/**
+ * Convert OKLCH to HSL ColorConfig
+ */
+export function oklchToHSL(config: OKLCHConfig): ColorConfig {
+  const oklchColor = {
+    mode: "oklch" as const,
+    l: config.l / 100, // Convert back to 0-1 range
+    c: config.c,
+    h: config.h,
+    alpha: config.alpha ?? 1,
+  };
+
+  const hslColor = hsl(oklchColor);
+
+  return {
+    hue: hslColor.h ?? 0,
+    saturation: (hslColor.s ?? 0) * 100,
+    lightness: (hslColor.l ?? 0) * 100,
+    alpha: hslColor.alpha ?? 1,
+  };
+}
+
+/**
+ * Format OKLCH config as CSS variable value
+ */
+export function formatOKLCHForCSS(config: OKLCHConfig): string {
+  const l = (config.l / 100).toFixed(4); // 0-1 range
+  const c = config.c.toFixed(4);
+  const h = config.h.toFixed(2);
+  
+  return `${l} ${c} ${h}`;
+}
+
+/**
+ * Format OKLCH config as full CSS color
+ */
+export function oklchToCSS(config: OKLCHConfig): string {
+  const l = (config.l / 100).toFixed(4);
+  const c = config.c.toFixed(4);
+  const h = config.h.toFixed(2);
+  const alpha = config.alpha ?? 1;
+  
+  if (alpha < 1) {
+    return `oklch(${l} ${c} ${h} / ${alpha})`;
+  }
+  return `oklch(${l} ${c} ${h})`;
+}
+
+/**
+ * Parse OKLCH string to OKLCHConfig
+ */
+export function parseOKLCH(oklchString: string): OKLCHConfig | null {
+  const oklchRegex = /^oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)$/i;
+  const match = oklchString.trim().match(oklchRegex);
+  
+  if (!match) return null;
+  
+  return {
+    l: parseFloat(match[1]) * 100, // Convert to 0-100 range
+    c: parseFloat(match[2]),
+    h: parseFloat(match[3]),
+    alpha: match[4] ? parseFloat(match[4]) : 1,
+  };
+}
+
+/**
+ * Convert hex to OKLCH
+ */
+export function hexToOKLCH(hex: string): OKLCHConfig {
+  const hslColor = hexToHSL(hex);
+  return hslToOKLCH(hslColor);
+}
+
+/**
+ * Convert OKLCH to hex
+ */
+export function oklchToHex(config: OKLCHConfig): string {
+  const oklchColor = {
+    mode: "oklch" as const,
+    l: config.l / 100,
+    c: config.c,
+    h: config.h,
+    alpha: config.alpha ?? 1,
+  };
+
+  return formatHex(oklchColor);
+}
