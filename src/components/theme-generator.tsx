@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { convertColor, rgbToHSL, hslToOKLCH, oklchToCSS, oklchToHSL, parseOKLCH } from "@/lib/color-utils";
+import { convertColor, rgbToHSL, hslToOKLCH, oklchToCSS, oklchToHSL, parseOKLCH, parseToHSL } from "@/lib/color-utils";
 import {
   Dialog,
   DialogContent,
@@ -52,6 +52,7 @@ export default function ThemeGenerator() {
     useState<Record<string, ColorConfig>>(defaultsDark);
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [pasteInput, setPasteInput] = useState("");
+  const [pasteInputFormat, setPasteInputFormat] = useState<"auto" | "hex" | "rgb" | "hsl" | "oklch">("auto");
   const [dialogState, setDialogState] = useState({
     paste: false,
     save: false,
@@ -64,6 +65,7 @@ export default function ThemeGenerator() {
   const [activeMode, setActiveMode] = useState<"light" | "dark">("light");
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
   const [colorInput, setColorInput] = useState("");
+  const [inputFormat, setInputFormat] = useState<"hex" | "rgb" | "hsl" | "oklch">("hex");
   const [selectedFormat, setSelectedFormat] = useState<
     "hex" | "rgb" | "rgba" | "hsl" | "hsla"
   >("hex");
@@ -76,11 +78,24 @@ export default function ThemeGenerator() {
   const [showPreview, setShowPreview] = useState(false);
 
   const handleConvert = () => {
-    const result = convertColor(colorInput.trim(), selectedFormat);
+    const trimmedInput = colorInput.trim();
+    
+    // Parse with the explicitly selected format (no auto-detection)
+    const parsed = parseToHSL(trimmedInput, inputFormat);
+    if (!parsed) {
+      toast.error(`Invalid ${inputFormat.toUpperCase()} color format. Please check your input.`);
+      setConvertedColor(null);
+      return;
+    }
+    
+    // Convert HSL to the desired output format
+    const hslString = `hsl(${parsed.hue}, ${parsed.saturation}%, ${parsed.lightness}%)`;
+    const result = convertColor(hslString, selectedFormat);
     if (result) {
       setConvertedColor(result);
+      toast.success("Color converted successfully!");
     } else {
-      toast.error("Invalid color format. Please try again.");
+      toast.error("Conversion failed. Please try again.");
       setConvertedColor(null);
     }
   };
@@ -155,143 +170,68 @@ export default function ThemeGenerator() {
       const lightSectionMatch = inputString.match(lightSectionRegex);
       const darkSectionMatch = inputString.match(darkSectionRegex);
 
+      // Check if input looks like a full CSS theme
+      const isFullTheme = lightSectionMatch || darkSectionMatch;
+      
+      // If not a full theme AND format is "auto", that's an error
+      if (!isFullTheme && pasteInputFormat === "auto") {
+        toast.error("Please select a color format (HEX, RGB, HSL, or OKLCH) for single color input");
+        return;
+      }
+      
+      // If not a full theme, it's a single color - use the selected format
+      if (!isFullTheme) {
+        const trimmedInput = inputString.trim();
+        
+        const parsedColor = parseToHSL(trimmedInput, pasteInputFormat);
+        if (!parsedColor) {
+          toast.error(`Invalid ${pasteInputFormat.toUpperCase()} color format. Please check your input.`);
+          return;
+        }
+        
+        // Generate theme from this single color
+        const generatedColorsLight = generateThemeColorsFromPrimary(
+          parsedColor.hue,
+          parsedColor.saturation,
+          parsedColor.lightness,
+          false
+        );
+        const generatedColorsDark = generateThemeColorsFromPrimary(
+          parsedColor.hue,
+          parsedColor.saturation,
+          parsedColor.lightness,
+          true
+        );
+        
+        addToHistory(generatedColorsLight, generatedColorsDark);
+        setColorsLight(generatedColorsLight);
+        setColorsDark(generatedColorsDark);
+        updateCSSVariables(
+          activeMode === "light" ? generatedColorsLight : generatedColorsDark
+        );
+        setDialogState((prev) => ({ ...prev, paste: false }));
+        toast.success("Theme generated from color!");
+        return;
+      }
+
+      // For full CSS themes (pasteInputFormat === "auto"), parse variables with auto-detection
       const parseColorValue = (value: string): ColorConfig | string | null => {
         value = value.trim();
-        const hslFunctionRegex =
-          /^(?:hsl|hsla)\(\s*([\d.-]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
-        const hslSpaceRegex =
-          /^([\d.-]+)(?:deg)?\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
-        const hslNoBracketsRegex =
-          /^([\d.-]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?$/i;
-        const customFormatRegex =
-          /^(?:--[\w-]+:\s*)?([\d.-]+)\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?;?$/i;
         
-        // OKLCH format regex patterns
-        const oklchFunctionRegex =
-          /^oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+%?))?\s*\)$/i;
-        const oklchSpaceRegex =
-          /^([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+%?))?$/i;
-        
-        const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
-        const rgbFunctionRegex =
-          /^(?:rgb|rgba)\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
-        const rgbSpaceRegex =
-          /^([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?$/i;
+        // Check for radius values first (not colors)
         const radiusRegex = /^([\d.]+)rem$/i;
-
-        let match;
-        
-        // Try OKLCH format first (both function and space-separated)
-        if ((match = value.match(oklchFunctionRegex))) {
-          const alpha = match[4] 
-            ? match[4].endsWith("%")
-              ? parseFloat(match[4]) / 100
-              : parseFloat(match[4])
-            : 1;
-          const oklchConfig = {
-            l: parseFloat(match[1]) * 100, // Convert to 0-100 range
-            c: parseFloat(match[2]),
-            h: parseFloat(match[3]),
-            alpha,
-          };
-          return oklchToHSL(oklchConfig);
-        } else if ((match = value.match(oklchSpaceRegex))) {
-          // Check if this looks like OKLCH (L is 0-1 range, not 0-360 like hue)
-          const firstNum = parseFloat(match[1]);
-          const secondNum = parseFloat(match[2]);
-          const thirdNum = parseFloat(match[3]);
-          
-          // OKLCH: L is 0-1, C is typically 0-0.4, H is 0-360
-          // HSL: H is 0-360, S is 0-100%, L is 0-100%
-          if (firstNum <= 1 && secondNum <= 1) {
-            // Likely OKLCH format
-            const alpha = match[4] 
-              ? match[4].endsWith("%")
-                ? parseFloat(match[4]) / 100
-                : parseFloat(match[4])
-              : 1;
-            const oklchConfig = {
-              l: firstNum * 100,
-              c: secondNum,
-              h: thirdNum,
-              alpha,
-            };
-            return oklchToHSL(oklchConfig);
-          }
+        const radiusMatch = value.match(radiusRegex);
+        if (radiusMatch) {
+          return `${parseFloat(radiusMatch[1])}rem`;
         }
         
-        // Continue with existing HSL parsers
-        if ((match = value.match(hslFunctionRegex))) {
-          return {
-            hue: parseFloat(match[1]),
-            saturation: parseFloat(match[2]),
-            lightness: parseFloat(match[3]),
-            alpha: match[4]
-              ? match[4].endsWith("%")
-                ? parseFloat(match[4]) / 100
-                : parseFloat(match[4])
-              : 1,
-          };
-        } else if ((match = value.match(hslSpaceRegex))) {
-          return {
-            hue: parseFloat(match[1]),
-            saturation: parseFloat(match[2]),
-            lightness: parseFloat(match[3]),
-            alpha: match[4]
-              ? match[4].endsWith("%")
-                ? parseFloat(match[4]) / 100
-                : parseFloat(match[4])
-              : 1,
-          };
-        } else if ((match = value.match(hslNoBracketsRegex))) {
-          return {
-            hue: parseFloat(match[1]),
-            saturation: parseFloat(match[2]),
-            lightness: parseFloat(match[3]),
-            alpha: match[4]
-              ? match[4].endsWith("%")
-                ? parseFloat(match[4]) / 100
-                : parseFloat(match[4])
-              : 1,
-          };
-        } else if ((match = value.match(customFormatRegex))) {
-          return {
-            hue: parseFloat(match[1]),
-            saturation: parseFloat(match[2]),
-            lightness: parseFloat(match[3]),
-            alpha: match[4]
-              ? match[4].endsWith("%")
-                ? parseFloat(match[4]) / 100
-                : parseFloat(match[4])
-              : 1,
-          };
-        } else if ((match = value.match(hexRegex))) {
-          return hexToHSL(value);
-        } else if ((match = value.match(rgbFunctionRegex))) {
-          const r = parseFloat(match[1]);
-          const g = parseFloat(match[2]);
-          const b = parseFloat(match[3]);
-          const alpha = match[4]
-            ? match[4].endsWith("%")
-              ? parseFloat(match[4]) / 100
-              : parseFloat(match[4])
-            : 1;
-          return { ...rgbToHSL(r, g, b), alpha };
-        } else if ((match = value.match(rgbSpaceRegex))) {
-          const r = parseFloat(match[1]);
-          const g = parseFloat(match[2]);
-          const b = parseFloat(match[3]);
-          const alpha = match[4]
-            ? match[4].endsWith("%")
-              ? parseFloat(match[4]) / 100
-              : parseFloat(match[4])
-            : 1;
-          return { ...rgbToHSL(r, g, b), alpha };
-        } else if ((match = value.match(radiusRegex))) {
-          return `${parseFloat(match[1])}rem`;
-        } else {
-          return null;
+        // For CSS theme variables, use auto-detection (they typically have % signs)
+        const parsedColor = parseToHSL(value, "auto");
+        if (parsedColor) {
+          return parsedColor;
         }
+        
+        return null;
       };
 
       const parseSection = (
@@ -929,39 +869,68 @@ export default function ThemeGenerator() {
                 <DialogTitle>Convert Color</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <Input
-                  type="text"
-                  value={colorInput}
-                  onChange={(e) => setColorInput(e.target.value)}
-                  placeholder="Enter color value (e.g., hsl(255, 81%, 95%), #ff5733)"
-                  className="w-full p-2 border rounded"
-                />
-                <select
-                  value={selectedFormat}
-                  onChange={(e) =>
-                    setSelectedFormat(
-                      e.target.value as "hex" | "rgb" | "rgba" | "hsl" | "hsla",
-                    )
-                  }
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="hex">HEX</option>
-                  <option value="rgb">RGB</option>
-                  <option value="rgba">RGBA</option>
-                  <option value="hsl">HSL</option>
-                  <option value="hsla">HSLA</option>
-                  <option value="custom">Custom (--primary: h s% l%;)</option>
-                </select>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Input Format</label>
+                  <select
+                    value={inputFormat}
+                    onChange={(e) =>
+                      setInputFormat(
+                        e.target.value as "hex" | "rgb" | "hsl" | "oklch"
+                      )
+                    }
+                    className="w-full p-2 border rounded bg-background"
+                  >
+                    <option value="hex">HEX (e.g., #F54927 or F54927)</option>
+                    <option value="rgb">RGB (e.g., 245, 73, 39)</option>
+                    <option value="hsl">HSL (e.g., 10, 91, 56)</option>
+                    <option value="oklch">OKLCH (e.g., 0.65, 0.21, 33)</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Color Value</label>
+                  <Input
+                    type="text"
+                    value={colorInput}
+                    onChange={(e) => setColorInput(e.target.value)}
+                    placeholder={
+                      inputFormat === "hex" ? "#F54927" :
+                      inputFormat === "rgb" ? "245, 73, 39" :
+                      inputFormat === "hsl" ? "10, 91, 56" :
+                      "0.65, 0.21, 33"
+                    }
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Convert To</label>
+                  <select
+                    value={selectedFormat}
+                    onChange={(e) =>
+                      setSelectedFormat(
+                        e.target.value as "hex" | "rgb" | "rgba" | "hsl" | "hsla",
+                      )
+                    }
+                    className="w-full p-2 border rounded bg-background"
+                  >
+                    <option value="hex">HEX</option>
+                    <option value="rgb">RGB</option>
+                    <option value="rgba">RGBA</option>
+                    <option value="hsl">HSL</option>
+                    <option value="hsla">HSLA</option>
+                    <option value="custom">Custom (--primary: h s% l%;)</option>
+                  </select>
+                </div>
                 {convertedColor && (
-                  <div className="p-2 border rounded bg-background text-primary">
-                    Converted Color: <strong>{convertedColor}</strong>
+                  <div className="p-3 border rounded bg-muted">
+                    <div className="text-sm font-medium mb-1">Result:</div>
+                    <div className="font-mono text-sm break-all">{convertedColor}</div>
                   </div>
                 )}
                 <div className="flex justify-end space-x-2">
                   <Button variant="outline" onClick={handleConvert}>
                     Convert
                   </Button>
-                  <Button variant="outline" onClick={handleCopy}>
+                  <Button variant="outline" onClick={handleCopy} disabled={!convertedColor}>
                     Copy
                   </Button>
                   <Button
@@ -1170,14 +1139,52 @@ export default function ThemeGenerator() {
       >
         <DialogContent className="bg-background/60 p-4 sm:p-6 md:p-8 max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto">
           <DialogHeader>
-            <DialogTitle>Paste Theme/Hex value</DialogTitle>
+            <DialogTitle>Import Theme/Color</DialogTitle>
           </DialogHeader>
-          <textarea
-            value={pasteInput}
-            onChange={(e) => setPasteInput(e.target.value)}
-            className="w-full h-40 sm:h-48 md:h-60 border rounded p-2 text-black dark:text-white"
-            placeholder="Paste your shadcn theme or single hex/hsl color value..."
-          />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Content Type</label>
+              <select
+                value={pasteInputFormat}
+                onChange={(e) =>
+                  setPasteInputFormat(
+                    e.target.value as "auto" | "hex" | "rgb" | "hsl" | "oklch"
+                  )
+                }
+                className="w-full p-2 border rounded bg-background"
+              >
+                <option value="auto">Full CSS Theme (auto-detect colors)</option>
+                <option value="hex">Single Color - HEX (e.g., #F54927)</option>
+                <option value="rgb">Single Color - RGB (e.g., 245, 73, 39)</option>
+                <option value="hsl">Single Color - HSL (e.g., 10, 91, 56)</option>
+                <option value="oklch">Single Color - OKLCH (e.g., 0.65, 0.21, 33)</option>
+              </select>
+            </div>
+            <textarea
+              value={pasteInput}
+              onChange={(e) => setPasteInput(e.target.value)}
+              className="w-full h-40 sm:h-48 md:h-60 border rounded p-2 text-black dark:text-white"
+              placeholder={
+                pasteInputFormat === "auto" 
+                  ? "Paste your full shadcn CSS theme here...\n\nExample:\n:root {\n  --primary: 10 91% 56%;\n  --secondary: 200 98% 39%;\n}"
+                  : pasteInputFormat === "hex"
+                  ? "#F54927 or F54927"
+                  : pasteInputFormat === "rgb"
+                  ? "245, 73, 39"
+                  : pasteInputFormat === "hsl"
+                  ? "10, 91, 56"
+                  : "0.65, 0.21, 33"
+              }
+            />
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p className="font-medium">
+                {pasteInputFormat === "auto" 
+                  ? "Full Theme Mode: Paste complete CSS with :root { } and .dark { }"
+                  : "Single Color Mode: A full theme will be generated from this color"
+                }
+              </p>
+            </div>
+          </div>
           <div className="flex justify-end space-x-2 mt-4">
             <Button variant="outline" onClick={() => handlePasteTheme()}>
               Apply
