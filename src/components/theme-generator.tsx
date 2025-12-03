@@ -80,7 +80,6 @@ export default function ThemeGenerator() {
   const handleConvert = () => {
     const trimmedInput = colorInput.trim();
     
-    // Parse with the explicitly selected format 
     const parsed = parseToHSL(trimmedInput, inputFormat);
     if (!parsed) {
       toast.error(`Invalid ${inputFormat.toUpperCase()} color format. Please check your input.`);
