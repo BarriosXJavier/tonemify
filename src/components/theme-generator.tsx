@@ -80,7 +80,6 @@ export default function ThemeGenerator() {
   const handleConvert = () => {
     const trimmedInput = colorInput.trim();
     
-    // Parse with the explicitly selected format (no auto-detection)
     const parsed = parseToHSL(trimmedInput, inputFormat);
     if (!parsed) {
       toast.error(`Invalid ${inputFormat.toUpperCase()} color format. Please check your input.`);
@@ -124,9 +123,7 @@ export default function ThemeGenerator() {
     // Check for theme to apply from /saved page
     const themeToApply = localStorage.getItem("theme-to-apply");
     if (themeToApply) {
-      // Remove the flag
       localStorage.removeItem("theme-to-apply");
-      // Apply the theme
       handlePasteTheme(themeToApply);
       toast.success("Theme applied from saved collection!");
     } else {
@@ -170,7 +167,6 @@ export default function ThemeGenerator() {
       const lightSectionMatch = inputString.match(lightSectionRegex);
       const darkSectionMatch = inputString.match(darkSectionRegex);
 
-      // Check if input looks like a full CSS theme
       const isFullTheme = lightSectionMatch || darkSectionMatch;
       
       // If not a full theme AND format is "auto", that's an error
