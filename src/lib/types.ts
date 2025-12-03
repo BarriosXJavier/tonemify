@@ -14,6 +14,8 @@ export interface OKLCHConfig {
 
 export type ColorFormat = 'hsl' | 'oklch';
 
+export type ColorInputFormat = "auto" | "hex" | "rgb" | "hsl" | "oklch";
+
 export interface ThemeColors {
   [key: string]: ColorConfig;
 }

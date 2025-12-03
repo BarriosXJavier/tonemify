@@ -137,12 +137,27 @@ export const hslToRGB = ({
   return { r, g, b };
 };
 
-export function parseToHSL(color: string): {
+export type ColorInputFormat = "auto" | "hex" | "rgb" | "hsl" | "oklch";
+
+/**
+ * Parse color string to HSL with optional format hint
+ * @param color - Color string to parse
+ * @param format - Optional format hint ("auto", "hex", "rgb", "hsl", "oklch")
+ */
+export function parseToHSL(color: string, format: ColorInputFormat = "auto"): {
   hue: number;
   saturation: number;
   lightness: number;
   alpha: number;
 } | null {
+  color = color.trim();
+  
+  // Format-specific parsing when user specifies format
+  if (format !== "auto") {
+    return parseWithFormat(color, format);
+  }
+  
+  // Auto-detection (existing logic with improvements)
   const hslFunctionRegex =
     /^(?:hsl|hsla)\(\s*([\d.-]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
   const hslSpaceRegex =
@@ -150,8 +165,28 @@ export function parseToHSL(color: string): {
   const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
   const rgbFunctionRegex =
     /^(?:rgb|rgba)\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
+  const oklchFunctionRegex =
+    /^oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+%?))?\s*\)$/i;
 
   let match;
+  
+  // Try OKLCH first (most specific)
+  if ((match = color.match(oklchFunctionRegex))) {
+    const oklchConfig = {
+      l: parseFloat(match[1]) * 100,
+      c: parseFloat(match[2]),
+      h: parseFloat(match[3]),
+      alpha: match[4]
+        ? match[4].endsWith("%")
+          ? parseFloat(match[4]) / 100
+          : parseFloat(match[4])
+        : 1,
+    };
+    const result = oklchToHSL(oklchConfig);
+    return { ...result, alpha: result.alpha ?? 1 };
+  }
+  
+  // Try HSL with % signs
   if ((match = color.match(hslFunctionRegex))) {
     return {
       hue: parseFloat(match[1]),
@@ -175,7 +210,8 @@ export function parseToHSL(color: string): {
         : 1,
     };
   } else if ((match = color.match(hexRegex))) {
-    return hexToHSL(color);
+    const result = hexToHSL(color);
+    return { ...result, alpha: result.alpha ?? 1 };
   } else if ((match = color.match(rgbFunctionRegex))) {
     const r = parseFloat(match[1]);
     const g = parseFloat(match[2]);
@@ -186,8 +222,178 @@ export function parseToHSL(color: string): {
         : parseFloat(match[4])
       : 1;
     return { ...rgbToHSL(r, g, b), alpha };
-  } else {
-    return null;
+  }
+  
+  // Try comma-separated numbers (ambiguous - could be RGB, HSL, or OKLCH)
+  const commaSeparatedRegex = /^([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?$/;
+  if ((match = color.match(commaSeparatedRegex))) {
+    const v1 = parseFloat(match[1]);
+    const v2 = parseFloat(match[2]);
+    const v3 = parseFloat(match[3]);
+    const v4 = match[4] ? parseFloat(match[4]) : undefined;
+    
+    // Heuristic: If first value is 0-1 and second is also 0-1, likely OKLCH
+    if (v1 <= 1 && v2 <= 1) {
+      const oklchConfig = {
+        l: v1 * 100,
+        c: v2,
+        h: v3,
+        alpha: v4 ?? 1,
+      };
+      const result = oklchToHSL(oklchConfig);
+      return { ...result, alpha: result.alpha ?? 1 };
+    }
+    
+    // Improved heuristic for RGB vs HSL:
+    // RGB: values typically in higher ranges (e.g., 245, 73, 39)
+    // HSL: first value 0-360 (hue), second/third typically > 100 or clearly percentages
+    
+    // If second or third value is > 100, it's likely HSL (saturation/lightness as percentages)
+    if (v2 > 100 || v3 > 100) {
+      return {
+        hue: v1,
+        saturation: v2,
+        lightness: v3,
+        alpha: v4 ?? 1,
+      };
+    }
+    
+    // If first value is 0-360 AND at least one other value looks like RGB (> 100)
+    // then it's RGB. Otherwise, if all values are low (< 100), likely HSL
+    if (v1 <= 360 && (v2 <= 100 && v3 <= 100)) {
+      // All values are "low" - could be HSL or RGB
+      // Check if any value is clearly in RGB range (> 50 suggests RGB intensity)
+      // HSL percentages are typically more spread: e.g., (10, 91, 56) not (200, 150, 100)
+      const avgValue = (v1 + v2 + v3) / 3;
+      
+      // If average is low and first value looks like hue (not RGB-like), treat as HSL
+      if (v1 <= 360 && avgValue < 100) {
+        return {
+          hue: v1,
+          saturation: v2,
+          lightness: v3,
+          alpha: v4 ?? 1,
+        };
+      }
+    }
+    
+    // Default to RGB for typical RGB ranges
+    if (v1 <= 255 && v2 <= 255 && v3 <= 255) {
+      return { ...rgbToHSL(v1, v2, v3), alpha: v4 ?? 1 };
+    }
+    
+    // Fallback to HSL for anything else
+    return {
+      hue: v1,
+      saturation: v2,
+      lightness: v3,
+      alpha: v4 ?? 1,
+    };
+  }
+  
+  return null;
+}
+
+/**
+ * Parse color with explicit format
+ */
+function parseWithFormat(color: string, format: ColorInputFormat): {
+  hue: number;
+  saturation: number;
+  lightness: number;
+  alpha: number;
+} | null {
+  color = color.trim();
+  
+  switch (format) {
+    case "hex": {
+      const hexRegex = /^#?([a-fA-F0-9]{3,8})$/i;
+      if (color.match(hexRegex)) {
+        const result = hexToHSL(color);
+        return { ...result, alpha: result.alpha ?? 1 };
+      }
+      return null;
+    }
+    
+    case "rgb": {
+      // Try both function and comma-separated
+      const rgbFunctionRegex =
+        /^(?:rgb|rgba)\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
+      const commaSeparatedRegex = /^([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?$/;
+      
+      let match;
+      if ((match = color.match(rgbFunctionRegex)) || (match = color.match(commaSeparatedRegex))) {
+        const r = parseFloat(match[1]);
+        const g = parseFloat(match[2]);
+        const b = parseFloat(match[3]);
+        const alpha = match[4]
+          ? match[4].endsWith?.("%")
+            ? parseFloat(match[4]) / 100
+            : parseFloat(match[4])
+          : 1;
+        return { ...rgbToHSL(r, g, b), alpha };
+      }
+      return null;
+    }
+    
+    case "hsl": {
+      // Try function, space-separated with %, and comma-separated
+      const hslFunctionRegex =
+        /^(?:hsl|hsla)\(\s*([\d.-]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+%?))?\s*\)$/i;
+      const hslSpaceRegex =
+        /^([\d.-]+)(?:deg)?\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?$/i;
+      const commaSeparatedRegex = /^([\d.-]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?$/;
+      
+      let match;
+      if ((match = color.match(hslFunctionRegex)) || (match = color.match(hslSpaceRegex))) {
+        return {
+          hue: parseFloat(match[1]),
+          saturation: parseFloat(match[2]),
+          lightness: parseFloat(match[3]),
+          alpha: match[4]
+            ? match[4].endsWith("%")
+              ? parseFloat(match[4]) / 100
+              : parseFloat(match[4])
+            : 1,
+        };
+      } else if ((match = color.match(commaSeparatedRegex))) {
+        // Comma-separated without % signs
+        return {
+          hue: parseFloat(match[1]),
+          saturation: parseFloat(match[2]),
+          lightness: parseFloat(match[3]),
+          alpha: match[4] ? parseFloat(match[4]) : 1,
+        };
+      }
+      return null;
+    }
+    
+    case "oklch": {
+      // Try function and space/comma-separated
+      const oklchFunctionRegex =
+        /^oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+%?))?\s*\)$/i;
+      const separatedRegex = /^([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)(?:[\s,]+([\d.]+))?$/;
+      
+      let match;
+      if ((match = color.match(oklchFunctionRegex)) || (match = color.match(separatedRegex))) {
+        const oklchConfig = {
+          l: parseFloat(match[1]) * 100, // Expecting 0-1 range
+          c: parseFloat(match[2]),
+          h: parseFloat(match[3]),
+          alpha: match[4]
+            ? match[4].endsWith?.("%")
+              ? parseFloat(match[4]) / 100
+              : parseFloat(match[4])
+            : 1,
+        };
+        const result = oklchToHSL(oklchConfig);
+        return { ...result, alpha: result.alpha ?? 1 };
+      }
+      return null;
+    }
+    
+    default:
+      return null;
   }
 }
 
