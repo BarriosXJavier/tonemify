@@ -721,7 +721,7 @@ export default function ThemeGenerator() {
                   );
                   setColorsLight(generatedLight);
                   setColorsDark(generatedDark);
-                  updateCSSVariables(generatedLight);
+                  updateCSSVariables(activeMode === "light" ? generatedLight : generatedDark);
                 }
               }}
             />
