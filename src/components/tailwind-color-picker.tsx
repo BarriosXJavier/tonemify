@@ -21,7 +21,8 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
       const defaultShade = shades["500"] || shades["400"] || Object.values(shades)[0];
       onApplyColor(defaultShade);
       toast.success(`Applied ${color} as primary color!`);
-      setIsOpen(false);
+      setSelectedColor(color);
+      setCopiedColor(null);
       return;
     }
     
