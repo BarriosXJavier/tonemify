@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import { Check, Copy, X, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { tailwindColorPalette } from "@/lib/color-utils";
@@ -10,7 +10,7 @@ interface TailwindColorPickerProps {
   onApplyColor?: (hex: string) => void;
 }
 
-const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
+const TailwindColorPicker = memo(function TailwindColorPicker({ onApplyColor }: TailwindColorPickerProps) {
   const [selectedColor, setSelectedColor] = useState<Color>(null);
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -214,6 +214,6 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
       )}
     </div>
   );
-};
+});
 
 export default TailwindColorPicker;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { ColorPicker } from "@/components/color-picker";
@@ -18,7 +18,7 @@ interface ColorControlsProps {
   onHexChange: (hex: string) => void;
 }
 
-export function ColorControls({
+export const ColorControls = memo(function ColorControls({
   color,
   onChange,
   onHexChange,
@@ -204,6 +204,6 @@ export function ColorControls({
       </div>
     </div>
   );
-}
+});
 
 export default ColorControls;

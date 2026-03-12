@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import {
@@ -31,14 +31,15 @@ import { ColorConfig, ColorFormat } from "@/lib/types";
 import { generateThemeColorsFromPrimary } from "@/lib/color-utils";
 import { hexToHSL } from "@/lib/color-utils";
 import TailwindColorPicker from "./tailwind-color-picker";
-import ThemePreview from "./theme-preview";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { KeyboardShortcut, getModifierKey } from "@/lib/keyboard-shortcuts";
-import ColorHarmonyPicker from "./color-harmony-picker";
-import ThemePresetsPicker from "./theme-presets-picker";
-import ShareThemeDialog from "./share-theme-dialog";
-import AccessibilityChecker from "./accessibility-checker";
 import { getThemeFromURL } from "@/lib/url-sharing";
+
+const ThemePreview = lazy(() => import("@/components/theme-preview").then((mod) => ({ default: mod.default })));
+const ThemePresetsPicker = lazy(() => import("@/components/theme-presets-picker").then((mod) => ({ default: mod.default })));
+const ColorHarmonyPicker = lazy(() => import("@/components/color-harmony-picker").then((mod) => ({ default: mod.default })));
+const ShareThemeDialog = lazy(() => import("@/components/share-theme-dialog").then((mod) => ({ default: mod.default })));
+const AccessibilityChecker = lazy(() => import("@/components/accessibility-checker").then((mod) => ({ default: mod.default })));
 
 interface ThemeHistoryEntry {
   light: Record<string, ColorConfig>;
@@ -686,10 +687,12 @@ export default function ThemeGenerator() {
               </div>
 
               {/* Theme Presets */}
-              <ThemePresetsPicker
-                activeMode={activeMode}
-                onApplyPresetAction={actions.applyPreset}
-              />
+              <Suspense fallback={<div className="h-10 animate-pulse bg-muted rounded-md" />}>
+                <ThemePresetsPicker
+                  activeMode={activeMode}
+                  onApplyPresetAction={actions.applyPreset}
+                />
+              </Suspense>
 
               {/* Preview Button */}
               <Button
@@ -863,10 +866,12 @@ export default function ThemeGenerator() {
                 </Link>
               </Button>
 
-              <ShareThemeDialog
-                lightColors={colorsLight}
-                darkColors={colorsDark}
-              />
+              <Suspense fallback={null}>
+                <ShareThemeDialog
+                  lightColors={colorsLight}
+                  darkColors={colorsDark}
+                />
+              </Suspense>
             </div>
 
             <Button
@@ -1139,10 +1144,12 @@ export default function ThemeGenerator() {
         )}
         <div className="lg:col-span-3" id="theme-preview-section">
           <div className="sticky top-24">
-            <ThemePreview 
-              showPreview={showPreview}
-              onContinueEditing={() => setShowPreview(false)}
-            />
+            <Suspense fallback={<div className="h-96 animate-pulse bg-muted rounded-lg" />}>
+              <ThemePreview 
+                showPreview={showPreview}
+                onContinueEditing={() => setShowPreview(false)}
+              />
+            </Suspense>
           </div>
         </div>
       </div>
