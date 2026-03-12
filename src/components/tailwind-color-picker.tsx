@@ -6,7 +6,11 @@ import { Button } from "./ui/button";
 
 type Color = keyof typeof tailwindColorPalette | null;
 
-const TailwindColorPicker = () => {
+interface TailwindColorPickerProps {
+  onApplyColor?: (hex: string) => void;
+}
+
+const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
   const [selectedColor, setSelectedColor] = useState<Color>(null);
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -32,6 +36,14 @@ const TailwindColorPicker = () => {
     navigator.clipboard.writeText(colorHex);
     setCopiedColor(colorName);
     toast.success(`Copied ${colorName} to clipboard!`);
+  };
+
+  const handleApplyColor = (colorHex: string, colorName: string) => {
+    if (onApplyColor) {
+      onApplyColor(colorHex);
+      toast.success(`Applied ${colorName} as primary color!`);
+      setIsOpen(false);
+    }
   };
 
   const handleReset = () => {
@@ -134,7 +146,7 @@ const TailwindColorPicker = () => {
               data-color-section={selectedColor}
             >
               <h4 className="font-medium mb-3 ">
-                {selectedColor} shades (click a shade to copy)
+                {selectedColor} shades (click a shade to copy, hold Shift+click to apply)
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {Object.entries(tailwindColorPalette[selectedColor]).map(
@@ -146,9 +158,13 @@ const TailwindColorPicker = () => {
                           : ""
                         }`}
                       style={{ backgroundColor: hex }}
-                      onClick={() =>
-                        handleColorCopy(hex, `${selectedColor}-${shade}`)
-                      }
+                      onClick={(e) => {
+                        if (e.shiftKey && onApplyColor) {
+                          handleApplyColor(hex, `${selectedColor}-${shade}`);
+                        } else {
+                          handleColorCopy(hex, `${selectedColor}-${shade}`);
+                        }
+                      }}
                     >
                       <div className="flex flex-col items-center justify-center p-4 h-28 text-center">
                         {/* Color circle */}

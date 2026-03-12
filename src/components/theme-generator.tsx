@@ -703,7 +703,28 @@ export default function ThemeGenerator() {
               </Button>
             </div>
             {/* Tailwind Color Picker - Full Width */}
-            <TailwindColorPicker />
+            <TailwindColorPicker
+              onApplyColor={(hex) => {
+                const hsl = hexToHSL(hex);
+                if (hsl) {
+                  const generatedLight = generateThemeColorsFromPrimary(
+                    hsl.hue,
+                    hsl.saturation,
+                    hsl.lightness,
+                    false
+                  );
+                  const generatedDark = generateThemeColorsFromPrimary(
+                    hsl.hue,
+                    hsl.saturation,
+                    hsl.lightness,
+                    true
+                  );
+                  setColorsLight(generatedLight);
+                  setColorsDark(generatedDark);
+                  updateCSSVariables(generatedLight);
+                }
+              }}
+            />
 
             <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-2">
               <Button
