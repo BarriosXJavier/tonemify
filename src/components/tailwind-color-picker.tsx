@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Check, Copy, X } from "lucide-react";
+import { Check, Copy, X, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { tailwindColorPalette } from "@/lib/color-utils";
 import { Button } from "./ui/button";
@@ -14,6 +14,7 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
   const [selectedColor, setSelectedColor] = useState<Color>(null);
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleColorSelect = (color: keyof typeof tailwindColorPalette) => {
     if (onApplyColor && tailwindColorPalette[color]) {
@@ -23,23 +24,13 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
       toast.success(`Applied ${color} as primary color!`);
       setSelectedColor(color);
       setCopiedColor(null);
+      setIsFocused(true);
       return;
     }
     
     setSelectedColor(color);
     setCopiedColor(null);
-
-    setTimeout(() => {
-      const selectedColorSection = document.querySelector(
-        `[data-color-section="${color}"]`,
-      );
-      if (selectedColorSection) {
-        selectedColorSection.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }, 100);
+    setIsFocused(true);
   };
 
   const handleColorCopy = (colorHex: string, colorName: string) => {
@@ -58,6 +49,7 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
   const handleReset = () => {
     setSelectedColor(null);
     setCopiedColor(null);
+    setIsFocused(false);
   };
 
   const toggleDropdown = () => {
@@ -65,6 +57,12 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
       handleReset();
     }
     setIsOpen(!isOpen);
+  };
+
+  const handleBack = () => {
+    setIsFocused(false);
+    setSelectedColor(null);
+    setCopiedColor(null);
   };
 
   return (
@@ -75,17 +73,31 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
         className="w-full h-12 px-4 text-left flex items-center justify-center gap-2"
         title="Select from Tailwind Color Palettes"
       >
-        {selectedColor
+        {selectedColor && !isOpen
           ? `${selectedColor}`
-          : "Pick from tailwind palettes"}
+          : isOpen && isFocused
+            ? `${selectedColor} shades`
+            : "Pick from tailwind palettes"}
       </Button>
 
       {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
           <div className="flex items-center justify-between p-3 border-b border-border">
-            <span className="font-medium text-foreground">
-              Tailwind Color Palette
-            </span>
+            <div className="flex items-center gap-2">
+              {isFocused && (
+                <Button
+                  onClick={handleBack}
+                  variant="ghost"
+                  size="sm"
+                  className="p-1 h-8 w-8"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+              )}
+              <span className="font-medium text-foreground">
+                {isFocused ? `${selectedColor} shades` : "Tailwind Color Palette"}
+              </span>
+            </div>
             <div className="flex items-center gap-2">
               <Button
                 onClick={toggleDropdown}
@@ -96,67 +108,66 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
             </div>
           </div>
 
-          {/* Color Selection Grid */}
-          <div className="p-3">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {Object.entries(tailwindColorPalette).map(
-                ([colorName, shades]) => (
-                  <div
-                    key={colorName}
-                    onClick={() =>
-                      handleColorSelect(
-                        colorName as keyof typeof tailwindColorPalette,
-                      )
-                    }
-                    className={`cursor-pointer p-3 rounded-lg border-2 transition-all hover:border-primary ${selectedColor === colorName
-                        ? "border-primary bg-primary/10"
-                        : "border-border hover:bg-accent"
-                      }`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      {/* Color preview circles */}
-                      <div className="flex -space-x-2">
-                        {Object.entries(shades)
-                          .slice(0, 3)
-                          .map(([shade, hex]) => (
+          {/* Color Selection Grid - Show when not focused */}
+          {!isFocused && (
+            <div className="p-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {Object.entries(tailwindColorPalette).map(
+                  ([colorName, shades]) => (
+                    <div
+                      key={colorName}
+                      onClick={() =>
+                        handleColorSelect(
+                          colorName as keyof typeof tailwindColorPalette,
+                        )
+                      }
+                      className={`cursor-pointer p-3 rounded-lg border-2 transition-all hover:border-primary ${selectedColor === colorName
+                          ? "border-primary bg-primary/10"
+                          : "border-border hover:bg-accent"
+                        }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        {/* Color preview circles */}
+                        <div className="flex -space-x-2">
+                          {Object.entries(shades)
+                            .slice(0, 3)
+                            .map(([shade, hex]) => (
+                              <div
+                                key={shade}
+                                className="w-8 h-8 rounded-full border-2 border-border shadow-sm"
+                                style={{ backgroundColor: hex }}
+                              />
+                            ))}
+                          {Object.keys(shades).length > 3 && (
                             <div
-                              key={shade}
-                              className="w-8 h-8 rounded-full border-2 border-border shadow-sm"
-                              style={{ backgroundColor: hex }}
-                            />
-                          ))}
-                        {Object.keys(shades).length > 3 && (
-                          <div
-                            className="w-8 h-8 rounded-full border-2 border-border shadow-sm flex items-center justify-center"
-                            style={{
-                              backgroundColor: Object.values(shades)[3],
-                            }}
-                          >
-                            <span className="text-sm font-bold text-foreground mix-blend-difference">
-                              +
-                            </span>
-                          </div>
-                        )}
+                              className="w-8 h-8 rounded-full border-2 border-border shadow-sm flex items-center justify-center"
+                              style={{
+                                backgroundColor: Object.values(shades)[3],
+                              }}
+                            >
+                              <span className="text-sm font-bold text-foreground mix-blend-difference">
+                                +
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
+                      <span className="text-sm font-medium capitalize">
+                        {colorName}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium capitalize">
-                      {colorName}
-                    </span>
-                  </div>
-                ),
-              )}
+                  ),
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Selected Color Shades */}
-          {selectedColor && (
-            <div
-              className="border-t border-gray-200 p-3"
-              data-color-section={selectedColor}
-            >
-              <h4 className="font-medium mb-3 ">
-                {selectedColor} shades (click a shade to apply)
-              </h4>
+          {/* Selected Color Shades - Show when focused */}
+          {isFocused && selectedColor && (
+            <div className="p-3">
+              <p className="text-sm text-muted-foreground mb-3">
+                Click a shade to apply as primary color
+              </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {Object.entries(tailwindColorPalette[selectedColor]).map(
                   ([shade, hex]) => (
