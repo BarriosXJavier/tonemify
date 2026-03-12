@@ -109,8 +109,6 @@ body {
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -118,4 +116,28 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border/40 rounded-full hover:bg-border/60;
+}
+
+/* Selection styling */
+::selection {
+  @apply bg-primary/20 text-foreground;
 }

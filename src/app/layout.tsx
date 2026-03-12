@@ -7,6 +7,7 @@ import { Montserrat } from "next/font/google";
 import Footer from "@/components/footer";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { AnimatedBackground } from "@/components/animated-background";
 
 const montserrat = Montserrat({
   weight: ["300", "400", "500", "700"],
@@ -27,13 +28,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning={true} className="antialiased">
-      <body className={`${montserrat.className} bg-background min-h-screen flex flex-col`}>
+      <body className={`${montserrat.className} bg-background min-h-screen flex flex-col relative`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
+          <AnimatedBackground />
           <Navbar />
           <main className="flex-1">
             {children}
