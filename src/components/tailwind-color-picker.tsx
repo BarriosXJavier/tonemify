@@ -16,6 +16,15 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleColorSelect = (color: keyof typeof tailwindColorPalette) => {
+    if (onApplyColor && tailwindColorPalette[color]) {
+      const shades = tailwindColorPalette[color];
+      const defaultShade = shades["500"] || shades["400"] || Object.values(shades)[0];
+      onApplyColor(defaultShade);
+      toast.success(`Applied ${color} as primary color!`);
+      setIsOpen(false);
+      return;
+    }
+    
     setSelectedColor(color);
     setCopiedColor(null);
 
@@ -33,17 +42,16 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
   };
 
   const handleColorCopy = (colorHex: string, colorName: string) => {
-    navigator.clipboard.writeText(colorHex);
-    setCopiedColor(colorName);
-    toast.success(`Copied ${colorName} to clipboard!`);
-  };
-
-  const handleApplyColor = (colorHex: string, colorName: string) => {
     if (onApplyColor) {
       onApplyColor(colorHex);
       toast.success(`Applied ${colorName} as primary color!`);
       setIsOpen(false);
+      return;
     }
+    
+    navigator.clipboard.writeText(colorHex);
+    setCopiedColor(colorName);
+    toast.success(`Copied ${colorName} to clipboard!`);
   };
 
   const handleReset = () => {
@@ -146,7 +154,7 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
               data-color-section={selectedColor}
             >
               <h4 className="font-medium mb-3 ">
-                {selectedColor} shades (click a shade to copy, hold Shift+click to apply)
+                {selectedColor} shades (click a shade to apply)
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {Object.entries(tailwindColorPalette[selectedColor]).map(
@@ -158,12 +166,8 @@ const TailwindColorPicker = ({ onApplyColor }: TailwindColorPickerProps) => {
                           : ""
                         }`}
                       style={{ backgroundColor: hex }}
-                      onClick={(e) => {
-                        if (e.shiftKey && onApplyColor) {
-                          handleApplyColor(hex, `${selectedColor}-${shade}`);
-                        } else {
-                          handleColorCopy(hex, `${selectedColor}-${shade}`);
-                        }
+                      onClick={() => {
+                        handleColorCopy(hex, `${selectedColor}-${shade}`);
                       }}
                     >
                       <div className="flex flex-col items-center justify-center p-4 h-28 text-center">
